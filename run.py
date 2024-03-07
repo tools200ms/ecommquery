@@ -1,15 +1,16 @@
 
-from prestapyt import PrestaShopWebService
-from ecommquery import IniConfig
+
+from ecommquery import *
 
 from var_dump import var_dump
 
-config = IniConfig( 'fs24-test.ini' ).load()
+inegr = Integrations( 'fs24-test.ini' ).load()
 
-print(config.memo)
-#prestashop = PrestaShopWebService('https://test.foodieshop24.pl/api', '6PMBR6LGUHL19KBQYMK8RNVU45ZK1C1Q', verbose=True)
+inegr.list()
 
-#v = prestashop.search('addresses', options={'limit': 10})
+ps_srv = inegr.getService()
 
-#var_dump(v);
+v = ps_srv.search('addresses', options={'limit': 10})
+
+var_dump(v);
 

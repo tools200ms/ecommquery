@@ -18,6 +18,8 @@ report/
 
 # Compiled Python bytecode
 *.py[cod]
+# python .venv fo virtual environment
+.venv/
 
 # Log files
 *.log

@@ -18,7 +18,7 @@ def read( path ):
             raise ECQParserError( 'Missing Heading [ecommquery] section' )
 
         memo = ini_parser.get(sect[0], 'memo')
-        config = Config(memo)
+        config = GlobalConfig(memo)
 
         for s in sect[1:] :
             match s:

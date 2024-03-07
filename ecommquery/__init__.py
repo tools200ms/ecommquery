@@ -1,3 +1,2 @@
 
-
-from .ecommquery import IniConfig
+from .ecommquery import Integrations
