@@ -30,10 +30,7 @@ class IniLoader(Loader):
                 if ep_class == None:
                     raise LoaderParserError('Unknown endpoint \'' + '\'')
 
-                ep = ep_class.factory(
-                    {  'url': self.__ini_parser.get(ep_type, 'url'),
-                       'api_secret_key': self.__ini_parser.get(ep_type, 'api_secret_key') } )
-
+                ep = ep_class.factory( self.__ini_parser[ep_type] )
                 config.addEndpoint( ep )
 
         except configparser.MissingSectionHeaderError as miss_sect_head_err:
