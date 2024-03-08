@@ -3,8 +3,11 @@
 from ecommquery import *
 
 from var_dump import var_dump
+loader = IniLoader('fs24-PROD.ini')
 
-inegr = Integrations( 'fs24-test.ini' ).load()
+inegr = Integrations()
+
+inegr.addLoaderAndRead(loader)
 
 inegr.list()
 

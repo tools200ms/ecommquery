@@ -1,34 +1,45 @@
-
-from . import ini_config
-
 # integrations source
 class Integrations:
-    def __init__( self, file_path ):
-        self.file_path = file_path
+    class LoadedConf:
+        def __init__(self, loader, conf):
+            self.loader = loader
+            self.conf = conf
+    def __init__( self ):
+        self.__inte = []
 
-    def load(self):
-        self.config = ini_config.read( self.file_path )
+    def addLoaderAndRead(self, loader):
+        self.__inte.append(Integrations.LoadedConf(loader, loader.readConfig()))
 
         return self
 
-    def save(self):
-        pass
 
     def list(self):
-        if self.config == None:
-            print( "No configuration has been loaded" )
+        if len(self.__inte) == 0:
+            print( "No integrations has been loaded" )
             return
 
-        for inte in self.config.integrations():
-            print('Id # %s' % ( inte.id() ) )
-            print('%sname: %s' % ( 4 * ' ', inte.endPoint() ) )
-            print('%shost: %s' % ( 4 * ' ', inte.info() ) )
+        for inte in self.__inte:
+            loader_info = inte.loader.getInfo()
+            print( ' ' + loader_info + ' (' + ')' )
+
+            for e in inte.conf.endpoints():
+                print(' Id # %s' % ( e.id() ) )
+                print(' %sname: %s' % ( 4 * ' ', e.name() ) )
+                print(' %shost: %s' % ( 4 * ' ', e.info() ) )
+
+            print( ' ' + (len(loader_info) * '=') )
 
 
-    def getService(self, id = None):
-        if id == None and len( self.config.configs ) == 1:
-            index = 0
-        elif id == None:
-            raise Exception( 'Multiple services, specify which one to provide' )
+    def getService(self, c_id = 0, e_id = None):
+        if e_id == None:
+            e_no = self.__inte[c_id].conf.endpointNo()
+            if e_no == 1:
+                ep = self.__inte[c_id].conf.endpoint()
+            elif e_no == 0:
+                raise Exception('Empty Endpoint configuration')
+            else:
+                raise Exception('Multiple endpoints, specify which one to use')
+        else:
+            ep = self.__inte[c_id].conf.endpoint(e_id)
 
-        return self.config.configs[index].getService()
+        return ep.getService()
