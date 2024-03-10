@@ -10,10 +10,7 @@ class Integrations:
     def addLoaderAndRead(self, loader):
         self.__inte.append(Integrations.LoadedConf(loader, loader.readConfig()))
 
-        return self
-
-
-    def list(self):
+    def print(self):
         if len(self.__inte) == 0:
             print( "No integrations has been loaded" )
             return
@@ -43,10 +40,3 @@ class Integrations:
             ep = self.__inte[c_id].conf.endpoint(e_id)
 
         return ep.getService()
-
-    def uploadImage(self, srv, file_name, p_id):
-        fd = open('data/' + file_name, "rb")
-        content = fd.read()
-        fd.close()
-
-        srv.add('/images/products/' + str(p_id), files=[('image', file_name, content)])

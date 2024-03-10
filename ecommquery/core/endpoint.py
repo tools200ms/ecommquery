@@ -1,25 +1,21 @@
 from abc import abstractmethod
 
-endpointtypes = {}
 
 class Endpoint:
+    __endpointtypes = {}
     _id = 0
 
     @staticmethod
     def register(type, ep_class):
-        global endpointtypes
-        if endpointtypes == None:
-            endpointtypes = {}
-
-        endpointtypes[type] = ep_class;
+        Endpoint.__endpointtypes[type] = ep_class;
 
     @staticmethod
     def getClass(type):
-        global endpointtypes
-        if not type in endpointtypes:
+        #global endpointtypes
+        if not type in Endpoint.__endpointtypes:
             raise Exception('Endpoint of \'' + type + '\' has not been defined')
 
-        return endpointtypes[type]
+        return Endpoint.__endpointtypes[type]
 
     @staticmethod
     @abstractmethod

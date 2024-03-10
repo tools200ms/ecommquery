@@ -1,7 +1,7 @@
 import configparser
 
-from ecommquery.loader import Loader, LoaderParserError
-from ecommquery.endpoint import Endpoint
+from ecommquery.core.loader import Loader, LoaderParserError
+from ecommquery.core.endpoint import Endpoint
 
 class IniLoader(Loader):
     def __init__(self, path = 'integrations.ini'):

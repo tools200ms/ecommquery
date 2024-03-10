@@ -1,6 +1,6 @@
-from prestapyt import PrestaShopWebServiceDict
+from ecommquery.ext.prestashop.core.service_ps import PSService
 
-from ecommquery.endpoint import Endpoint
+from ecommquery.core.endpoint import Endpoint
 
 class EndpointPS(Endpoint):
 
@@ -18,6 +18,8 @@ class EndpointPS(Endpoint):
         self.url = url
         self.key = key
 
+        self.ps_srv = None
+
     def name(self):
         return "PrestaShop"
 
@@ -28,7 +30,10 @@ class EndpointPS(Endpoint):
         return info
 
     def getService(self):
-        return PrestaShopWebServiceDict( self.url, self.key, verbose=False )
+        if self.ps_srv == None:
+            self.ps_srv = PSService( self.url, self.key, verbose=False )
+
+        return self.ps_srv
 
 #Endpoint.endpointtypes = {'presta_api': EndpointPS}
 Endpoint.register('presta_api', EndpointPS)
