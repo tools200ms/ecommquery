@@ -40,3 +40,7 @@ class Integrations:
             ep = self.__inte[c_id].conf.endpoint(e_id)
 
         return ep.getService()
+
+class ECommDef:
+    class Unset:
+        pass
