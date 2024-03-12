@@ -6,8 +6,8 @@ class Endpoint:
     _id = 0
 
     @staticmethod
-    def register(type, ep_class):
-        Endpoint.__endpointtypes[type] = ep_class;
+    def register(ep_class):
+        Endpoint.__endpointtypes[ep_class.reg_name()] = ep_class;
 
     @staticmethod
     def getClass(type):
@@ -20,6 +20,11 @@ class Endpoint:
     @staticmethod
     @abstractmethod
     def factory( params ):
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def reg_name():
         pass
 
     def __init__(self, ep_set, memo = None):
@@ -37,6 +42,9 @@ class Endpoint:
 
     @abstractmethod
     def name(self):
+        pass
+
+    def shortname(self):
         pass
 
     @abstractmethod

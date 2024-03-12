@@ -1,9 +1,9 @@
 from ecommquery.core.service import Service
-from ecommquery.ext.prestashop.lib.ps_product import PSProduct
+from ecommquery.ext.prestashop_api.lib.ps_product import PSProduct
 from prestapyt import PrestaShopWebServiceDict
 
 
-class PSService(Service, PrestaShopWebServiceDict):
+class ServicePS(Service, PrestaShopWebServiceDict):
     def getProductList(self, criteria = None):
         if criteria != None:
             res = self.search('products', options = criteria)

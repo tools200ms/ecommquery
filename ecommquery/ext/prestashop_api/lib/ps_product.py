@@ -21,6 +21,9 @@ class PSProduct(Product):
         # self._short_description = HTMLDescription.Generator().newDescription()
         # self._short_description = ...
 
+    def getRaw(self):
+        return self.__raw
+
     def getItemNo(self):
         return self._item_no
 
@@ -139,9 +142,6 @@ class PSProduct(Product):
 
         if img_id == ECommDef.Unset:
             return self.unSetDefImage()
-
-    def getRaw(self):
-        return self.__raw
 
     def prepareToCommit(self):
         if 'position_in_category' in self.__raw_prod_buf:

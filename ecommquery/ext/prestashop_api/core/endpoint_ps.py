@@ -1,8 +1,14 @@
-from ecommquery.ext.prestashop.core.service_ps import PSService
+import validators
+
+from ecommquery.ext.prestashop_api.core.service_ps import ServicePS
 
 from ecommquery.core.endpoint import Endpoint
 
 class EndpointPS(Endpoint):
+
+    @staticmethod
+    def reg_name():
+        return 'presta_api'
 
     @staticmethod
     def factory(params):
@@ -15,13 +21,18 @@ class EndpointPS(Endpoint):
 
     def __init__(self, url, key, memo = None):
         super().__init__( memo )
-        self.url = url
+
+        if validators.url( url ):
+            self.url = url
+        else:
+            raise Exception('Invalid url')
+
         self.key = key
 
         self.ps_srv = None
 
     def name(self):
-        return "PrestaShop"
+        return "PrestaShop API"
 
     def info(self):
         info = self.url
@@ -31,9 +42,9 @@ class EndpointPS(Endpoint):
 
     def getService(self):
         if self.ps_srv == None:
-            self.ps_srv = PSService( self.url, self.key, verbose=False )
+            self.ps_srv = ServicePS( self.url, self.key, verbose=False )
 
         return self.ps_srv
 
 #Endpoint.endpointtypes = {'presta_api': EndpointPS}
-Endpoint.register('presta_api', EndpointPS)
+Endpoint.register(EndpointPS)

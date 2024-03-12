@@ -10,28 +10,36 @@ inegr.addLoaderAndRead( IniLoader('fs24-PROD.ini') )
 
 inegr.print()
 
-ps = inegr.getService()
+ps = inegr.getService( 0, 'presta_api' )
 
-prod = ps.getProduct('1184')
+wps = inegr.getService( 0, 'wp_scrap' )
+prod_s = wps.getProduct('')
 
-print(prod.name())
+
+s_prod_name = prod_s.name()
+s_prod_descr = prod_s.description()
+
+prod_t = ps.getProduct( '1192' )
+
+prod_t.name(s_prod_name)
+prod_t.description('<p>' + s_prod_descr + '</p>' + prod_t.description() )
 
 # v = ps.search('addresses', options={'limit': 10})
 
-pprint( prod.images() )
-pprint( prod.defImage() )
-pprint( prod.getRaw()['product']['id_default_image'] )
+#pprint( prod.images() )
+#pprint( prod.defImage() )
+#pprint( prod.getRaw()['product']['id_default_image'] )
 
 
-prod.rmImage('4630')
-prod.rmImage('4629')
-prod.rmImage('4631')
-prod.rmImage('4632')
+#prod.rmImage('4630')
+#prod.rmImage('4629')
+#prod.rmImage('4631')
+#prod.rmImage('4632')
 
-print('RAW2:')
-pprint( prod.images() )
-pprint( prod.defImage() )
-pprint(prod.getRaw()['product']['id_default_image'])
+#print('RAW2:')
+#pprint( prod.images() )
+#pprint( prod.defImage() )
+#pprint( prod.getRaw()['product']['id_default_image'] )
 
-# ps.commitProduct(prod)
+ps.commitProduct(prod_t)
 # ps.uploadImage('3-1.png', prod)
