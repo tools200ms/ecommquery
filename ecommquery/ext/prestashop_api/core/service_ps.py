@@ -16,8 +16,10 @@ class ServicePS(Service, PrestaShopWebServiceDict):
         return PSProduct(self.get('products', item_no))
 
     def commitProduct(self, prod):
-        prod.prepareToCommit()
-        self.edit('products', prod.getRaw())
+        changes = prod.prepareToCommit()
+        if changes != False:
+            self.edit('products', prod.getRaw())
+        # if there has been no changes don't attempt to call API
 
     def uploadImage(self, file_name, prod):
         fd = open('data/' + file_name, "rb")

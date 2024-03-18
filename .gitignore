@@ -3,6 +3,10 @@
 # Learn more about .gitignore:
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
+# Confidential
+tasks/
+confs/
+
 # Data & dump directory
 data/
 dump/

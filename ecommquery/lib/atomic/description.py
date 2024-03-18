@@ -1,6 +1,7 @@
+from ecommquery.lib.atomic.atomic import Atomic
 
-class SimpleDescription:
-    class Generator:
+class SimpleDescription (Atomic):
+    class Translations:
         def __init__(self, langs = None):
             self.langs = langs
 
@@ -8,6 +9,8 @@ class SimpleDescription:
             return SimpleDescription(self.langs)
 
     def __init__(self, langs = None):
+        super().__init__()
+
         if langs == None or len(langs) == 0:
             self._text = None
             self._def_lang = False
@@ -28,16 +31,21 @@ class SimpleDescription:
 
         # I'm getter:
         if text == None:
-
             if lang == False:
                 return self._text
             else:
                 return self._text[self._def_lang]
 
-        # I'm setter:
+        # I'm a setter:
         if self._def_lang == False:
+            if self._text != None:
+                self.markChange()
+
             self._text = text
         else:
+            if self._text[lang] != None:
+                self.markChange()
+
             self._text[lang] = text
 
     def getText(self):
@@ -46,7 +54,7 @@ class SimpleDescription:
     def validate(self):
         pass
 class HTMLDescription (SimpleDescription):
-    class Generator(SimpleDescription.Generator):
+    class Translations( SimpleDescription.Translations ):
         def __init__(self, sterilization = True, langs = None):
             super().__init__(langs)
 

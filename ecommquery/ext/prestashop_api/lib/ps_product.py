@@ -1,4 +1,5 @@
 from ecommquery.ecommquery import ECommDef
+from ecommquery.ext.prestashop_api.lib.atomic.ps_number import PSNumber
 from ecommquery.lib.atomic.description import SimpleDescription, HTMLDescription
 from ecommquery.lib.product import Product
 
@@ -11,12 +12,18 @@ class PSProduct(Product):
 
         self.__raw_prod_buf = raw['product']
 
-        self._item_no = raw['product']['id']
-        self._name = SimpleDescription.Generator().newDescription()
-        self._name.text( raw['product']['name']['language']['value'] )
+        self._item_no = self.__raw_prod_buf['id']
+        self._name = SimpleDescription.Translations().newDescription()
+        self._name.text( self.__raw_prod_buf['name']['language']['value'] )
 
-        self._description = HTMLDescription.Generator().newDescription()
-        self._description.text( raw['product']['description']['language']['value'] )
+        self._sdescr = HTMLDescription.Translations().newDescription()
+        self._sdescr.text(self.__raw_prod_buf['description_short']['language']['value'])
+
+        self._descr = HTMLDescription.Translations().newDescription()
+        self._descr.text( self.__raw_prod_buf['description']['language']['value'] )
+
+        self._weight = PSNumber()
+        self._weight.rawValue( self.__raw_prod_buf['weight'] );
 
         # self._short_description = HTMLDescription.Generator().newDescription()
         # self._short_description = ...
@@ -27,12 +34,23 @@ class PSProduct(Product):
     def getItemNo(self):
         return self._item_no
 
+    # Return product's name, if name is empty, empty string is '
+    # returned
     def name( self, value = None, lang = None ):
         return self._name.text( value, lang )
 
-    def description( self, value = None, lang = None ):
-        return self._description.text( value, lang )
+    # Return String with short description, string might be an HTML code
+    # if short desription is empty, an empty string is returned
+    def sdescr( self, value = None, lang = None ):
+        return self._sdescr.text( value, lang )
 
+    # Return String with description, string might be an HTML code
+    # if desription is empty, an rmpty string is returned
+    def descr( self, value = None, lang = None ):
+        return self._descr.text( value, lang )
+
+    def weight(self, weight = None):
+        return self._weight.value(weight)
 
     def __getImgIdArr(self):
         if 'associations' not in self.__raw_prod_buf or 'images' not in self.__raw_prod_buf['associations']:
@@ -153,6 +171,23 @@ class PSProduct(Product):
         if 'quantity' in self.__raw_prod_buf:
             del self.__raw_prod_buf['quantity']
 
-        self.__raw_prod_buf['name']['language']['value'] = self.name()
-        self.__raw_prod_buf['description']['language']['value'] = self.description()
+
+        changes = []
+        if self._name.hasChanged():
+            changes.append(self._name.text)
+            self.__raw_prod_buf['name']['language']['value'] = self._name.text()
+
+        if self._sdescr.hasChanged():
+            changes.append(self._sdescr.text)
+            self.__raw_prod_buf['description_short']['language']['value'] = self._sdescr.text()
+
+        if self._descr.hasChanged():
+            changes.append(self._descr.text)
+            self.__raw_prod_buf['description']['language']['value'] = self._descr.text()
+
+        if self._weight.hasChanged():
+            changes.append(self._weight.rawValue)
+            self.__raw_prod_buf['weight'] = self._weight.rawValue()
+
+        return len(changes) != 0
 
