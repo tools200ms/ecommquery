@@ -23,7 +23,7 @@ class EndpointScrapWP(Endpoint):
         super().__init__(memo)
 
         if validators.url(url):
-            self.url = url
+            self._url = url
         else:
             raise Exception('Invalid url')
 
@@ -33,7 +33,14 @@ class EndpointScrapWP(Endpoint):
         return "WordPress - scrapping"
 
     def info(self):
-        return self.url
+        return self._url
+
+    def match(self, pattern: str) -> bool:
+        if self._memo != None:
+            if self._memo.find(pattern) != -1:
+                return True
+
+        return self._url.find(pattern) != -1
 
     def getService(self):
         if self.__srv == None:

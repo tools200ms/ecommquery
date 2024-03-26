@@ -28,7 +28,7 @@ class Endpoint:
         pass
 
     def __init__(self, ep_set, memo = None):
-        self.memo = memo
+        self._memo = memo
 
         self._id = Endpoint._id
         Endpoint._id += 1
@@ -45,6 +45,10 @@ class Endpoint:
         pass
 
     def shortname(self):
+        pass
+
+    @abstractmethod
+    def match(self, pattern: str) -> bool:
         pass
 
     @abstractmethod

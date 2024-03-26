@@ -23,28 +23,35 @@ class EndpointPS(Endpoint):
         super().__init__( memo )
 
         if validators.url( url ):
-            self.url = url
+            self._url = url
         else:
             raise Exception('Invalid url')
 
-        self.key = key
+        self.__key = key
 
-        self.ps_srv = None
+        self._ps_srv = None
 
     def name(self):
         return "PrestaShop API"
 
+    def match(self, pattern: str) -> bool:
+        if self._memo != None:
+            if self._memo.find(pattern) != -1:
+                return True
+
+        return self._url.find(pattern) != -1
+
     def info(self):
-        info = self.url
-        if self.memo != None: info += "\n" + self.memo
+        info = self._url
+        if self._memo != None: info += "\n" + self._memo
 
         return info
 
     def getService(self):
-        if self.ps_srv == None:
-            self.ps_srv = ServicePS( self.url, self.key, verbose=False )
+        if self._ps_srv == None:
+            self._ps_srv = ServicePS( self._url, self.__key, verbose = False )
 
-        return self.ps_srv
+        return self._ps_srv
 
 #Endpoint.endpointtypes = {'presta_api': EndpointPS}
 Endpoint.register(EndpointPS)
