@@ -23,6 +23,9 @@ prod_t = ps.getProduct( '1192' )
 prod_t.name(s_prod_name)
 prod_t.description('<p>' + s_prod_descr + '</p>' + prod_t.description() )
 
+
+# validators bs4
+
 # v = ps.search('addresses', options={'limit': 10})
 
 #pprint( prod.images() )
