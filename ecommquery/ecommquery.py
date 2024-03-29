@@ -72,7 +72,7 @@ class Integrations:
         if conf_id not in self.__inte:
             raise CallError('Conf.Id has not been found: ' + conf_id)
 
-        ep = self.__inte[conf_id].conf.endpoint(endpoint)
+        ep = self.__inte[conf_id].conf.endpoint(id = ep_id, pattern = endpoint)
 
         return ep.getService()
 
