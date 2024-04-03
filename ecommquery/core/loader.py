@@ -32,7 +32,8 @@ class Loader:
                 if id in self.__ep_dict:
                     ep = self.__ep_dict[id]
                 else:
-                    raise Loader.CallError('No endpoint with given Id has been found')
+                    raise CallError(f"No endpoint with given Id has been found: {id}")
+
             elif pattern != None:
                 for ep_i in self.__ep_dict.values():
                     if ep_i.match(pattern):

@@ -7,7 +7,8 @@ class Integrations:
         def __init__(self, loader, conf):
             self.loader = loader
             self.conf = conf
-    def __init__( self ):
+
+    def __init__(self):
         self.__inte = {}
 
     def addLoaderAndRead(self, loader):
@@ -58,10 +59,13 @@ class Integrations:
         elif conf_id == None: # search for endpoint
             for inet in self.__inte.values():
                 ep_match = inet.conf.endpoint(id = ep_id, pattern = endpoint)
-                if ep_match != None and ep == None:
-                    ep = ep_match
-                elif ep_match != None:
+                if ep_match == None:
+                    continue
+
+                if ep != None:
                     raise CallError('Ambiguous endpoint references')
+
+                ep = ep_match
 
             if ep == None:
                 raise CallError('No endpoint has been found')
@@ -70,9 +74,12 @@ class Integrations:
 
         # pick endpoint
         if conf_id not in self.__inte:
-            raise CallError('Conf.Id has not been found: ' + conf_id)
+            raise CallError(f"Conf.Id has not been found: {conf_id}")
 
         ep = self.__inte[conf_id].conf.endpoint(id = ep_id, pattern = endpoint)
+
+        if ep == None:
+            raise CallError('No endpoint has been found')
 
         return ep.getService()
 

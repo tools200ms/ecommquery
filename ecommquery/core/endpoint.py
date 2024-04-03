@@ -1,7 +1,14 @@
 from abc import abstractmethod
 
+from ecommquery.exceptions import DataformatError, CallError
+
 
 class Endpoint:
+    class Constr:
+        def __init__(self, name, validator):
+            self.name = name
+            self.validator = validator
+
     __endpointtypes = {}
     _id = 0
 
@@ -19,19 +26,41 @@ class Endpoint:
 
     @staticmethod
     @abstractmethod
-    def factory( params ):
+    def reg_name() -> str:
         pass
 
     @staticmethod
     @abstractmethod
-    def reg_name():
+    def name():
         pass
 
-    def __init__(self, ep_set, memo = None):
-        self._memo = memo
+    def __init__(self, attr_list : {}, params : {}):
+        comm_attr_list = {'memo': Endpoint.Constr('_memo', None)}
 
-        self._id = Endpoint._id
+        all_attr_list = comm_attr_list | attr_list
+        used = {}
+
+        for name, value in params.items():
+            if name not in all_attr_list:
+                raise DataformatError(f"Parameter {name} not supported, endpoint: {self.reg_name()}")
+
+            if name in used:
+                raise DataformatError(f"Parameter {name} already used, endpoint: {self.reg_name()}")
+
+            setattr(self, all_attr_list[name].name, value)
+            used[name] = 1
+
+        # Set none for attributes that has been not mentioned in configuration
+        for name, attr in all_attr_list.items():
+            if name in used:
+                continue
+            # TODO: check if is it obligatory?
+            setattr(self, attr.name, None)
+
+        self._id = str(Endpoint._id) + "" + self.reg_name()
         Endpoint._id += 1
+        self._srv = None
+        self.__attr_list = all_attr_list
 
     def id(self):
         return self._id
@@ -40,24 +69,43 @@ class Endpoint:
     def identificator(self):
         pass
 
-    @abstractmethod
-    def name(self):
-        pass
-
     def shortname(self):
         pass
 
-    @abstractmethod
     def match(self, pattern: str) -> bool:
-        pass
+        if len(pattern) < 3:
+            raise CallError(f"Patter must be at leas 3 character long, but found: {pattern}")
 
+        if pattern == self.reg_name():
+            return True
+
+        pattern = pattern.lower()
+
+        if self.name().lower().find(pattern) != -1:
+            return True
+
+        for name, value in self.__attr_list.items():
+            attr = getattr(self, value.name)
+            if attr == None:
+                continue
+
+            if attr.lower().find(pattern) != -1:
+                return True
+
+        return False
     @abstractmethod
     def info(self):
         pass
 
     @abstractmethod
-    def getService(self):
+    def _getService(self):
         pass
+
+    def getService(self):
+        if self._srv == None:
+            self._srv = self._getService()
+
+        return self._srv
 
     def add(self, ep):
         self.__ep.append(ep)

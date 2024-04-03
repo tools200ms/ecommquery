@@ -10,3 +10,5 @@ from .ext.prestashop_api.lib import *
 from .ext.wordpress_scrap.core.endpointscrap_wp import EndpointScrapWP
 from .ext.wordpress_scrap.core import *
 from .ext.wordpress_scrap.lib import *
+
+#from .assistant.openai

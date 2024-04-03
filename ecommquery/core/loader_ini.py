@@ -1,6 +1,7 @@
 import os.path
 import configparser
 
+from ecommquery import EndpointPS
 from ecommquery.core.endpoint import Endpoint
 from ecommquery.core.loader import Loader
 from ecommquery.exceptions import DataformatError
@@ -11,7 +12,8 @@ class IniLoader(Loader):
         super().__init__()
         self.__path = path;
         self.__ini_parser = configparser.ConfigParser()
-        self.__ini_parser.read(path)
+        with open(path) as f:
+            self.__ini_parser.read_file(f)
 
     def getInfo(self):
         return 'INI file: ' + self.__path;
@@ -41,14 +43,15 @@ class IniLoader(Loader):
             config = Loader.Config(memo, name)
 
             for ep_type in sect[1:]:
-
                 ep_class = Endpoint.getClass(ep_type)
 
                 if ep_class == None:
-                    raise DataformatError('Unknown endpoint \'' + '\'')
+                    raise DataformatError(f"Unknown endpoint '{ep_type}'")
 
-                ep = ep_class.factory( self.__ini_parser[ep_type] )
-                config.addEndpoint( ep )
+                res = self.__ini_parser[ep_type]
+                ep = ep_class(res)
+                    #.factory(self.__ini_parser[ep_type])
+                config.addEndpoint(ep)
 
         except configparser.MissingSectionHeaderError as miss_sect_head_err:
             raise DataformatError('Missing section header')

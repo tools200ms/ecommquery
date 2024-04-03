@@ -10,42 +10,18 @@ class EndpointScrapWP(Endpoint):
     def reg_name():
         return 'wp_scrap'
 
+    def __init__(self, params : {}):
+        super().__init__({'url': Endpoint.Constr('_url', None)},
+                         params)
+
     @staticmethod
-    def factory(params):
-        if 'memo' in params:
-            memo = params['param']
-        else:
-            memo = None
-
-        return EndpointScrapWP(params['url'], memo)
-
-    def __init__(self, url, memo):
-        super().__init__(memo)
-
-        if validators.url(url):
-            self._url = url
-        else:
-            raise Exception('Invalid url')
-
-        self.__srv = None
-
-    def name(self):
+    def name():
         return "WordPress - scrapping"
 
     def info(self):
         return self._url
 
-    def match(self, pattern: str) -> bool:
-        if self._memo != None:
-            if self._memo.find(pattern) != -1:
-                return True
-
-        return self._url.find(pattern) != -1
-
-    def getService(self):
-        if self.__srv == None:
-            self.__srv = ServiceWPScrap( self.url, verbose=False )
-
-        return self.__srv
+    def _getService(self):
+        return ServiceWPScrap(self._url, verbose=False)
 
 Endpoint.register(EndpointScrapWP)
