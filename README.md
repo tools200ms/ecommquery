@@ -116,3 +116,4 @@ def do_stuff(inegr):
 * [PrestaShop 1.7 API](https://devdocs.prestashop-project.org/1.7/webservice/)
 * [PrestaShop 8 API](https://devdocs.prestashop-project.org/8/webservice/)
 * [Docker container with Prestashop tuned for development environment](https://hub.docker.com/r/200ms/prestashop_dev2)
+* [OpenAI API reference](https://platform.openai.com/docs/api-reference)
