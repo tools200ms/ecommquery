@@ -18,6 +18,8 @@ report/
 
 # Configuration files
 *.ini
+!example.ini
+
 *.env
 
 # Compiled Python bytecode

@@ -1,13 +1,14 @@
 from abc import abstractmethod
 
+from ecommquery.core.validators import Validator
 from ecommquery.exceptions import DataformatError, CallError
 
 
 class Endpoint:
     class Constr:
-        def __init__(self, name, validator):
+        def __init__(self, name, validator, default = None):
             self.name = name
-            self.validator = validator
+            self.validate = validator
 
     __endpointtypes = {}
     _id = 0
@@ -35,7 +36,7 @@ class Endpoint:
         pass
 
     def __init__(self, attr_list : {}, params : {}):
-        comm_attr_list = {'memo': Endpoint.Constr('_memo', None)}
+        comm_attr_list = {'memo': Endpoint.Constr('_memo', Validator.text)}
 
         all_attr_list = comm_attr_list | attr_list
         used = {}
@@ -46,6 +47,9 @@ class Endpoint:
 
             if name in used:
                 raise DataformatError(f"Parameter {name} already used, endpoint: {self.reg_name()}")
+
+            if all_attr_list[name].validate(value) == False:
+                raise DataformatError(f"Illegal value of '{name}' parameter, endpoint: {self.reg_name()}")
 
             setattr(self, all_attr_list[name].name, value)
             used[name] = 1

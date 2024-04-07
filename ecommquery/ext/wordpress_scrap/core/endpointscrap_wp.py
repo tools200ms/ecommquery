@@ -11,7 +11,7 @@ class EndpointScrapWP(Endpoint):
         return 'wp_scrap'
 
     def __init__(self, params : {}):
-        super().__init__({'url': Endpoint.Constr('_url', None)},
+        super().__init__({'url': Endpoint.Constr('_url', validators.url)},
                          params)
 
     @staticmethod

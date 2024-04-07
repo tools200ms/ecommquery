@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
 
-class Service:
+class ManagementService:
 
     @abstractmethod
     def getProductList(self, criteria = None):
@@ -9,4 +9,7 @@ class Service:
 
     @abstractmethod
     def getProduct(self, item_no):
+        pass
+
+    def commitUpdates(self):
         pass

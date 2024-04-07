@@ -2,11 +2,11 @@ import requests
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
-from ecommquery.core.service import Service
+from ecommquery.core.service_management import ManagementService
 from ecommquery.ext.wordpress_scrap.lib.wps_product import WPSProduct
 
 
-class ServiceWPScrap(Service):
+class ServiceWPScrap(ManagementService):
 
     def __init__(self, url, verbose=False):
         self.url = url
