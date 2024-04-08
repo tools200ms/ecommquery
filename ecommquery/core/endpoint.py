@@ -1,14 +1,26 @@
 from abc import abstractmethod
 
-from ecommquery.core.validators import Validator
+from ecommquery.core.validators import Validator, ParamValidator
 from ecommquery.exceptions import DataformatError, CallError
 
 
 class Endpoint:
     class Constr:
-        def __init__(self, name, validator, default = None):
+        def __init__(self, name, validator, obligatory: bool = True):
             self.name = name
-            self.validate = validator
+
+            if isinstance(validator, ParamValidator):
+                self.validate = validator.validate
+                self.getDefaultValue = validator.getDefaultValue
+            else:
+                self.validate = validator
+                self.getDefaultValue = ParamValidator.getNone
+
+
+            self.__obligatory = obligatory
+
+        def isObligatory(self):
+            return self.__obligatory
 
     __endpointtypes = {}
     _id = 0
@@ -36,7 +48,7 @@ class Endpoint:
         pass
 
     def __init__(self, attr_list : {}, params : {}):
-        comm_attr_list = {'memo': Endpoint.Constr('_memo', Validator.text)}
+        comm_attr_list = {'memo': Endpoint.Constr('_memo', Validator.text, False)}
 
         all_attr_list = comm_attr_list | attr_list
         used = {}
@@ -58,8 +70,13 @@ class Endpoint:
         for name, attr in all_attr_list.items():
             if name in used:
                 continue
-            # TODO: check if is it obligatory?
-            setattr(self, attr.name, None)
+
+            def_value = attr.getDefaultValue()
+
+            if attr.isObligatory() and def_value == None:
+                raise CallError(f"'{name}' is obligatory but value is missing, endpoint: {self.reg_name()}")
+
+            setattr(self, attr.name, def_value)
 
         self._id = str(Endpoint._id) + "" + self.reg_name()
         Endpoint._id += 1

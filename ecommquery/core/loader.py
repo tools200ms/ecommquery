@@ -22,29 +22,30 @@ class Loader:
             if len(self.__ep_dict) == 0:
                 raise Loader.CallError('Empty Endpoint set')
 
+            ep_dict_search = None
             ep = None
 
-            if id == None and len(self.__ep_dict) == 1:
-                ep = list(self.__ep_dict.values())[0]
-            elif id == None and pattern == None:
-                raise CallError('Multiple endpoint elements but no Id has been provided')
-            elif id != None:
+            if id == None:
+                ep_dict_search = self.__ep_dict
+            else:
                 if id in self.__ep_dict:
-                    ep = self.__ep_dict[id]
+                    ep_dict_search[id] = self.__ep_dict[id]
                 else:
                     raise CallError(f"No endpoint with given Id has been found: {id}")
 
-            elif pattern != None:
-                for ep_i in self.__ep_dict.values():
+            if pattern != None:
+                for ep_i in ep_dict_search.values():
                     if ep_i.match(pattern):
                         if ep == None:
                             ep = ep_i
                         else:
                             raise CallError('Multiple matches for Endpoint')
-                # ep can be None if no patter mach has been found
+            elif len(ep_dict_search) == 1:
+                ep = list(ep_dict_search.values())[0]
             else:
-                raise CallError('Wrong data type, endpoint can be indicated by name, partial name or Id')
+                raise CallError('Multiple endpoint elements but no Id nor unque pattern has been provided')
 
+            # ep is of a None type if no endpoint has been found/mached
             return ep
 
         def endpoints(self):

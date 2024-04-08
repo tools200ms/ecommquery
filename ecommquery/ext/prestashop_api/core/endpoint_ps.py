@@ -23,7 +23,7 @@ class EndpointPS(Endpoint):
                             # characters (assuming that UPPER case characters are curently used)
                             # this code sould handle change without updates.
                             # Exact validation is made by library that talks to API
-                            RegExValidator('[a-zA-Z0-9|\-|\_]{16,96}').validator)},
+                            RegExValidator('[a-zA-Z0-9|\-|\_]{16,96}'))},
                         params)
 
     def info(self):
