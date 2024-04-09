@@ -18,18 +18,27 @@ class ServiceChatGPT(AnalyticalService):
 
         self.__tomens_used = 0
 
-    def descr(self, text):
-        msg = "Can you determine categories and attributes that fits to the following product description that is in a Polish language?: \n\n" + \
-                text + "\n\nAim to generate multiple categories, avoid details regarding product ingredients. Return an answer in JSON format with results in Polish language"
+    def product_prompt(self, text):
+        return "Can you determine categories and attributes that fits to the following product description that is in a Polish language?: \n\n" + \
+                text + \
+                "\n\nAim to find multiple categories, avoid details regarding product ingredients, nutritions and origin. \n" + \
+                "Try to assign generic names for categories. \n" + \
+                "Return also product speciffic attributes. \n" + \
+                "Categories and sub-categories should be outputed as an array of strings sorted by relevance (most relevant as first), this array should be under 'kategorie' key. \n" + \
+                "Number of categories should be between one and three. \n" + \
+                "JSON keys should start by capital letter, followed by lowercase characters, values can't be objects, only arrays and strings are allowed. \n" + \
+                "Format output in JSON, provide results in Polish language."
 
+    def descr(self, text):
         try:
             response = self.__client.chat.completions.create(
                 model= self.__model_name,
                 messages=[
                     { "role": "assistant",
-                      "content": msg },
+                      "content": self.product_prompt(text) },
                 ],
-                max_tokens = 150  # Maximum number of tokens to generate in the completion
+                stream = False,
+                max_tokens = 1080  # Maximum number of tokens to generate in the completion
             )
 
         except openai.RateLimitError as rl_err:
@@ -46,6 +55,7 @@ class ServiceChatGPT(AnalyticalService):
                     {"role": "assistant",
                      "content": "Say Hello in Polish. Provide JSON answer."},
                 ],
+                stream = False,
                 max_tokens = 50  # Maximum number of tokens to generate in the completion
             )
 
@@ -56,25 +66,16 @@ class ServiceChatGPT(AnalyticalService):
 
     def _process_answer(self, response):
         chooses_list = []
+        j = None
+
         for ch in response.choices:
-            #self.__tomens_used += ch.total_tokens
-            pprint(ch)
-            # chooses_list.append(json.loads(ch.message.content))
-            chooses_list.append(ch.message.content)
+            j = json.loads(ch.message.content)
+            chooses_list.append(j)
 
         return chooses_list
 
     def getTotalTokensUsed(self):
         return self.__tomens_used
-
-        #stream = client.chat.completions.create(
-        #    model="gpt-4",
-        #    messages=[{"role": "user", "content": "Say this is a test"}],
-        #    stream=True,
-        #)
-        #for chunk in stream:
-        #    if chunk.choices[0].delta.content is not None:
-        #        print(chunk.choices[0].delta.content, end="")
 
     def close(self):
         if not self.__client.is_closed():
