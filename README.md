@@ -1,6 +1,27 @@
 # EcommQuery
-Python e-commerce integration software.
 
+Python e-commerce integration framework. This project has been 
+developed to handle automation tasks for eCommerce. 
+
+Key element of this framework are endpoints that belong to one of the classes: 
+- Data source
+- AI assistant
+
+EcomQuery operates on: 
+- product data (name, description) and metadata (weight, codes)
+- and product related data (categories, brands) and its metadata (category index)
+
+`Data source` is an end that allows on product and product related data access. 
+One of the data sources is PrestaShop API. 
+`AI assistant` is an AI component ussed to extract or complement data brought from 
+data source. One of implemented AI assistants is OpenAI's ChatGPT.
+
+User of eCommQuery framework defines tasks. Task comunicates with eCommerce and AI 
+(if configured so) via endpoints. The task can perform a certain job such as 
+adding a new products, or improving meta description quality (wich AI).
+
+All texts (Product names, product descriptions) are language aware. Meaning that 
+text is complemented by the information about its language.
 
 ## Loading configurations
 
@@ -110,6 +131,43 @@ def do_stuff(inegr):
     # commit changes (update product at the store)
     ps.commitProduct(the_prod)
 ```
+
+# Implementation status
+
+Data source for Product: 
+
+ Function        | PrestaShop API |Web scrap
+-----------------|---------|---
+ *Product data* | |
+ name            | [x]     |[x]
+ short description ||
+ description ||
+ price ||
+ available stock ||
+ *codes* ||
+ EAN ||
+ MPN (manufacturer part number)||
+ Id (ecommerce platform specific code) ||
+ *shipping data* ||
+ weight ||
+ dimmensions ||
+
+
+Data source for Categories:
+
+ Function        | PrestaShop API | Web scrap
+-----------------|---------|---
+name| |
+description | |
+
+
+Data source for Brands:
+
+ Function        | PrestaShop API | Web scrap
+-----------------|---------|---
+name | |
+description | |
+
 
 # References
 
