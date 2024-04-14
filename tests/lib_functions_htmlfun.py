@@ -74,13 +74,6 @@ class TestHTMLfun(unittest.TestCase):
         #res, stat = HTMLfun.cut_head(input3b, ['i'], 'Header')
         #self.assertEqual(expected32, res)
 
-    def test_cut_head_file1(self):
-        f_in = open("../tests/files/descr-4754.txt", 'r')
-
-        intr_txt = "Zotter to jeden z pięciu najlepszych czekoladników świata. Jako jeden z niewielu wytwarza swoje tabliczki ręcznie, w technologii Bean-to-Bar (od ziarna kakao do tabliczki czekolady). Jako jedyny z tej piątki ma wszystkie składniki BIO i FairTrade. W ten sposób Zotter stawia się w opozycji wobec standardowej, masowej produkcji czekolady i zunitaryzowania czekoladowego przemysłu. Te kultowe czekolady przeznaczone są dla osób o otwartych, nieszablonowych umysłach, które potrafią docenić to co w życiu najlepsze. Bogata i zróżnicowana oferta czekolad Zotter jest odzwierciedleniem różnorodności natury, choć nadal jest to jedynie niewielki wycinek tego, czym jest arcybogaty smak i aromat ziarna kakaowca."
-
-        res, stat = HTMLfun.cut_head(f_in.read(), ['b'], intr_txt)
-        f_in.close()
 
 if __name__ == '__main__':
     unittest.main()

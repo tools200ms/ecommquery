@@ -1,5 +1,10 @@
+import os
 import re
+
+from pathlib import Path
 from abc import abstractmethod
+
+from ecommquery.exceptions import LocalResourceAccessError, CallError
 
 
 class Validator:
@@ -45,4 +50,22 @@ class RegExValidator (ParamValidator):
 
     def validate(self, str):
         return self.__re.match(str)
+
+class PathValidator(ParamValidator):
+    def __init__(self, def_path: str):
+        if not self.validate(def_path):
+            raise CallError(f"Illegal path name: {def_path}")
+
+        self.__def_path = def_path
+
+    def validate(self, path):
+        try:
+            Path(path).resolve()
+        except (OSError, RuntimeError):
+            return False
+
+        return len(path) < 1024
+
+    def getDefaultValue(self):
+        return self.__def_path
 

@@ -1,0 +1,7 @@
+[ecommquery]
+memo = "AI endpoint"
+
+[chatgpt]
+memo = ai-query
+key = test-0000000000000
+queries = ./aiquery/

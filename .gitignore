@@ -6,6 +6,7 @@
 # Confidential
 tasks/
 confs/
+aiquery/
 
 # Data & dump directory
 data/

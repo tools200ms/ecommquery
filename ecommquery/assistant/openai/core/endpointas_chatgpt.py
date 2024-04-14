@@ -1,6 +1,7 @@
 from ecommquery import Endpoint
+from ecommquery.assistant.lib.query_loader import QueryLoader
 from ecommquery.assistant.openai.core.service_chatgpt import ServiceChatGPT
-from ecommquery.core.validators import RegExValidator, ListValidator
+from ecommquery.core.validators import RegExValidator, ListValidator, PathValidator
 
 
 class EndpointAsOpenAI(Endpoint):
@@ -23,7 +24,8 @@ class EndpointAsOpenAI(Endpoint):
                                         # characters (assuming that UPPER case characters are curently used)
                                         # this code sould handle change without updates.
                                         # Exact validation is made by library that talks to API
-                                        RegExValidator('[a-zA-Z0-9|\-|\_]{16,96}'))
+                                        RegExValidator('[a-zA-Z0-9|\-|\_]{16,96}')),
+                           'queries': Endpoint.Constr('_queries_path', PathValidator('queries'))
                                     },
                          params )
 
@@ -31,6 +33,8 @@ class EndpointAsOpenAI(Endpoint):
         return "Model version: " + self._version
 
     def _getService(self):
+        queries = QueryLoader(self._queries_path)
+
         return ServiceChatGPT(self._key, self._version)
 
 Endpoint.register(EndpointAsOpenAI)

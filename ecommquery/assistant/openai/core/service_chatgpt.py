@@ -19,15 +19,10 @@ class ServiceChatGPT(AnalyticalService):
         self.__tomens_used = 0
 
     def product_prompt(self, text):
-        return "Can you determine categories and attributes that fits to the following product description that is in a Polish language?: \n\n" + \
-                text + \
-                "\n\nAim to find multiple categories, avoid details regarding product ingredients, nutritions and origin. \n" + \
-                "Try to assign generic names for categories. \n" + \
-                "Return also product speciffic attributes. \n" + \
-                "Categories and sub-categories should be outputed as an array of strings sorted by relevance (most relevant as first), this array should be under 'kategorie' key. \n" + \
-                "Number of categories should be between one and three. \n" + \
-                "JSON keys should start by capital letter, followed by lowercase characters, values can't be objects, only arrays and strings are allowed. \n" + \
-                "Format output in JSON, provide results in Polish language."
+        return ""
+
+    def prompt(self, scopes, function):
+        pass
 
     def descr(self, text):
         try:
