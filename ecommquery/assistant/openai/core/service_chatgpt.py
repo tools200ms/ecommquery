@@ -10,19 +10,22 @@ from ecommquery.exceptions import CallError
 
 
 class ServiceChatGPT(AnalyticalService):
-    def __init__(self, key: str, model_name: str, verbose: bool = False):
+    def __init__(self, key: str, model_name: str, queries, verbose: bool = False):
         self.__verbose = verbose
 
         self.__client = OpenAI(api_key = key)
         self.__model_name = model_name
 
         self.__tomens_used = 0
+        self.__queries = queries
 
     def product_prompt(self, text):
         return ""
 
-    def prompt(self, scopes, function):
-        pass
+    def query(self, name, params : [] = []):
+        q_text = self.__queries[name].getQueryText()
+
+        print(q_text)
 
     def descr(self, text):
         try:

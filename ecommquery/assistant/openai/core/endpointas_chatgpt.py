@@ -33,8 +33,8 @@ class EndpointAsOpenAI(Endpoint):
         return "Model version: " + self._version
 
     def _getService(self):
-        queries = QueryLoader(self._queries_path)
+        q_loader = QueryLoader(self._queries_path)
 
-        return ServiceChatGPT(self._key, self._version)
+        return ServiceChatGPT(self._key, self._version, q_loader.getQueries())
 
 Endpoint.register(EndpointAsOpenAI)

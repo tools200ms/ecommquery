@@ -14,5 +14,6 @@ class TestTask(unittest.TestCase):
         inegr.print()
         gpt = inegr.getService(endpoint="chatgpt")
 
+        gpt.query('summary')
 
         self.assertEqual('0', '0')
