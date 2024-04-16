@@ -74,6 +74,12 @@ class TestHTMLfun(unittest.TestCase):
         #res, stat = HTMLfun.cut_head(input3b, ['i'], 'Header')
         #self.assertEqual(expected32, res)
 
+    def test_cut_h1(self):
+        input = "<p><h1>Header</h1> and <h2>sub-header</h2> ... </p>"
+        expected = "<p><h2>Header</h2> and <h3>sub-header</h3> ... </p>"
+
+        ret, stat = HTMLfun.sanitize(input, start_hlevel = 2)
+        self.assertEqual(expected, ret)
 
 if __name__ == '__main__':
     unittest.main()

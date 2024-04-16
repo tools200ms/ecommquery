@@ -1,12 +1,16 @@
 from bs4 import BeautifulSoup
 
+from ecommquery.lib.atomic.description import HTMLDescription
+
+
 # String operations:
 class HTMLfun:
-    __allowed_tags = ['p', 'b', 'i', 'strong', 'em', 'u',
-                      'table', 'tbody', 'th', 'tr', 'td',
-                      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                      'ul', 'ol', 'li',
-                      'br']
+    __header_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+    __style_tags = ['b', 'i', 'strong', 'em', 'u']
+    __table_tags = ['table', 'tbody', 'th', 'tr', 'td']
+    __list_tags = ['ul', 'ol', 'li']
+
+    __allowed_tags = ['p'] + __header_tags + __style_tags + __table_tags + __list_tags + ['br']
 
     class Stat:
         def __init__(self, orgi_text_len: int):
@@ -24,7 +28,6 @@ class HTMLfun:
             return HTMLfun.Stat(len(text))
 
         def feedTagMod(self, tag_name: str):
-
             if tag_name in self.tags_cut:
                 self.tags_cut[tag_name] += 1
             else:
@@ -36,12 +39,18 @@ class HTMLfun:
 
             return self
         def cut_ratio(self):
-            return self.sani_text_len / self.orgi_text_len
+            if self.orgi_text_len == 0:
+                return 0
 
-    def sanitize(html: str, purge_classes: bool = False, purge_style: bool = False) -> str:
+            return 100 * (1 - (self.sani_text_len / self.orgi_text_len))
+
+    @staticmethod
+    def sanitize(html: str, purge_classes: bool = False, purge_style: bool = False, start_hlevel: int = None) -> str:
         # Parse the HTML content
         soup = BeautifulSoup(html, 'html.parser')
         stat = HTMLfun.Stat.openFeed(html)
+
+        trans_hlevel_vector = {}
 
         # Find all tags in the HTML content
         for tag in soup.find_all(True):
@@ -57,8 +66,32 @@ class HTMLfun:
             if purge_style and 'style' in tag.attrs:
                 del tag.attrs['style']
 
+            if start_hlevel != None and tag.name in HTMLfun.__header_tags:
+                if (int)(tag.name[1]) < start_hlevel:
+                    trans_hlevel_vector[tag.name] = 'h' + (str)(start_hlevel)
+                    tag.name = 'h' + (str)(start_hlevel)
+                elif len(trans_hlevel_vector) != 0:
+                    if tag.name not in trans_hlevel_vector:
+                        l_h = list(trans_hlevel_vector.keys())[-1]
+                        n_h = trans_hlevel_vector[l_h]
+                        trans_hlevel_vector[tag.name] = 'h' + (str)((int)(n_h[1]) + 1)
+
+                    tag.name = trans_hlevel_vector[tag.name]
+
+
+
         output_str = str(soup).strip()
         return output_str, stat.closeFeed(output_str)
+
+    @staticmethod
+    def sanitize_descr(html_descr: HTMLDescription, lang = None):
+        html_text = html_descr.text(lang=lang)
+
+        html_text_out, stat = HTMLfun.sanitize(html_text, start_hlevel = 2)
+
+        html_descr.text(text = html_text_out, lang = lang)
+
+        return stat
 
     # prototype function
     # begin

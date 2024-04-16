@@ -31,24 +31,6 @@ class PSProduct(Product):
     def getRaw(self):
         return self.__raw
 
-    def getItemNo(self):
-        return self._item_no
-
-    # Return product's name, if name is empty, empty string is '
-    # returned
-    def name( self, value = None, lang = None ):
-        return self._name.text( value, lang )
-
-    # Return String with short description, string might be an HTML code
-    # if short desription is empty, an empty string is returned
-    def sdescr( self, value = None, lang = None ):
-        return self._sdescr.text( value, lang )
-
-    # Return String with description, string might be an HTML code
-    # if desription is empty, an rmpty string is returned
-    def descr( self, value = None, lang = None ):
-        return self._descr.text( value, lang )
-
     def weight(self, weight = None):
         return self._weight.value(weight)
 

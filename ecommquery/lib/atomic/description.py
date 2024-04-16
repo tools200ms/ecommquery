@@ -25,7 +25,7 @@ class SimpleDescription (Atomic):
     def setDefLang(self, lang):
         self._def_lang = lang
 
-    def text(self, text = None, lang = None):
+    def text(self, text: str = None, lang = None) -> str:
         if lang == None:
             lang = self._def_lang
 

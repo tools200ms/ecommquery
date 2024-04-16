@@ -7,6 +7,7 @@ from openai import OpenAI
 
 from ecommquery.core.service_analytical import AnalyticalService
 from ecommquery.exceptions import CallError
+from ecommquery.lib.product import Product
 
 
 class ServiceChatGPT(AnalyticalService):
@@ -25,7 +26,7 @@ class ServiceChatGPT(AnalyticalService):
     def query(self, name, params : [] = []):
         q_text = self.__queries[name].getQueryText()
 
-        print(q_text)
+        print(q_text.format(product = (Product)(params[0])))
 
     def descr(self, text):
         try:

@@ -1,9 +1,10 @@
 import importlib
+import re
 
 
 class Query:
     def __init__(self, name: str):
-        if not name.isalnum():
+        if not re.match(r'^\w{1,256}$', name):
             raise SyntaxError(f"Incorrect query name: {name}\nexpected '@<alphanumeric name>'")
 
         self._name = name
