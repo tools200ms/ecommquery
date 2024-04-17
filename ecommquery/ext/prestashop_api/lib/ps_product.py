@@ -5,6 +5,8 @@ from ecommquery.lib.product import Product
 
 class PSProduct(Product):
     def __init__(self, raw):
+        super().__init__()
+
         self.__raw = raw
 
         if 'product' not in raw:
@@ -30,6 +32,10 @@ class PSProduct(Product):
 
     def getRaw(self):
         return self.__raw
+
+    @property
+    def test(self) -> str:
+        return "TEST"
 
     def weight(self, weight = None):
         return self._weight.value(weight)

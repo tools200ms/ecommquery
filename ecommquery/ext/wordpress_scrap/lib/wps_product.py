@@ -5,6 +5,8 @@ from ecommquery.lib.product import Product
 class WPSProduct(Product):
 
     def __init__(self, soup):
+        super().__init__()
+
         self.__raw = soup
 
         self._name = SimpleDescription.Generator().newDescription()

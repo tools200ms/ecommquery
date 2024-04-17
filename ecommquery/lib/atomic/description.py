@@ -48,7 +48,7 @@ class SimpleDescription (Atomic):
 
             self._text[lang] = text
 
-    def getText(self):
+    def getText(self) -> str:
         return self.text()
 
     def validate(self):

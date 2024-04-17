@@ -23,10 +23,10 @@ class ServiceChatGPT(AnalyticalService):
     def product_prompt(self, text):
         return ""
 
-    def query(self, name, params : [] = []):
-        q_text = self.__queries[name].getQueryText()
+    def query(self, name, params : []):
+        q = self.__queries[name]
 
-        print(q_text.format(product = (Product)(params[0])))
+        return q.compileQueryText(params)
 
     def descr(self, text):
         try:

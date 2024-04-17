@@ -1,6 +1,8 @@
 import importlib
 import re
 
+from ecommquery.exceptions import CallError
+
 
 class Query:
     def __init__(self, name: str):
@@ -48,5 +50,21 @@ class Query:
     def getName(self):
         return self._name
 
-    def getQueryText(self):
+    def getQueryText(self) -> str:
         return self._text
+
+    def compileQueryText(self, values: []) -> str:
+        args = {}
+        if len(self._params) != len(values):
+            raise CallError(f"Incorrect argument number, expecting {len(self._params)}")
+
+        for idx, param in enumerate(self._params):
+            val = values[idx]
+            if not isinstance(val, param):
+                raise CallError(f"Expecting {param.__name__}, got {val.__name__}")
+
+            p_name = param.__name__.lower()
+
+            args[p_name] = val
+
+        return self._text.format(**args)
