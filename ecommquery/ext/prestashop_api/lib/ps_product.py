@@ -33,10 +33,6 @@ class PSProduct(Product):
     def getRaw(self):
         return self.__raw
 
-    @property
-    def test(self) -> str:
-        return "TEST"
-
     def weight(self, weight = None):
         return self._weight.value(weight)
 

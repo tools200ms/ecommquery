@@ -1,5 +1,9 @@
 from abc import abstractmethod
 
+from ecommquery.lib.atomic.description import HTMLDescription, SimpleDescription
+from ecommquery.lib.functions.html import HTMLfun
+
+
 class Product:
 
     def __init__(self):
@@ -17,10 +21,8 @@ class Product:
 
     lang = property(get_lang, set_lang)
 
-    # Return product's name, if name is empty, empty string is '
-    # returned
-    def name_variant(self, lang, value = None) -> str:
-        return self._name.text(value, lang)
+    def getName(self) -> SimpleDescription:
+        return self._name
 
     def get_name(self) -> str:
         return self._name.text(None, self._def_lang_code)
@@ -30,10 +32,8 @@ class Product:
 
     name = property(get_name, set_name)
 
-    # Return String with short description, string might be an HTML code
-    # if short desription is empty, an empty string is returned
-    def sdescr_variant(self, lang, value=None) -> str:
-        return self._sdescr.text(value, lang)
+    def getSDescr(self) -> HTMLDescription:
+        return self._sdescr
 
     def get_sdescr(self):
         return self._sdescr.text(None, self._def_lang_code)
@@ -43,10 +43,8 @@ class Product:
 
     sdescr = property(get_sdescr, set_sdescr)
 
-    # Return String with description, string might be an HTML code
-    # if desription is empty, an rmpty string is returned
-    def descr_variant(self, lang, value=None) -> str:
-        return self._descr.text(value, lang)
+    def getDescr(self) -> HTMLDescription:
+        return self._descr
 
     def get_descr(self):
         return self._descr.text(None, self._def_lang_code)
@@ -71,3 +69,38 @@ class Product:
     @property
     def cdescr(self):
         return self.cdescr_variant(self._def_lang_code)
+
+class PlainTextProduct(Product):
+    def __init__(self, prod):
+        self.prod = prod
+
+    def get_name(self) -> str:
+        return self.prod.get_name()
+
+    name = property(get_name)
+
+    def get_sdescr(self):
+        return HTMLfun.getStripedText(self.prod.get_sdescr())
+
+    sdescr = property(get_sdescr)
+
+    def get_descr(self):
+        return HTMLfun.getStripedText(self.prod.get_descr())
+
+    descr = property(get_descr)
+
+    def cdescr_variant(self) -> str:
+        # HTMLDescription
+        sdesc = self.sdescr
+        desc = self.descr
+
+        if len(sdesc) != 0 and len(desc) != 0:
+            sep = '\n\n'
+        else:
+            sep = ''
+
+        return sdesc + sep + desc
+
+    @property
+    def cdescr(self):
+        return self.cdescr_variant()

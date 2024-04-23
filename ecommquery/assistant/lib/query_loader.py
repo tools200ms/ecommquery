@@ -65,8 +65,11 @@ class QueryLoader:
                         if len(line) != 0:
                             query_text += line
 
-                        query.addQuery(query_text)
-                        query.ready(self.__queries)
+                        if len(query_text) != 0:
+                            query.addQuery(query_text)
+                            query.ready(self.__queries)
+                        else:
+                            print(f"Warning: empty query {query.getName()}, line: {line_no}")
 
                         query = None
                         query_text = None
@@ -90,6 +93,7 @@ class QueryLoader:
                     elif line.startswith('@'): # parse for instruction
 
                         query = Query.factory(self.__queries, line)
+                        query_text = ''
                         state = QueryLoader.State.QUERY
                     else:
                         raise DataformatError(f"Unexpected syntax")

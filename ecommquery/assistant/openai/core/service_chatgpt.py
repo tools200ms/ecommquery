@@ -23,18 +23,22 @@ class ServiceChatGPT(AnalyticalService):
     def product_prompt(self, text):
         return ""
 
-    def query(self, name, params : []):
+    def getPromptText(self, name, params : []):
         q = self.__queries[name]
 
         return q.compileQueryText(params)
 
-    def descr(self, text):
+    def sendQuery(self, name, params : []):
+        q = self.__queries[name]
+
+        prompt = q.compileQueryText(params)
+
         try:
             response = self.__client.chat.completions.create(
                 model= self.__model_name,
                 messages=[
                     { "role": "assistant",
-                      "content": self.product_prompt(text) },
+                      "content": prompt },
                 ],
                 stream = False,
                 max_tokens = 1080  # Maximum number of tokens to generate in the completion
@@ -68,8 +72,12 @@ class ServiceChatGPT(AnalyticalService):
         j = None
 
         for ch in response.choices:
-            j = json.loads(ch.message.content)
-            chooses_list.append(j)
+            try:
+                j = json.loads(ch.message.content)
+                chooses_list.append(j)
+            except json.decoder.JSONDecodeError:
+                print("JSON decoder exception")
+                pprint(ch)
 
         return chooses_list
 

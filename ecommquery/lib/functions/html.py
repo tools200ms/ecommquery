@@ -83,8 +83,9 @@ class HTMLfun:
         output_str = str(soup).strip()
         return output_str, stat.closeFeed(output_str)
 
+
     @staticmethod
-    def sanitize_descr(html_descr: HTMLDescription, lang = None):
+    def sanitize_html(html_descr: HTMLDescription, lang = None):
         html_text = html_descr.text(lang=lang)
 
         html_text_out, stat = HTMLfun.sanitize(html_text, start_hlevel = 2)
@@ -92,6 +93,12 @@ class HTMLfun:
         html_descr.text(text = html_text_out, lang = lang)
 
         return stat
+
+    @staticmethod
+    def getStripedText(html) -> str:
+        soup = BeautifulSoup(html, 'html.parser')
+        return soup.get_text()
+        #transf = {'p': '\n\n', 'br': '\n', 'hr': '-' * 64, 'li': ' - '}
 
     # prototype function
     # begin
