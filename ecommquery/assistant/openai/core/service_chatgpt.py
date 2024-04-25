@@ -77,7 +77,7 @@ class ServiceChatGPT(AnalyticalService):
                 chooses_list.append(j)
             except json.decoder.JSONDecodeError:
                 print("JSON decoder exception")
-                pprint(ch)
+                pprint(ch.message.content)
 
         return chooses_list
 

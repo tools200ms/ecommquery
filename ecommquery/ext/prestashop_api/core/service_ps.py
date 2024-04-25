@@ -4,6 +4,9 @@ from prestapyt import PrestaShopWebServiceDict
 
 
 class ServicePS(ManagementService, PrestaShopWebServiceDict):
+
+    # example criteria filtering:
+    # criteria = {'filter[id_category_default]': '269'}
     def getProductList(self, criteria = None):
         if criteria != None:
             res = self.search('products', options = criteria)

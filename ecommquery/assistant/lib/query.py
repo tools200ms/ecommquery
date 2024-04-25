@@ -1,5 +1,6 @@
 import importlib
 import re
+import types
 
 from ecommquery.exceptions import CallError
 
@@ -31,11 +32,15 @@ class Query:
         if not param_name.isalpha() and len(param_name) < 64:
             raise SyntaxError("Illegal parameter name")
 
-        module = importlib.import_module('ecommquery.lib.' + param_name)
+        if param_name == 'simplenamespace':
+            p_class = types.SimpleNamespace
+        else:
+            # get ecommquery.lib. module to find class:
+            module = importlib.import_module('ecommquery.lib.' + param_name)
 
-        p_class = getattr(module, param_name.capitalize(), None)
-        if not p_class:
-            return False
+            p_class = getattr(module, param_name.capitalize(), None)
+            if not p_class:
+                return False
 
         self._params.append(p_class)
 

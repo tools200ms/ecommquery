@@ -3,22 +3,24 @@
 Python e-commerce integration framework. This project has been 
 developed to handle automation tasks for eCommerce. 
 
-Key element of this framework are endpoints that belong to one of the classes: 
-- Data source
-- AI assistant
+The concept of this framework is based on endpoints that can be of: 
+- **Data source**
+- or **AI assistant** type
+
+Endpoints bind together in a certain way let on defaining various tasks desired by merchant.
 
 EcomQuery operates on: 
 - product data (name, description) and metadata (weight, codes)
 - and product related data (categories, brands) and its metadata (category index)
 
-`Data source` is an end that allows on product and product related data access. 
+**Data source** is an end that allows on product and product related data access. 
 One of the data sources is PrestaShop API. 
-`AI assistant` is an AI component ussed to extract or complement data brought from 
+**AI assistant** is an AI component used to extract or complement data brought from 
 data source. One of implemented AI assistants is OpenAI's ChatGPT.
 
-User of eCommQuery framework defines tasks. Task comunicates with eCommerce and AI 
+User of eCommQuery framework defines tasks. Task communicates with eCommerce platform and AI 
 (if configured so) via endpoints. The task can perform a certain job such as 
-adding a new products, or improving meta description quality (wich AI).
+adding a new products, or improving meta description quality (with AI).
 
 All texts (Product names, product descriptions) are language aware. Meaning that 
 text is complemented by the information about its language.
@@ -136,38 +138,35 @@ def do_stuff(inegr):
 
 Data source for Product: 
 
- Function        | PrestaShop API |Web scrap
------------------|---------|---
- *Product data* | |
- name            | [x]     |[x]
- short description ||
- description ||
- price ||
- available stock ||
- *codes* ||
- EAN ||
- MPN (manufacturer part number)||
- Id (ecommerce platform specific code) ||
- *shipping data* ||
- weight ||
- dimmensions ||
-
+| Function                       | PrestaShop API | Web scrap |
+|--------------------------------|----------------|-----------|
+| *Product data*                 |                |           |
+| name                           | [x]            | [x]       |
+| short description              |                |           |
+| description                    |                |           |
+| price                          |                |           |
+| available stock                |                |           |
+| *codes*                        |                |           |
+| EAN                            |                |           |
+| MPN (manufacturer part number) |                |           |
+| Id (platform specific code)    |                |           |
+| *shipping data*                |                |           |
+| weight                         |                |           |
+| dimensions (W*H*D)             |                |           |
 
 Data source for Categories:
 
- Function        | PrestaShop API | Web scrap
------------------|---------|---
-name| |
-description | |
-
+| Function    | PrestaShop API | Web scrap |
+|-------------|----------------|-----------|
+| name        |                |           |
+| description |                |           |
 
 Data source for Brands:
 
- Function        | PrestaShop API | Web scrap
------------------|---------|---
-name | |
-description | |
-
+| Function    | PrestaShop API | Web scrap |
+|-------------|----------------|-----------|
+| name        |                |           |
+| description |                |           |
 
 # References
 

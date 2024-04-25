@@ -1,4 +1,5 @@
 from ecommquery.ecommquery import ECommDef
+from ecommquery.exceptions import ExternalResourceAccessError
 from ecommquery.ext.prestashop_api.lib.atomic.ps_number import PSNumber
 from ecommquery.lib.atomic.description import SimpleDescription, HTMLDescription
 from ecommquery.lib.product import Product
@@ -35,6 +36,30 @@ class PSProduct(Product):
 
     def weight(self, weight = None):
         return self._weight.value(weight)
+
+    def get_def_cat(self):
+        return self.__raw_prod_buf['id_category_default']
+
+    def set_def_cat(self, value):
+        raise Exception("Not implemented!")
+        raw_cat_list = self.__raw_prod_buf['associations']['categories']['category']
+        cat_list = {}
+
+        # validate cat. list
+        for cat in raw_cat_list:
+            c_id = cat['id']
+            if c_id in cat_list:
+                raise ExternalResourceAccessError(f"Duplicated category id ({c_id}) for item: {self._item_no}")
+            cat_list[c_id] = {}
+
+        if value not in cat_list:
+            raise ExternalResourceAccessError(
+                f"Data inconsistency, default category has not been found, item id: {self._item_no}, failed cat_id: {search_cat}")
+
+        # setter
+        self.__raw_prod_buf['id_category_default'] = value
+
+    def_cat = property(get_def_cat, set_def_cat)
 
     def __getImgIdArr(self):
         if 'associations' not in self.__raw_prod_buf or 'images' not in self.__raw_prod_buf['associations']:
