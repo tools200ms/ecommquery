@@ -54,7 +54,7 @@ class SimpleDescription (Atomic):
     def validate(self):
         pass
 class HTMLDescription (SimpleDescription):
-    class Translations( SimpleDescription.Translations ):
+    class Translations(SimpleDescription.Translations):
         def __init__(self, sterilization = True, langs = None):
             super().__init__(langs)
 

@@ -16,14 +16,10 @@ class PSProduct(Product):
         self.__raw_prod_buf = raw['product']
 
         self._item_no = self.__raw_prod_buf['id']
-        self._name = SimpleDescription.Translations().newDescription()
-        self._name.text( self.__raw_prod_buf['name']['language']['value'] )
 
-        self._sdescr = HTMLDescription.Translations().newDescription()
+        self._name.text(self.__raw_prod_buf['name']['language']['value'])
         self._sdescr.text(self.__raw_prod_buf['description_short']['language']['value'])
-
-        self._descr = HTMLDescription.Translations().newDescription()
-        self._descr.text( self.__raw_prod_buf['description']['language']['value'] )
+        self._descr.text(self.__raw_prod_buf['description']['language']['value'])
 
         self._weight = PSNumber()
         self._weight.rawValue( self.__raw_prod_buf['weight'] );

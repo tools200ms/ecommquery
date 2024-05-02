@@ -6,8 +6,16 @@ from ecommquery.lib.functions.html import HTMLfun
 
 class Product:
 
-    def __init__(self):
+    def __init__(self, name: str = None, sdescr: str = None, descr: str = None):
         self._def_lang_code = None
+
+        self._name = SimpleDescription.Translations().newDescription()
+        self._sdescr = HTMLDescription.Translations().newDescription()
+        self._descr = HTMLDescription.Translations().newDescription()
+
+        if name != None: self._name.text(name)
+        if sdescr != None: self._sdesrc.text(sdescr)
+        if descr != None: self._descr.text(descr)
 
     @property
     def getItemNo(self):

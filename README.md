@@ -3,38 +3,82 @@
 Python e-commerce integration framework. This project has been 
 developed to handle automation tasks for eCommerce. 
 
-The concept of this framework is based on endpoints that can be of: 
+Its concept is based on endpoints that can be of type: 
 - **Data source**
-- or **AI assistant** type
+- or **AI assistant**
 
-Endpoints bind together in a certain way let on defaining various tasks desired by merchant.
+User defines the **Task** that is a Python code calling appropriately endpoints to do a desired job in eCommerce system.
 
 EcomQuery operates on: 
-- product data (name, description) and metadata (weight, codes)
-- and product related data (categories, brands) and its metadata (category index)
+- product data (name, description, ...) and metadata (weight, codes, ...)
+- and product related data (categories, brands, ...) and its metadata (category index, ...)
 
-**Data source** is an end that allows on product and product related data access. 
-One of the data sources is PrestaShop API. 
-**AI assistant** is an AI component used to extract or complement data brought from 
-data source. One of implemented AI assistants is OpenAI's ChatGPT.
+**Data source** is an end that allows on product and product related data access. One of the data sources is PrestaShop API. 
 
-User of eCommQuery framework defines tasks. Task communicates with eCommerce platform and AI 
-(if configured so) via endpoints. The task can perform a certain job such as 
-adding a new products, or improving meta description quality (with AI).
+**AI assistant** is an interface for prompting AI (such as OpenAI's ChatGPT) with purpose of doing a certain operations on product or product related data. It could be for instance data extraction (e.g. to place product in desired categories), or improvement of description quality.
 
-All texts (Product names, product descriptions) are language aware. Meaning that 
-text is complemented by the information about its language.
+The framework provides common (regardless of eCommerce at the backend) interface for accessing product and other data. 
+EcomQuery operates in 'language context'. Textual data such as names, descriptions must be linked with a language that are written in. It means also that one text can hold multiple language versions. This is to cover multilingual shops.
+
+# Configuration
+ECommQuery endpoints have to be configured by parameters, bellow the list of endpoints and its parameters:
+
+Data Source: 
+* `presta_api`- PrestaShop API endpoint
+  * *url* - store or API URL
+  * *api_secret_key* - API key
+* `web_scrap`- Web scrapping endpoint
+  * *url* - store URL
+
+AI assistant:
+* `chatgpt`- ChatGPT
+  * *version* - model version, default: `gpt-3.5-turbo`
+  * *key* - ChatGPT key
+  * *queries* - path to directory with prompt files (see )
+
+## Configuration files
+Configuration is hold in ini file, the format is: 
+```
+[ecommquery]
+memo = <Description of what is in this config.>
+
+# Endpoint, e.g.:
+[presta_api]
+memo = <optional description>
+url = https://www.example.com/grocerystore
+api_secret_key = TEST06LGUHL19KBQYMK8RNVU45ZK1C1Q
+
+[web_scrap]
+memo = <optional description>
+url = https://example.com/store
+```
+
+## Propmpt files
+User defines AI prompts in file with extension '.query.txt', simple example: 
+```
+@lookup_for_categories product
+Please lookup of categories of the product 
+of which description is below: 
+=== Description Begin ===
+{product.descr}
+=== Description End ===
+@end
+
+Return your responce in JSON foramt.
+# next prompt definitins ...
+```
+Content between `@lookup_for_categories` and `@end` sections is a prompt message.
+
+`@lookup_for_categories` is a prompt name, followed by name of the object that is to be datasource for prompt.
+In this case `{product.descr}` inserts Product's description into prompt message.
+
+# Usage Examples
+User defines tasks that operate on endpoints to achieve desired results.
+Bellow are an example code scraps demonstrating usage.
 
 ## Loading configurations
 
-Integration consists of a multiple configurations. 
-Configuration is a configuration loaded from ini file (other formats possible in future) 
-that contains one or multiple endpoints that can be of type: 
-
-* PrestaShop API endpoint
-* Web scrapping endpoint
-
-Example code looks as follows: 
+Starting point is `Integrations` object that is used for loading configurations. One configuration file might hold multiple endpoints. There might be one or more configuration files that can be loaded into 'Integration', see example:
 ```python
 from ecommquery import *
 from ecommquery.core.loader_ini import IniLoader
@@ -42,8 +86,8 @@ from ecommquery.exceptions import EcommQueryError
 
 try:
     inegr = Integrations()
-    inegr.addLoaderAndRead(IniLoader('./configurations/PRODUCTION.ini'))
-    inegr.addLoaderAndRead(IniLoader('./configurations/testing.ini'))
+    inegr.addLoaderAndRead(IniLoader('./configurations/testing-noe.ini'))
+    inegr.addLoaderAndRead(IniLoader('./configurations/testing-sim.ini'))
 
     inegr.print()
     
@@ -53,66 +97,47 @@ except EcommQueryError as ecq_err:
 ```
 Output of `inegr.print()` might be following:
 ```
- INI file: ./configurations/PRODUCTION.ini (ini:PRODUCTION)
+ INI file: ./configurations/testing-noe.ini (ini:PRODUCTION)
  Id # 0
      name: PrestaShop API
-     host: https://www.example.com/grocerystore
+     host: https://noe-test.example.com/grocerystore
  Id # 1
      name: PrestaShop API
-     host: https://www.example.com/electronic-shop
+     host: https://noe-test.example.com/electronic-shop
  ==========================================================
- INI file: ./configurations/testing.ini (ini:testing)
+ INI file: ./configurations/testing-sim.ini (ini:testing)
  Id # 2
      name: PrestaShop API
-     host: https://www.example.com/grocerystore-test01
- Id # 3
-     name: PrestaShop API
-     host: https://www.example.com/grocerystore-test02
- Id # 4
-     name: PrestaShop API
-     host: https://www.example.com/electronic-shop-test01
- Id # 5
-     name: PrestaShop API
-     host: https://www.example.com/electronic-shop-test02
+     host: https://sim-test.example.com/grocerystore-test01
  ====================================================
 ```
 and the configuration files might look like bellow: 
 ```
-# file: configurations/PRODUCTION.ini'))
+# file: configurations/testing-noe.ini'))
 [ecommquery]
-memo = Production stores
+memo = Testing stores @ Noe
 
 [presta_api]
-url = https://www.example.com/grocerystore
+url = https://noe-test.example.com/grocerystore
 api_secret_key = TEST06LGUHL19KBQYMK8RNVU45ZK1C1Q
 
-[presta_api]
-url = https://www.example.com/electronic-shop
+[presta_api 2]
+url = https://noe-test.example.com/electronic-shop
 api_secret_key = ...
 
 ```
-
+and 
 ```
 # file: configurations/testing.ini
 [ecommquery]
-memo = Testing setups
+memo = Testing setups @ Sim
 
 [presta_api]
-url = https://www.example.com/grocerystore-test01
-api_secret_key = ...
-
-[presta_api]
-url = https://www.example.com/grocerystore-test02
-api_secret_key = ...
-
-[presta_api]
-url = https://www.example.com/electronic-shop-test01
-api_secret_key = ...
-
-[presta_api]
-url = https://www.example.com/electronic-shop-test02
+url = https://sim-test.example.com/grocerystore-test01
 api_secret_key = ...
 ```
+
+Once configuration is loaded task is ready for accessing resources.
 
 # Accessing service
 Store products, manufacturers, taxes etc. can be accessed via 

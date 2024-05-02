@@ -1,14 +1,14 @@
 import validators
 
 from ecommquery import Endpoint
-from ecommquery.ext.wordpress_scrap.core.servicescrap_wp import ServiceWPScrap
+from ecommquery.ext.web_scrap.core.servicescrap_wp import ServiceWPScrap
 
 
 class EndpointScrapWP(Endpoint):
 
     @staticmethod
     def reg_name():
-        return 'wp_scrap'
+        return 'web_scrap'
 
     def __init__(self, params : {}):
         super().__init__({'url': Endpoint.Constr('_url', validators.url)},

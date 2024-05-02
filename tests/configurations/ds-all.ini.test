@@ -1,0 +1,10 @@
+[ecommquery]
+memo = Testing conf.
+
+[presta_api]
+url = https://noe-test.example.com/grocerystore
+api_secret_key = TEST06LGUHL19KBQYMK8RNVU45ZK1C1Q
+
+[web_scrap]
+url = https://www.example.com/web_scrap
+

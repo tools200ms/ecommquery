@@ -3,7 +3,7 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
 from ecommquery.core.service_management import ManagementService
-from ecommquery.ext.wordpress_scrap.lib.wps_product import WPSProduct
+from ecommquery.ext.web_scrap.lib.wps_product import WPSProduct
 
 
 class ServiceWPScrap(ManagementService):
