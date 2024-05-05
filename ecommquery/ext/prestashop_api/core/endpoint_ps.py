@@ -1,6 +1,7 @@
 import validators
 
 from ecommquery.core.validators import RegExValidator
+from ecommquery.ecommquery import Mode
 from ecommquery.ext.prestashop_api.core.service_ps import ServicePS
 
 from ecommquery.core.endpoint import Endpoint
@@ -32,7 +33,7 @@ class EndpointPS(Endpoint):
 
         return info
 
-    def _getService(self):
-        return ServicePS( self._url, self._key, verbose = False )
+    def _getService(self, mode: Mode):
+        return ServicePS( self._url, self._key, **Mode.as_args(mode) )
 
 Endpoint.register(EndpointPS)

@@ -1,10 +1,11 @@
 import validators
 
 from ecommquery import Endpoint
-from ecommquery.ext.web_scrap.core.servicescrap_wp import ServiceWPScrap
+from ecommquery.ecommquery import Mode
+from ecommquery.ext.web_scrap.core.servicescrap_web import ServiceWEBScrap
 
 
-class EndpointScrapWP(Endpoint):
+class EndpointScrapWEB(Endpoint):
 
     @staticmethod
     def reg_name():
@@ -21,7 +22,7 @@ class EndpointScrapWP(Endpoint):
     def info(self):
         return self._url
 
-    def _getService(self):
-        return ServiceWPScrap(self._url, verbose=False)
+    def _getService(self, mode: Mode):
+        return ServiceWPScrap(self._url, **Mode.as_args(mode))
 
-Endpoint.register(EndpointScrapWP)
+Endpoint.register(EndpointScrapWEB)

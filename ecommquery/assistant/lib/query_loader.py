@@ -20,7 +20,7 @@ class QueryLoader:
             raise LocalResourceAccessError(f"Path ('{query_path}') does not exists")
 
         if os.path.isdir(query_path):
-            q_file_list = Path(query_path).glob('**/*.query.txt')
+            q_file_list = Path(query_path).glob('**/*.mp.txt')
         elif os.path.isfile(query_path):
             q_file_list = [query_path]
         else:

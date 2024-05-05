@@ -2,7 +2,7 @@ from ecommquery.lib.atomic.description import SimpleDescription, HTMLDescription
 from ecommquery.lib.product import Product
 
 
-class WPSProduct(Product):
+class WEBProduct(Product):
 
     def __init__(self, soup):
         super().__init__()

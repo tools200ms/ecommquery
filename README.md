@@ -54,7 +54,7 @@ url = https://example.com/store
 ```
 
 ## Propmpt files
-User defines AI prompts in file with extension '.query.txt', simple example: 
+User defines AI prompts in Machine/Model Prompt (*.mp.txt) file, simple example: 
 ```
 @lookup_for_categories product
 Please lookup of categories of the product 

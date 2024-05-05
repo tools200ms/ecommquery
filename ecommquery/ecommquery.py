@@ -1,15 +1,33 @@
 # integrations source
+from enum import Enum
+
 from ecommquery.exceptions import CallError
 
 
+class Mode(Enum):
+    # NORMAL?
+    WORK: int = 0
+    DEBUG: int = 1
+    VERBOSE: int = 2
+    PRETEND: int = 4
+
+    @staticmethod
+    def as_args(mode):
+        m = mode.value
+        # TODO: do it to be Python like, not C like!
+        return {'verbose': (m & Mode.VERBOSE.value) != 0, 'debug': (m & Mode.DEBUG.value) != 0, 'pretend': (m & Mode.PRETEND.value) != 0}
+
+
 class Integrations:
+
     class LoadedConf:
         def __init__(self, loader, conf):
             self.loader = loader
             self.conf = conf
 
-    def __init__(self):
+    def __init__(self, mode: Mode = Mode.WORK):
         self.__inte = {}
+        self._gmode = mode
 
     def addLoaderAndRead(self, loader):
         conf = loader.readConfig()
@@ -48,7 +66,7 @@ class Integrations:
             print( ' ' + (len(inte_msg) * '=') )
 
 
-    def getService(self, conf_id = None, ep_id: str = None, endpoint = None):
+    def getService(self, conf_id = None, ep_id: str = None, endpoint = None, mode: Mode = Mode.WORK):
         ep = None
 
         if len(self.__inte) == 0:
@@ -70,7 +88,10 @@ class Integrations:
             if ep == None:
                 raise CallError('No endpoint has been found')
 
-            return ep.getService()
+            if mode == Mode.WORK:
+                mode = self._gmode
+
+            return ep.getService(mode)
 
         # pick endpoint
         if conf_id not in self.__inte:

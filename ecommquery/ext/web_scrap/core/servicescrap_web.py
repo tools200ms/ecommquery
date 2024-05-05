@@ -3,14 +3,17 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
 from ecommquery.core.service_management import ManagementService
-from ecommquery.ext.web_scrap.lib.wps_product import WPSProduct
+from ecommquery.ext.web_scrap.lib.web_product import WEBProduct
 
 
-class ServiceWPScrap(ManagementService):
+class ServiceWEBScrap(ManagementService):
 
-    def __init__(self, url, verbose=False):
+    def __init__(self, url, verbose: bool, debug: bool, pretend: bool):
+        self.__verbose = verbose
+        self.__debug = debug
+        self.__pretend = pretend
+
         self.url = url
-        self.verbose = verbose
 
     def getProductList(self, criteria = None):
 

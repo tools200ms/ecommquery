@@ -1,6 +1,7 @@
 from abc import abstractmethod
 
 from ecommquery.core.validators import Validator, ParamValidator
+from ecommquery.ecommquery import Mode
 from ecommquery.exceptions import DataformatError, CallError
 
 
@@ -119,12 +120,12 @@ class Endpoint:
         pass
 
     @abstractmethod
-    def _getService(self):
+    def _getService(self, mode: Mode):
         pass
 
-    def getService(self):
+    def getService(self, mode: Mode):
         if self._srv == None:
-            self._srv = self._getService()
+            self._srv = self._getService(mode)
 
         return self._srv
 

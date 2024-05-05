@@ -11,8 +11,15 @@ from ecommquery.lib.product import Product
 
 
 class ServiceChatGPT(AnalyticalService):
-    def __init__(self, key: str, model_name: str, queries, verbose: bool = False):
+    def __init__(self, key: str, model_name: str, queries, verbose: bool, debug: bool, pretend: bool):
         self.__verbose = verbose
+        self.__debug = debug
+
+        if pretend:
+            # echo mode
+            self.sendPrompt = self.echoPromptMsg
+        else:
+            self.sendPrompt = self.sendPromptMsg
 
         self.__client = OpenAI(api_key = key)
         self.__model_name = model_name
@@ -20,15 +27,12 @@ class ServiceChatGPT(AnalyticalService):
         self.__tomens_used = 0
         self.__queries = queries
 
-    def product_prompt(self, text):
-        return ""
-
-    def getPromptText(self, name, params : []):
+    def echoPromptMsg(self, name, params : []):
         q = self.__queries[name]
 
         return q.compileQueryText(params)
 
-    def sendQuery(self, name, params : []):
+    def sendPromptMsg(self, name, params : []):
         q = self.__queries[name]
 
         prompt = q.compileQueryText(params)

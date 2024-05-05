@@ -5,6 +5,9 @@ from prestapyt import PrestaShopWebServiceDict
 
 class ServicePS(ManagementService, PrestaShopWebServiceDict):
 
+    def __init__(self, api_url, api_key, verbose: bool, debug: bool, pretend: bool):
+        super().__init__(api_url, api_key, debug = debug, session = None, verbose = verbose)
+
     # example criteria filtering:
     # criteria = {'filter[id_category_default]': '269'}
     def getProductList(self, criteria = None):

@@ -2,6 +2,7 @@ from ecommquery import Endpoint
 from ecommquery.assistant.lib.query_loader import QueryLoader
 from ecommquery.assistant.openai.core.service_chatgpt import ServiceChatGPT
 from ecommquery.core.validators import RegExValidator, ListValidator, PathValidator
+from ecommquery.ecommquery import Mode
 
 
 class EndpointAsOpenAI(Endpoint):
@@ -16,7 +17,7 @@ class EndpointAsOpenAI(Endpoint):
 
     def __init__(self, params: {}):
         super().__init__( {'version': Endpoint.Constr('_version',
-                                    ListValidator(["gpt-3.5-turbo"], 0) ),
+                                    ListValidator(["gpt-3.5-turbo", "gpt-4-turbo"], 0) ),
                            'key': Endpoint.Constr(
                                         '_key',
                                         # don't do to strict validation, if API provider would
@@ -32,9 +33,9 @@ class EndpointAsOpenAI(Endpoint):
     def info(self):
         return "Model version: " + self._version
 
-    def _getService(self):
+    def _getService(self, mode: Mode):
         q_loader = QueryLoader(self._queries_path)
 
-        return ServiceChatGPT(self._key, self._version, q_loader.getQueries())
+        return ServiceChatGPT(self._key, self._version, q_loader.getQueries(), **(Mode.as_args(mode)))
 
 Endpoint.register(EndpointAsOpenAI)
