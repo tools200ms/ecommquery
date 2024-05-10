@@ -1,16 +1,90 @@
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString, Tag
 
+from ecommquery.exceptions import CallError
 from ecommquery.lib.atomic.description import HTMLDescription
 
 
 # String operations:
 class HTMLfun:
     __header_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+    __format_tags = ['p', 'br']
     __style_tags = ['b', 'i', 'strong', 'em', 'u']
     __table_tags = ['table', 'tbody', 'th', 'tr', 'td']
     __list_tags = ['ul', 'ol', 'li']
 
-    __allowed_tags = ['p'] + __header_tags + __style_tags + __table_tags + __list_tags + ['br']
+    @staticmethod
+    def mapToPlainText(html: str = None, max_colnum = 80, parent_tag = None, contents = None, line = 0, column = 0):
+        if html != None:
+            soup = BeautifulSoup(html, 'html.parser')
+            contents = soup.contents
+
+        text = ''
+
+        for el in contents:
+            if isinstance(el, NavigableString):
+                el_idx = contents.index(el)
+                if parent_tag != None and (line + column) != 0 and el_idx == 0:
+                    text += HTMLfun._opentag_to_plain(parent_tag.name)
+                elif isinstance(contents[el_idx - 1], Tag):
+                    text += HTMLfun._closetag_to_plain(contents[el_idx - 1].name)
+
+                text += el.strip()
+                column += len(text)
+            elif isinstance(el, Tag):
+                text += HTMLfun.mapToPlainText(parent_tag = el, contents = el.contents, line = line, column = column)
+            # ignore other element types (e.g. comments)
+
+        return text
+
+    @staticmethod
+    def _opentag_to_plain(tag_name: str):
+        if tag_name in HTMLfun.__header_tags:
+            h_idx = HTMLfun.__header_tags.index(tag_name)
+            return '\n' + (' ' * h_idx)
+
+        if tag_name in HTMLfun.__format_tags:
+            return '\n\n'
+
+        if tag_name in HTMLfun.__style_tags:
+            return ' '
+
+        if tag_name in HTMLfun.__table_tags:
+            return {'table': '\n\n', 'tbody': '',
+                    'th': '\n', 'tr': '\n',
+                    'td': '    '}[tag_name]
+
+        if tag_name in HTMLfun.__list_tags:
+            return {'ul': '\n', 'ol': '\n',
+                    'li': ' * '}[tag_name]
+
+        raise CallError('Unspecified tag, was HTML sanitize before calling this function?')
+
+    @staticmethod
+    def _closetag_to_plain(tag_name: str):
+        if tag_name in HTMLfun.__header_tags:
+            return '\n'
+
+        if tag_name in HTMLfun.__format_tags:
+            return '\n'
+
+        if tag_name in HTMLfun.__style_tags:
+            return ' '
+
+        if tag_name in HTMLfun.__table_tags:
+            return {'table': '\n\n', 'tbody': '',
+                    'th': '\n', 'tr': '\n',
+                    'td': '    '}[tag_name]
+
+        if tag_name == 'table':
+            return '\n'
+
+        if tag_name in HTMLfun.__list_tags:
+            return ''
+
+        raise CallError(f"Unspecified tag ('{tag_name}'), was HTML sanitize before calling this function?")
+
+
+    __allowed_tags = __header_tags + __format_tags + __style_tags + __table_tags + __list_tags
 
     class Stat:
         def __init__(self, orgi_text_len: int):
@@ -51,6 +125,7 @@ class HTMLfun:
         stat = HTMLfun.Stat.openFeed(html)
 
         trans_hlevel_vector = {}
+        prev_tag = None
 
         # Find all tags in the HTML content
         for tag in soup.find_all(True):
@@ -66,6 +141,9 @@ class HTMLfun:
             if purge_style and 'style' in tag.attrs:
                 del tag.attrs['style']
 
+            #if prev_tag != None and prev_tag == tag.previous and prev_tag.name in HTMLfun.__style_tags:
+            #    print(f'Doplicated ......... {tag.name}')
+
             if start_hlevel != None and tag.name in HTMLfun.__header_tags:
                 if (int)(tag.name[1]) < start_hlevel:
                     trans_hlevel_vector[tag.name] = 'h' + (str)(start_hlevel)
@@ -78,7 +156,7 @@ class HTMLfun:
 
                     tag.name = trans_hlevel_vector[tag.name]
 
-
+            prev_tag = tag
 
         output_str = str(soup).strip()
         return output_str, stat.closeFeed(output_str)

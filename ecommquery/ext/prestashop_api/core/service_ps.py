@@ -21,6 +21,9 @@ class ServicePS(ManagementService, PrestaShopWebServiceDict):
     def getProduct(self, item_no):
         return PSProduct(self.get('products', item_no))
 
+    def getFeatures(self, item_no):
+        return self.get('product_features', item_no)
+
     def commitProduct(self, prod):
         changes = prod.prepareToCommit()
         if changes != False:

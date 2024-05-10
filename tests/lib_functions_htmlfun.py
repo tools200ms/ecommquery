@@ -81,5 +81,25 @@ class TestHTMLfun(unittest.TestCase):
         ret, stat = HTMLfun.sanitize(input, start_hlevel = 2)
         self.assertEqual(expected, ret)
 
+    def test_to_plain_text(self):
+        input1 = "<p><h1>Header</h1> and <h2>sub-header</h2> ... </p>"
+        input2 = """Introduction.
+        <p>Text <h1>Header</h1> and <h2>sub-header</h2> and text here. </p>Ending 
+        sentence."""
+
+        out = HTMLfun.mapToPlainText(input1)
+
+        print("BEGIN: ")
+        print(out)
+        print("END-")
+
+        out = HTMLfun.mapToPlainText(input2)
+
+        print("BEGIN: ")
+        print(out)
+        print("END-")
+
+        self.assertTrue(True)
+
 if __name__ == '__main__':
     unittest.main()

@@ -14,6 +14,11 @@ class PSProduct(Product):
             raise Exception('Missing data (product)')
 
         self.__raw_prod_buf = raw['product']
+        self.__raw_assoc_buf = self.__raw_prod_buf['associations']
+
+        if 'product_features' in self.__raw_assoc_buf:
+            self._features = self.__raw_assoc_buf['product_features']
+            self._feature_changed = False
 
         self._item_no = self.__raw_prod_buf['id']
 
@@ -26,6 +31,14 @@ class PSProduct(Product):
 
         # self._short_description = HTMLDescription.Generator().newDescription()
         # self._short_description = ...
+
+    def set_features(self, list: []):
+        if len(list) != 0:
+            self._features['product_feature'] = list
+            self._feature_changed = True
+        else:
+            if 'product_feature' in self._features:
+                del self._features['product_feature']
 
     def getRaw(self):
         return self.__raw
@@ -193,6 +206,10 @@ class PSProduct(Product):
         if self._weight.hasChanged():
             changes.append(self._weight.rawValue)
             self.__raw_prod_buf['weight'] = self._weight.rawValue()
+
+        if self._feature_changed:
+            pass
+
 
         return len(changes) != 0
 

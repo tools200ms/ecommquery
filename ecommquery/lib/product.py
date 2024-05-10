@@ -82,18 +82,24 @@ class PlainTextProduct(Product):
     def __init__(self, prod):
         self.prod = prod
 
+        # Make sure it's senitized:
+        HTMLfun.sanitize_html(prod.getDescr())
+        HTMLfun.sanitize_html(prod.getSDescr())
+
     def get_name(self) -> str:
         return self.prod.get_name()
 
     name = property(get_name)
 
     def get_sdescr(self):
-        return HTMLfun.getStripedText(self.prod.get_sdescr())
+        return HTMLfun.mapToPlainText(self.prod.get_sdescr())
+        # return HTMLfun.getStripedText()
 
     sdescr = property(get_sdescr)
 
     def get_descr(self):
-        return HTMLfun.getStripedText(self.prod.get_descr())
+        return HTMLfun.mapToPlainText(self.prod.get_descr())
+        #return HTMLfun.getStripedText(self.prod.get_descr())
 
     descr = property(get_descr)
 

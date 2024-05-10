@@ -19,6 +19,6 @@ class LocalResourceAccessError(Exception):
 class ExternalResourceAccessError(Exception):
     pass
 
-# Internel application error
+# Internal application error
 class CallError(Exception):
     pass
