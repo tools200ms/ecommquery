@@ -119,7 +119,7 @@ class HTMLfun:
             return 100 * (1 - (self.sani_text_len / self.orgi_text_len))
 
     @staticmethod
-    def sanitize(html: str, purge_classes: bool = False, purge_style: bool = False, start_hlevel: int = None) -> str:
+    def sanitize(html: str, purge_classes: bool = False, purge_styles: bool = False, start_hlevel: int = None) -> str:
         # Parse the HTML content
         soup = BeautifulSoup(html, 'html.parser')
         stat = HTMLfun.Stat.openFeed(html)
@@ -138,7 +138,7 @@ class HTMLfun:
             if purge_classes and 'class' in tag.attrs:
                 del tag.attrs['class']
 
-            if purge_style and 'style' in tag.attrs:
+            if purge_styles and 'style' in tag.attrs:
                 del tag.attrs['style']
 
             if tag.name in HTMLfun.__style_tags:

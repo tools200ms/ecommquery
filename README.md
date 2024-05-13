@@ -69,7 +69,7 @@ Return your responce in JSON foramt.
 ```
 Content between `@lookup_for_categories` and `@end` sections is a prompt message.
 
-`@lookup_for_categories` is a prompt name, followed by name of the object that is to be datasource for prompt.
+`@lookup_for_categories` is a prompt name, followed by a class name of the object that is to be datasource for prompt.
 In this case `{product.descr}` inserts Product's description into prompt message.
 
 # Usage Examples
@@ -139,7 +139,7 @@ api_secret_key = ...
 
 Once configuration is loaded task is ready for accessing resources.
 
-# Accessing service
+## Accessing service
 Store products, manufacturers, taxes etc. can be accessed via 
 service object that is created from endpoint using 
 `.getService()` method:
@@ -158,6 +158,29 @@ def do_stuff(inegr):
     # commit changes (update product at the store)
     ps.commitProduct(the_prod)
 ```
+
+## HTML sterilisation
+While working for custommers I found a common issue that HTML descriptions hold leftovers from data migration from a previus system. For instance, HTML code can contain 'div' elemets having defined classes that are nonexistent in a new system, or have 'img' elements with urls pointing to an old system.
+
+Therefore, code sterilisation is a vital part of migration process.
+Function `HTMLfun.sanitize(html: str)` cleansup code as follows: 
+* unwrap (remove tag keeping its content) all elements that are **not**: 
+  * `h1`, `h2`, `h3`, `h4`, `h5`, `h6` - header tags
+  * `p`, `br` - format tags
+  * `b`, `i`, `strong`, `em`, `u` - style tags
+  * `table`, `tbody`, `th`, `tr`, `td` - table tags
+  * `ul`, `ol`, `li` - list tags
+  
+  Note that `div` and `span` elements are also removed (unwraped).
+* `h1` element is kind of special, only one `h1` element should be defined on page. In templates used by eCommerce platforms `h1` is usually a product or category name. It is a good idea from SEO point of view. It means also that when sterilizing description any encounted `h1` tags should be shifted to be `h2`. Argument `start_hlevel=2` forces all `Header` elements to start from `h2`. 
+* remove empty **style** elements, such as `<b></b>`
+* merge consecutive style elements, for instance `<b>B</b><b>old</b>` merges to `<b>Bold</b>`. 
+  This it to eliminate an over definition.
+* purge `style` or `class` elements if argument: 
+  `purge_classes = True` or `purge_styles = True` is provided.
+
+When sterilized HTML code is translated to plain text it looks better (no muliple new lines, no strange spaces).
+Plain text is a way to communicate with AI, thus machine recives well formatted text. For instance, while translating unsterilized `<b>Co</b><b>conut</b>` to text the output is `Co conut`, thus empty style removal is kind important.
 
 # Implementation status
 
