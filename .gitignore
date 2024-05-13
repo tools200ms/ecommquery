@@ -5,8 +5,11 @@
 
 # Confidential
 tasks/
+tasks
 confs/
+confs
 aiquery/
+aiquery
 
 # Data & dump directory
 data/
