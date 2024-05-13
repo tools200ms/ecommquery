@@ -125,12 +125,12 @@ class HTMLfun:
         stat = HTMLfun.Stat.openFeed(html)
 
         trans_hlevel_vector = {}
-        prev_tag = None
+        prev_tag = soup.new_tag('<b>NULL TAG</b>')
 
         # Find all tags in the HTML content
         for tag in soup.find_all(True):
             # remove tag that is not in 'Allowed Tags' list
-            if tag.name not in HTMLfun.__allowed_tags:
+            if not (tag.name in HTMLfun.__allowed_tags):
                 tag.unwrap()  # Remove the tag but keep its contents
                 stat.feedTagMod(tag.name)
                 continue
@@ -141,20 +141,33 @@ class HTMLfun:
             if purge_style and 'style' in tag.attrs:
                 del tag.attrs['style']
 
-            #if prev_tag != None and prev_tag == tag.previous and prev_tag.name in HTMLfun.__style_tags:
-            #    print(f'Doplicated ......... {tag.name}')
+            if tag.name in HTMLfun.__style_tags:
+                # if style element that does not hold text, remove it:
+                if len(tag.contents) == 0:
+                    tag.unwrap()
+                    tag = prev_tag
+                # if previous element is a previus tag and tag name is the same,
+                # then merge tags
+                elif prev_tag == tag.previous_sibling and prev_tag.name == tag.name:
+                    new_tag = soup.new_tag(tag.name)
+                    new_tag.extend(prev_tag.contents + tag.contents)
+                    tag.insert_after(new_tag)
+                    tag.decompose()
+                    prev_tag.decompose()
 
-            if start_hlevel != None and tag.name in HTMLfun.__header_tags:
-                if (int)(tag.name[1]) < start_hlevel:
-                    trans_hlevel_vector[tag.name] = 'h' + (str)(start_hlevel)
-                    tag.name = 'h' + (str)(start_hlevel)
-                elif len(trans_hlevel_vector) != 0:
-                    if tag.name not in trans_hlevel_vector:
-                        l_h = list(trans_hlevel_vector.keys())[-1]
-                        n_h = trans_hlevel_vector[l_h]
-                        trans_hlevel_vector[tag.name] = 'h' + (str)((int)(n_h[1]) + 1)
+                    tag = new_tag
 
-                    tag.name = trans_hlevel_vector[tag.name]
+            elif start_hlevel != None and tag.name in HTMLfun.__header_tags:
+                if tag.name not in trans_hlevel_vector:
+                    if (int)(tag.name[1]) < start_hlevel:
+                        trans_hlevel_vector[tag.name] = 'h' + (str)(start_hlevel)
+                    elif len(trans_hlevel_vector) == 0:
+                        trans_hlevel_vector[tag.name] = 'h' + start_hlevel
+                    else:
+                        new_h_list = list(trans_hlevel_vector.values())[-1]
+                        trans_hlevel_vector[tag.name] = 'h' + (str)((int)(new_h_list[1]) + 1)
+
+                tag.name = trans_hlevel_vector[tag.name]
 
             prev_tag = tag
 

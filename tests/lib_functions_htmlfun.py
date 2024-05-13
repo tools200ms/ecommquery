@@ -7,14 +7,14 @@ from ecommquery.lib.functions.html import *
 
 
 class TestHTMLfun(unittest.TestCase):
-    def test_sanitize_html_1(self):
+    def test_sanitize_html_div(self):
         input = "<div>Don't make me naked!</div>"
         expected = "Don't make me naked!"
 
         ret, stat = HTMLfun.sanitize(input)
         self.assertEqual(ret, expected)
 
-    def test_sanitize_html_2(self):
+    def test_sanitize_html_style_and_class(self):
         input      = "<p class=\"keepme\"><b style=\"color: red\">I</b> will <i>survive</i></p>"
         expected1 = "<p class=\"keepme\"><b style=\"color: red\">I</b> will <i>survive</i></p>"
         expected2 = "<p><b style=\"color: red\">I</b> will <i>survive</i></p>"
@@ -29,12 +29,44 @@ class TestHTMLfun(unittest.TestCase):
         ret, stat = HTMLfun.sanitize(input, True, True)
         self.assertEqual(ret, expected3)
 
-    def test_sanitize_html_3(self):
+    def test_sanitize_html_span(self):
         input      = "<p><span>Don't strip everything!</span></p>"
         expected = "<p>Don't strip everything!</p>"
 
         ret, stat = HTMLfun.sanitize(input)
         self.assertEqual(ret, expected)
+
+    def test_sanitize_html_h1(self):
+        input = ["<p><h1>Header</h1> and <h2>sub-header</h2> ... </p>",
+                 "<h1>test</h1> ... <h4>test</h4>"]
+        expected = ["<p><h2>Header</h2> and <h3>sub-header</h3> ... </p>",
+                    "<h2>test</h2> ... <h3>test</h3>"]
+
+        for idx, inp in enumerate(input):
+            output, stat = HTMLfun.sanitize(inp, start_hlevel=2)
+            self.assertEqual(expected[idx], output)
+
+    def test_sanitize_html_empty(self):
+        input = ["<p><u>part</u>ially<u>underline</u><b>text</b><b></b></p>"]
+        expected = ["<p><u>part</u>ially<u>underline</u><b>text</b></p>"]
+
+        for idx, inp in enumerate(input):
+            output, stat = HTMLfun.sanitize(inp, start_hlevel=2)
+            self.assertEqual(expected[idx], output)
+
+    def test_sanitize_html_merge(self):
+        input = ["<p><b>Bo</b><b>ld</b> and <u>Under</u><u>line</u></p>",
+                 "<i>text</i> <i>.</i> and <i>text</i><i>.</i>",
+                 "<p><b>B</b><u>U</u><b>O</b>   </p>",
+                 "<p>1</p><p>1</p>"]
+        expected = ["<p><b>Bold</b> and <u>Underline</u></p>",
+                    "<i>text</i> <i>.</i> and <i>text.</i>",
+                    "<p><b>B</b><u>U</u><b>O</b> </p>",
+                    "<p>1</p><p>1</p>"]
+
+        for idx, inp in enumerate(input):
+            output, stat = HTMLfun.sanitize(inp, start_hlevel=2)
+            self.assertEqual(expected[idx], output)
 
     def test_sanitize_html_file1(self):
         f_in = open("../tests/files/htmlfun_1-input.txt", 'r')
@@ -74,12 +106,6 @@ class TestHTMLfun(unittest.TestCase):
         #res, stat = HTMLfun.cut_head(input3b, ['i'], 'Header')
         #self.assertEqual(expected32, res)
 
-    def test_cut_h1(self):
-        input = "<p><h1>Header</h1> and <h2>sub-header</h2> ... </p>"
-        expected = "<p><h2>Header</h2> and <h3>sub-header</h3> ... </p>"
-
-        ret, stat = HTMLfun.sanitize(input, start_hlevel = 2)
-        self.assertEqual(expected, ret)
 
     def test_to_plain_text(self):
         input1 = "<p><h1>Header</h1> and <h2>sub-header</h2> ... </p>"
