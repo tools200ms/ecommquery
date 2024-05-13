@@ -172,7 +172,7 @@ Function `HTMLfun.sanitize(html: str)` cleansup code as follows:
   * `ul`, `ol`, `li` - list tags
   
   Note that `div` and `span` elements are also removed (unwraped).
-* `h1` element is kind of special, only one `h1` element should be defined on page. In templates used by eCommerce platforms `h1` is usually a product or category name. It is a good idea from SEO point of view. It means also that when sterilizing description any encounted `h1` tags should be shifted to be `h2`. Argument `start_hlevel=2` forces all `Header` elements to start from `h2`. 
+* `h1` element is kind of special, only one `h1` element should be defined on page. In templates used by eCommerce platforms `h1` is usually a product or category name. It is a good idea from SEO point of view. It means also that when sterilizing description any encounted `h1` tags should be shifted to become `h2`. Argument `start_hlevel=2` forces all `Header` elements to start from `h2`. 
 * remove empty **style** elements, such as `<b></b>`
 * merge consecutive style elements, for instance `<b>B</b><b>old</b>` merges to `<b>Bold</b>`. 
   This it to eliminate an over definition.
