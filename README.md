@@ -175,12 +175,12 @@ Function `HTMLfun.sanitize(html: str)` cleansup code as follows:
 * `h1` element is kind of special, only one `h1` element should be defined on page. In templates used by eCommerce platforms `h1` is usually a product or category name. It is a good idea from SEO point of view. It means also that when sterilizing description any encounted `h1` tags should be shifted to become `h2`. Argument `start_hlevel=2` forces all `Header` elements to start from `h2`. 
 * remove empty **style** elements, such as `<b></b>`
 * merge consecutive style elements, for instance `<b>B</b><b>old</b>` merges to `<b>Bold</b>`. 
-  This it to eliminate an over definition.
-* purge `style` or `class` elements if argument: 
+  This it to eliminate an over definition. I found that this can exist surprisingly often.
+* purge `style` or `class` tag arguments if argument: 
   `purge_classes = True` or `purge_styles = True` is provided.
 
 When sterilized HTML code is translated to plain text it looks better (no muliple new lines, no strange spaces).
-Plain text is a way to communicate with AI, thus machine recives well formatted text. For instance, while translating unsterilized `<b>Co</b><b>conut</b>` to text the output is `Co conut`, thus empty style removal is kind important.
+Plain text is a way to communicate with AI, thus machine recives well formatted text. For instance, while translating unsterilized `<b>Co</b><b>conut</b>` to text the output is `Co conut`, thus tag merging is kind important.
 
 # Implementation status
 
