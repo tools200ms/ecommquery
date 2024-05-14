@@ -12,29 +12,6 @@ class HTMLfun:
     __table_tags = ['table', 'tbody', 'th', 'tr', 'td']
     __list_tags = ['ul', 'ol', 'li']
 
-    @staticmethod
-    def mapToPlainText(html: str = None, max_colnum = 80, parent_tag = None, contents = None, line = 0, column = 0):
-        if html != None:
-            soup = BeautifulSoup(html, 'html.parser')
-            contents = soup.contents
-
-        text = ''
-
-        for el in contents:
-            if isinstance(el, NavigableString):
-                el_idx = contents.index(el)
-                if parent_tag != None and (line + column) != 0 and el_idx == 0:
-                    text += HTMLfun._opentag_to_plain(parent_tag.name)
-                elif isinstance(contents[el_idx - 1], Tag):
-                    text += HTMLfun._closetag_to_plain(contents[el_idx - 1].name)
-
-                text += el.strip()
-                column += len(text)
-            elif isinstance(el, Tag):
-                text += HTMLfun.mapToPlainText(parent_tag = el, contents = el.contents, line = line, column = column)
-            # ignore other element types (e.g. comments)
-
-        return text
 
     @staticmethod
     def _opentag_to_plain(tag_name: str):
@@ -186,10 +163,84 @@ class HTMLfun:
         return stat
 
     @staticmethod
-    def getStripedText(html) -> str:
+    def getPlainText(html) -> str:
         soup = BeautifulSoup(html, 'html.parser')
         return soup.get_text()
         #transf = {'p': '\n\n', 'br': '\n', 'hr': '-' * 64, 'li': ' - '}
+
+    @staticmethod
+    def getPlainTextSuper(html: str, max_colnums = 80):
+
+        soup = BeautifulSoup(html, 'html.parser')
+
+        top_contents = enumerate(soup.contents)
+        contents_stack = []
+        elements_stack = []
+
+        text = ''
+        line_no = 0
+        column_no = 0
+
+        def update_text(s:str):
+            nonlocal text, line_no, column_no
+
+            for l in s.split("\n"):
+                l_len = len(l)
+
+                # Make correction if it's text very beginning.
+                # Returned text schould not start with new lines
+                if l_len == 0 and (line_no + column_no) == 0:
+                    continue
+                else:
+                    text += "\n"
+                    line_no += 1
+
+                while (column_no + l_len) > max_colnums:
+                    for m_idx, ch in enumerate(l[max_colnums - (column_no + 1)::-1]):
+                        if ch == ' ' or ch == '\t':
+                            break
+
+                    last_spc_idx = max_colnums - (column_no + m_idx)
+                    if last_spc_idx == 0: last_spc_idx = max_colnums
+
+                    text += l[:last_spc_idx] + "\n"
+                    line_no += 1
+                    l = l[last_spc_idx:]
+                    l_len = len(l)
+                    column_no = 0
+
+                text += l
+                column_no += len(l)
+
+        while True:
+            idx_el = next(top_contents, None)
+            # all 'contents' has been iterated, go back to
+            # iterating over parent contents
+            if idx_el == None:
+                if len(contents_stack) != 0:
+                    top_contents = contents_stack.pop()
+                    p_el = elements_stack.pop()
+                    update_text(HTMLfun._closetag_to_plain(p_el.name))
+
+                    continue
+                else: # all done
+                    break
+
+            el = idx_el[1]
+            if isinstance(el, NavigableString):
+                update_text(el.strip())
+                #column += len(text)
+            elif isinstance(el, Tag):
+                contents_stack.append(top_contents)
+                elements_stack.append(el)
+
+                top_contents = enumerate(el.contents)
+
+                update_text(HTMLfun._opentag_to_plain(el.name))
+            # else - ignore other elements then 'string' and 'tag'
+        # End of: while
+
+        return text
 
     # prototype function
     # begin

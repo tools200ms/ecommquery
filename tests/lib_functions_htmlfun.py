@@ -113,19 +113,31 @@ class TestHTMLfun(unittest.TestCase):
         <p>Text <h1>Header</h1> and <h2>sub-header</h2> and text here. </p>Ending 
         sentence."""
 
-        out = HTMLfun.mapToPlainText(input1)
+        out = HTMLfun.getPlainTextSuper(input1, max_colnums = 80)
 
         print("BEGIN: ")
         print(out)
         print("END-")
 
-        out = HTMLfun.mapToPlainText(input2)
+        out = HTMLfun.getPlainTextSuper(input2, max_colnums = 8)
 
         print("BEGIN: ")
         print(out)
         print("END-")
 
         self.assertTrue(True)
+
+    def test_to_plain_text_file1(self):
+        f_in = open("../tests/files/htmlfun_2-input.txt", 'r')
+        f_exp = open("../tests/files/htmlfun_2-expected.txt", 'r')
+
+        text = HTMLfun.getPlainTextSuper(f_in.read())
+        print("BEGIN: \n" + text + "\nEND ---")
+
+        self.assertEqual(text, f_exp.read())
+
+        f_exp.close()
+        f_in.close()
 
 if __name__ == '__main__':
     unittest.main()
