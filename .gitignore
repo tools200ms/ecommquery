@@ -10,6 +10,8 @@ confs/
 confs
 aiquery/
 aiquery
+prompts/
+prompts
 
 # Data & dump directory
 data/

@@ -109,23 +109,47 @@ class TestHTMLfun(unittest.TestCase):
 
     def test_to_plain_text(self):
         input1 = "<p><h1>Header</h1> and <h2>sub-header</h2> ... </p>"
+        expected1 = """Header
+and
+ sub-header
+...
+"""
         input2 = """Introduction.
-        <p>Text <h1>Header</h1> and <h2>sub-header</h2> and text here. </p>Ending 
+        <p>Text <h1>Header</h1> and <h2>sub-header</h2> and   
+        text here. </p>Ending 
         sentence."""
+        expected2 = """Introduc
+tion.
+Text
+Header
+and
+ sub-hea
+der
+and   
+  
+      
+text 
+here.
+Ending 
+ 
+       
+sentence
+."""
+        input3 = """<p>12345678123456789</p>12345678"""
+        expected3 = """12345678
+12345678
+9
+12345678
+"""
 
         out = HTMLfun.getPlainTextSuper(input1, max_colnums = 80)
-
-        print("BEGIN: ")
-        print(out)
-        print("END-")
+        self.assertEqual(expected1, out)
 
         out = HTMLfun.getPlainTextSuper(input2, max_colnums = 8)
+        self.assertEqual(expected2, out)
 
-        print("BEGIN: ")
-        print(out)
-        print("END-")
-
-        self.assertTrue(True)
+        out = HTMLfun.getPlainTextSuper(input3, max_colnums=8)
+        self.assertEqual(expected3, out)
 
     def test_to_plain_text_file1(self):
         f_in = open("../tests/files/htmlfun_2-input.txt", 'r')

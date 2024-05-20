@@ -20,14 +20,14 @@ class HTMLfun:
             return '\n' + (' ' * h_idx)
 
         if tag_name in HTMLfun.__format_tags:
-            return '\n\n'
+            return '\n'
 
         if tag_name in HTMLfun.__style_tags:
             return ' '
 
         if tag_name in HTMLfun.__table_tags:
-            return {'table': '\n\n', 'tbody': '',
-                    'th': '\n', 'tr': '\n',
+            return {'table': '\n', 'tbody': '',
+                    'th': '', 'tr': '',
                     'td': '    '}[tag_name]
 
         if tag_name in HTMLfun.__list_tags:
@@ -48,15 +48,12 @@ class HTMLfun:
             return ' '
 
         if tag_name in HTMLfun.__table_tags:
-            return {'table': '\n\n', 'tbody': '',
+            return {'table': '\n', 'tbody': '',
                     'th': '\n', 'tr': '\n',
-                    'td': '    '}[tag_name]
-
-        if tag_name == 'table':
-            return '\n'
+                    'td': ''}[tag_name]
 
         if tag_name in HTMLfun.__list_tags:
-            return ''
+            return '\n'
 
         raise CallError(f"Unspecified tag ('{tag_name}'), was HTML sanitize before calling this function?")
 
@@ -139,7 +136,7 @@ class HTMLfun:
                     if (int)(tag.name[1]) < start_hlevel:
                         trans_hlevel_vector[tag.name] = 'h' + (str)(start_hlevel)
                     elif len(trans_hlevel_vector) == 0:
-                        trans_hlevel_vector[tag.name] = 'h' + start_hlevel
+                        trans_hlevel_vector[tag.name] = 'h' + (str)(start_hlevel)
                     else:
                         new_h_list = list(trans_hlevel_vector.values())[-1]
                         trans_hlevel_vector[tag.name] = 'h' + (str)((int)(new_h_list[1]) + 1)
@@ -170,7 +167,6 @@ class HTMLfun:
 
     @staticmethod
     def getPlainTextSuper(html: str, max_colnums = 80):
-
         soup = BeautifulSoup(html, 'html.parser')
 
         top_contents = enumerate(soup.contents)
@@ -178,39 +174,45 @@ class HTMLfun:
         elements_stack = []
 
         text = ''
-        line_no = 0
-        column_no = 0
+        # cursor position:
+        line_no = 1
+        column_len = 0
 
         def update_text(s:str):
-            nonlocal text, line_no, column_no
+            nonlocal text, line_no, column_len
 
-            for l in s.split("\n"):
-                l_len = len(l)
+            # there is 'len(s) - 1' next line characters
+            ln = s.split("\n")
+            lastl_idx = len(ln) - 1
+            for l_idx, l in enumerate(ln):
+                rem_len = len(l)
 
                 # Make correction if it's text very beginning.
                 # Returned text schould not start with new lines
-                if l_len == 0 and (line_no + column_no) == 0:
+                if rem_len == 0 and (line_no + column_len) == 1:
                     continue
-                else:
-                    text += "\n"
-                    line_no += 1
 
-                while (column_no + l_len) > max_colnums:
-                    for m_idx, ch in enumerate(l[max_colnums - (column_no + 1)::-1]):
+                while rem_len != 0 and (column_len + rem_len) >= max_colnums:
+                    cut_at = max_colnums - column_len
+                    for m_idx, ch in enumerate(l[0:cut_at]):
+                        # find last space character:
                         if ch == ' ' or ch == '\t':
-                            break
+                            cut_at = m_idx + 1
 
-                    last_spc_idx = max_colnums - (column_no + m_idx)
-                    if last_spc_idx == 0: last_spc_idx = max_colnums
-
-                    text += l[:last_spc_idx] + "\n"
+                    text += (l[:cut_at] + "\n")
                     line_no += 1
-                    l = l[last_spc_idx:]
-                    l_len = len(l)
-                    column_no = 0
+                    column_len = 0
+
+                    l = l[cut_at:]
+                    rem_len = len(l)
 
                 text += l
-                column_no += len(l)
+                if l_idx != lastl_idx:
+                    text += "\n"
+                    line_no += 1
+                    column_len = 0
+
+                column_len += rem_len
 
         while True:
             idx_el = next(top_contents, None)
@@ -228,7 +230,7 @@ class HTMLfun:
 
             el = idx_el[1]
             if isinstance(el, NavigableString):
-                update_text(el.strip())
+                update_text(el.get_text().strip())
                 #column += len(text)
             elif isinstance(el, Tag):
                 contents_stack.append(top_contents)
