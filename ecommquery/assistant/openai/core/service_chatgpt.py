@@ -39,11 +39,26 @@ class ServiceChatGPT(AnalyticalService):
 
         try:
             response = self.__client.chat.completions.create(
-                model= self.__model_name,
-                messages=[
+                model = self.__model_name,
+                messages = [
                     { "role": "assistant",
                       "content": prompt },
                 ],
+                functions = [
+                { "name": "createResultObject",
+                  "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "first_sentence_of_point_3": {
+                                "type": "string"
+                            },
+                            "error": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }],
+                function_call = {"name": "createResultObject"},
                 stream = False,
                 max_tokens = 1080  # Maximum number of tokens to generate in the completion
             )
@@ -77,7 +92,10 @@ class ServiceChatGPT(AnalyticalService):
 
         for ch in response.choices:
             try:
-                j = json.loads(ch.message.content)
+                functionCall = ch.message.function_call
+                print("BEGIN: \n" + functionCall.arguments + "\nEND--")
+                j = json.loads(functionCall.arguments)
+
                 chooses_list.append(j)
             except json.decoder.JSONDecodeError:
                 print("JSON decoder exception")

@@ -86,28 +86,42 @@ class TestHTMLfun(unittest.TestCase):
         expected2 = "<p>Header</p><p></p><p>Header</p>"
 
         input3 = "<p></p><p><i>Header</i></p><p><i>Header</i></p><p></p><p>Body</p>"
-        input3b = "<p></p><p><i>Hea</i><i>der</i></p><p><i>Header</i></p><p></p><p>Body</p>"
         expected31 = "<p><i>Header</i></p><p><i>Header</i></p><p></p><p>Body</p>"
 
         expected32 = "<p><i>Header</i></p><p></p><p>Body</p>"
 
-        res, stat = HTMLfun.cut_head(input1, ['b'])
+        input4 = "<p>Heading, heading   first</p><p>This is the sentence </p><p>and ugly continuation. </p> <p>and the last part</p>"
+        expected41 = "<p>This is the sentence </p><p>and ugly continuation. </p> <p>and the last part</p>"
+        expected42 = "<p>and the last part</p>"
+
+        res, stat = HTMLfun.cut_until(input1, ['b'])
         self.assertEqual(expected1, res)
 
-        res, stat = HTMLfun.cut_head(input2, text_pattern = 'Header')
+        res, stat = HTMLfun.cut_until(input2, text = 'Header')
         self.assertEqual(expected2, res)
 
-        res, stat = HTMLfun.cut_head(input3, text_pattern='Header')
+        res, stat = HTMLfun.cut_until(input3, text = 'Header', inclusive = False)
         self.assertEqual(expected31, res)
 
-        res, stat = HTMLfun.cut_head(input3, ['i'], 'Header')
+        res, stat = HTMLfun.cut_until(input3, ['i'], 'Header', True)
         self.assertEqual(expected32, res)
 
-        #res, stat = HTMLfun.cut_head(input3b, ['i'], 'Header')
-        #self.assertEqual(expected32, res)
+
+        res, stat = HTMLfun.cut_until(input4, text = 'This is the sentence and ugly continuation.', inclusive = False)
+        self.assertEqual(expected41, res)
+
+        res, stat = HTMLfun.cut_until(input4, text='This is the sentence and ugly continuation.', inclusive=True)
+        self.assertEqual(expected42, res)
+
+    def test_to_plain_text1(self):
+        input1 = "Just text"
+        expected1 = "Just text"
+
+        out = HTMLfun.getPlainTextSuper(input1, max_colnums=80)
+        self.assertEqual(expected1, out)
 
 
-    def test_to_plain_text(self):
+    def test_to_plain_text2(self):
         input1 = "<p><h1>Header</h1> and <h2>sub-header</h2> ... </p>"
         expected1 = """Header
 and
@@ -141,6 +155,15 @@ sentence
 9
 12345678
 """
+        input4 = """<p>1234567</p><p>123456789</p><p>12345678</p>"""
+        expected4 = """1234567
+
+12345678
+9
+
+12345678
+
+"""
 
         out = HTMLfun.getPlainTextSuper(input1, max_colnums = 80)
         self.assertEqual(expected1, out)
@@ -150,6 +173,9 @@ sentence
 
         out = HTMLfun.getPlainTextSuper(input3, max_colnums=8)
         self.assertEqual(expected3, out)
+
+        out = HTMLfun.getPlainTextSuper(input4, max_colnums=8)
+        self.assertEqual(expected4, out)
 
     def test_to_plain_text_file1(self):
         f_in = open("../tests/files/htmlfun_2-input.txt", 'r')

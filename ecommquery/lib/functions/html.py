@@ -120,6 +120,7 @@ class HTMLfun:
                 if len(tag.contents) == 0:
                     tag.unwrap()
                     tag = prev_tag
+
                 # if previous element is a previus tag and tag name is the same,
                 # then merge tags
                 elif prev_tag == tag.previous_sibling and prev_tag.name == tag.name:
@@ -175,7 +176,7 @@ class HTMLfun:
 
         text = ''
         # cursor position:
-        line_no = 1
+        line_no = 0
         column_len = 0
 
         def update_text(s:str):
@@ -189,7 +190,7 @@ class HTMLfun:
 
                 # Make correction if it's text very beginning.
                 # Returned text schould not start with new lines
-                if rem_len == 0 and (line_no + column_len) == 1:
+                if rem_len == 0 and (line_no + column_len) == 0:
                     continue
 
                 while rem_len != 0 and (column_len + rem_len) >= max_colnums:
@@ -244,71 +245,97 @@ class HTMLfun:
 
         return text
 
+
     # prototype function
     # begin
     # continus begin
     # end
     # continuus end
     # all
-    def cut_head(html: str, inline_tags: str = [], text_pattern: str = None, seek = False, cut_pattern = True):
+    def cut_until(html: str, inline_tags: str = [], text: str = None, inclusive = True):
         soup = BeautifulSoup(html, 'html.parser')
         stat = HTMLfun.Stat.openFeed(html)
 
-        p_parent = None
-        l_tag = None
-        tags_for_removal = []
-        parent_text = ''
+        top_contents = enumerate(soup.contents)
+        contents_stack = []
+        marked_el = []
+        match_el = []
 
-        for tag in soup.find_all(True):
-            # ignore breaks
-            if tag.name == 'br':
-                continue
+        itag_found = len(inline_tags) == 0
 
-            # clean up any encounted empty tag
-            if len(tag.text) == 0:
-                tags_for_removal.append(tag)
-                continue
+        patter_found = True
+        pattern = None
+        pattern_idx = 0
 
-            if tag.name == 'p' and len(parent_text) == 0:
-                if p_parent != None:
-                    tags_for_removal.append(p_parent)
+        if text != None:
+            pattern = text.split()
+            patter_found = False
+            patter_len = len(pattern)
 
-                p_parent = tag
-                parent_text = tag.text
-            elif tag.name in inline_tags:
-                if parent_text.startswith(tag.text) == False:
+        while not patter_found or not itag_found:
+            idx_el = next(top_contents, None)
+            # all 'contents' has been iterated, go back to
+            # iterating over parent contents
+            if idx_el == None:
+                if len(contents_stack) != 0:
+                    top_contents = contents_stack.pop()
+                    continue
+                else:  # all done
                     break
 
-                parent_text = parent_text[len(tag.text):]
+            el = idx_el[1]
 
-                if text_pattern != None:
-                    if text_pattern.startswith(tag.text) == False:
+            if isinstance(el, NavigableString):
+                head_text = el.get_text().strip().split()
+                if len(head_text) == 0:
+                    continue
+
+                if text == None:
+                    continue
+
+                match_el.append(el)
+                for ht in head_text:
+                    if pattern[pattern_idx] != ht:
+                        # reset search
+                        pattern_idx = 0
+                        match_el = []
                         break
-                    text_pattern = text_pattern[len(tag.text):]
 
-                if len(parent_text) == 0:
-                    tags_for_removal.append(p_parent)
-                    p_parent = None
+                    pattern_idx += 1
+                    if pattern_idx == patter_len:
+                        # patter has been found
+                        patter_found = True
+                        break
 
-                tags_for_removal.append(tag)
+                #column += len(text)
+            elif isinstance(el, Tag):
+                if not itag_found and el.name in inline_tags:
+                    itag_found = True
+                    match_el.append(marked_el)
 
-                if text_pattern != None and len(text_pattern) == 0:
-                    # patter has been found, done.
-                    break
-            else:
-                l_tag = tag
-                break
+                contents_stack.append(top_contents)
+                marked_el.append(el)
 
-        # if there is a single element in input 'l_tag' stays as 'None'
-        # but we still want to validate if this single tag is not the one for removal
-        if p_parent != None and \
-                (l_tag != None and p_parent != l_tag.parent) and \
-           p_parent.text == text_pattern:
-            tags_for_removal.append(p_parent)
+                top_contents = enumerate(el.contents)
 
-        for tag in tags_for_removal:
-            stat.feedTagMod(tag.name)
-            tag.extract()
+
+        if patter_found and itag_found:
+            marked_el.reverse()
+            for el in marked_el:
+                if (el in match_el) and not inclusive:
+                    continue
+
+                for c in el.contents:
+                    if (c in match_el) and not inclusive:
+                        continue
+
+                    if isinstance(c, NavigableString):
+                        c.extract()
+
+                if len(el.text) == 0:
+                    el.decompose()
+
+            #stat.feedTagMod(tag.name)
 
         output_str = str(soup).strip()
         return output_str, stat.closeFeed(output_str)
