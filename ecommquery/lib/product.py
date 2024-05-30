@@ -92,13 +92,13 @@ class PlainTextProduct(Product):
     name = property(get_name)
 
     def get_sdescr(self):
-        return HTMLfun.mapToPlainText(self.prod.get_sdescr())
+        return HTMLfun.getPlainTextSuper(self.prod.get_sdescr())
         # return HTMLfun.getStripedText()
 
     sdescr = property(get_sdescr)
 
     def get_descr(self):
-        return HTMLfun.mapToPlainText(self.prod.get_descr())
+        return HTMLfun.getPlainTextSuper(self.prod.get_descr())
         #return HTMLfun.getStripedText(self.prod.get_descr())
 
     descr = property(get_descr)

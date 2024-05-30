@@ -17,7 +17,7 @@ class EndpointAsOpenAI(Endpoint):
 
     def __init__(self, params: {}):
         super().__init__( {'version': Endpoint.Constr('_version',
-                                    ListValidator(["gpt-3.5-turbo", "gpt-4-turbo"], 0) ),
+                                    ListValidator(["gpt-3.5-turbo", "gpt-4-turbo", "gpt-4o"], 0) ),
                            'key': Endpoint.Constr(
                                         '_key',
                                         # don't do to strict validation, if API provider would
