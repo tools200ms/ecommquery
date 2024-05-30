@@ -62,9 +62,10 @@ of which description is below:
 === Description Begin ===
 {product.descr}
 === Description End ===
-@end
 
 Return your responce in JSON foramt.
+@end
+
 # next prompt definitins ...
 ```
 Content between `@lookup_for_categories` and `@end` sections is a prompt message.
