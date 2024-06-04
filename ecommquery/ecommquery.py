@@ -27,7 +27,8 @@ class Integrations:
 
     def __init__(self, mode: Mode = Mode.WORK):
         self.__inte = {}
-        self._gmode = mode
+        # default mode
+        self._def_mode = mode
 
     def addLoaderAndRead(self, loader):
         conf = loader.readConfig()
@@ -66,8 +67,12 @@ class Integrations:
             print( ' ' + (len(inte_msg) * '=') )
 
 
-    def getService(self, conf_id = None, ep_id: str = None, endpoint = None, mode: Mode = Mode.WORK):
+    def getService(self, conf_id = None, ep_id: str = None, endpoint = None, mode: Mode = None):
         ep = None
+
+        if mode == None:
+            # set default mode
+            mode = self._def_mode
 
         if len(self.__inte) == 0:
             raise CallError('Empty configuration')
@@ -88,9 +93,6 @@ class Integrations:
             if ep == None:
                 raise CallError('No endpoint has been found')
 
-            if mode == Mode.WORK:
-                mode = self._gmode
-
             return ep.getService(mode)
 
         # pick endpoint
@@ -102,7 +104,7 @@ class Integrations:
         if ep == None:
             raise CallError('No endpoint has been found')
 
-        return ep.getService()
+        return ep.getService(mode)
 
 class ECommDef:
     class Unset:

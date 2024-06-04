@@ -1,5 +1,7 @@
 from ecommquery.core.service_management import ManagementService
+from ecommquery.ext.prestashop_api.lib.ps_feature import PSFeature, PSFeatureValue
 from ecommquery.ext.prestashop_api.lib.ps_product import PSProduct
+from ecommquery.lib.functions.url import URLFun
 from prestapyt import PrestaShopWebServiceDict
 
 
@@ -21,8 +23,24 @@ class ServicePS(ManagementService, PrestaShopWebServiceDict):
     def getProduct(self, item_no):
         return PSProduct(self.get('products', item_no))
 
-    def getFeatures(self, item_no):
-        return self.get('product_features', item_no)
+    def getFeatures(self):
+        feat_raw_list = PSFeature.getProductFeaturesList(self.get('product_features'))
+        feat_list = {}
+        feat_list_by_key = {}
+
+        from pprint import pprint
+        for feat_raw in feat_raw_list:
+            feat = PSFeature(self.get('product_features', feat_raw['attrs']['id']))
+            feat_list[feat.id] = feat
+            feat_list_by_key[URLFun.key_friendly_str(feat.text())] = feat
+
+        feat_val_raw_list = PSFeature.getProductFeatureValuesList(self.get('product_feature_values'))
+
+        for featval_raw in feat_val_raw_list:
+            feat_val = PSFeatureValue(self.get('product_feature_values', featval_raw['attrs']['id']))
+            feat_list[feat_val.id_feature].addValue(feat_val)
+
+        return feat_list_by_key
 
     def commitProduct(self, prod):
         changes = prod.prepareToCommit()
