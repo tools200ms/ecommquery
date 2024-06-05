@@ -49,22 +49,16 @@ class ServiceChatGPT(AnalyticalService):
                   "parameters": {
                         "type": "object",
                         "properties": {
-                            "weganski": {
+                            "ciemna": {
                                 "type": "boolean"
                             },
-                            "wegetarianski": {
+                            "mleczna": {
                                 "type": "boolean"
                             },
-                            "bezglutenowy": {
+                            "biala": {
                                 "type": "boolean"
                             },
-                            "bez-laktozy": {
-                                "type": "boolean"
-                            },
-                            "bez-dodatku-cukru": {
-                                "type": "boolean"
-                            },
-                            "certyfikowany-bio": {
+                            "owocowa": {
                                 "type": "boolean"
                             }
                         }

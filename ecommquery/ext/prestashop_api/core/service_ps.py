@@ -1,5 +1,6 @@
 from ecommquery.core.service_management import ManagementService
 from ecommquery.ext.prestashop_api.lib.ps_feature import PSFeature, PSFeatureValue
+from ecommquery.ext.prestashop_api.lib.ps_options import PSOption, PSOptionValue
 from ecommquery.ext.prestashop_api.lib.ps_product import PSProduct
 from ecommquery.lib.functions.url import URLFun
 from prestapyt import PrestaShopWebServiceDict
@@ -34,13 +35,26 @@ class ServicePS(ManagementService, PrestaShopWebServiceDict):
             feat_list[feat.id] = feat
             feat_list_by_key[URLFun.key_friendly_str(feat.text())] = feat
 
-        feat_val_raw_list = PSFeature.getProductFeatureValuesList(self.get('product_feature_values'))
+        for featval_raw in PSFeature.getProductFeatureValuesList(self.get('product_feature_values')):
 
-        for featval_raw in feat_val_raw_list:
             feat_val = PSFeatureValue(self.get('product_feature_values', featval_raw['attrs']['id']))
             feat_list[feat_val.id_feature].addValue(feat_val)
 
         return feat_list_by_key
+
+    def getOptions(self):
+        opt_raw_list = self.get('product_options')
+        opt_list = {}
+        opt_list_by_key = {}
+
+        for opt_raw in opt_raw_list:
+            opt = PSOption(opt_raw)
+
+        for optval_raw in PSOption.getProductOptionValuesList(self.get('product_option_values')):
+
+            opt_val = PSOptionValue(None)
+
+        return opt_list_by_key
 
     def commitProduct(self, prod):
         changes = prod.prepareToCommit()

@@ -78,6 +78,9 @@ class PSFeature:
 
     @staticmethod
     def getProductFeaturesList(raw):
+        if not 'product_feature' in raw['product_features']:
+            return []
+
         raw_features = raw['product_features']['product_feature']
 
         # just one element
@@ -88,6 +91,9 @@ class PSFeature:
 
     @staticmethod
     def getProductFeatureValuesList(raw):
+        if not 'product_feature_value' in raw['product_feature_values']:
+            return []
+
         raw_feat_vals = raw['product_feature_values']['product_feature_value']
 
         # if only one element is defined it can be not enclosed within list,

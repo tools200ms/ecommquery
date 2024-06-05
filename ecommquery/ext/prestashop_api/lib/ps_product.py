@@ -32,13 +32,17 @@ class PSProduct(Product):
         # self._short_description = HTMLDescription.Generator().newDescription()
         # self._short_description = ...
 
+    # append
     def set_features(self, list: []):
-        if len(list) != 0:
-            self._features['product_feature'] = list
-            self._feature_changed = True
+
+        if 'product_feature' in self._features:
+            clist = self._features['product_feature']
         else:
-            if 'product_feature' in self._features:
-                del self._features['product_feature']
+            clist = []
+
+        if len(list) != 0:
+            self._features['product_feature'] = clist + list
+            self._feature_changed = True
 
     def getRaw(self):
         return self.__raw
