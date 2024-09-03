@@ -150,8 +150,8 @@ def do_stuff(inegr):
 
     for prod_id in ps.getProductList():
         prod = ps.getProduct(prod_id)
-        print(prod.name())
-        print(prod.descr())
+        print(prod.name)
+        print(prod.descr)
 
     the_prod = ps.getProduct('1012')
 
@@ -217,9 +217,37 @@ Data source for Brands:
 | name        |                |           |
 | description |                |           |
 
+
+# Troubleshooting
+
+The fastest way to diagnose issues is to change framework's mode.
+
+## Modes
+Framework provides following modes: 
+
+- Mode.WORK, normal operation, no output messages, only if print( ... ) function is called from task.
+- Mode.DEBUG, print a lot of detailed messages, including those from modules used by framework (`prestapyt`, `openai`).
+- Mode.VERBOSE, print only `ecommquery` related messages (no output messages from modules).
+
+Mode can be passed to `Integrations` object: 
+```python
+inegr = Integrations( Mode.DEBUG )
+```
+in this case the `Mode.DEBUG` will apply to all endpoints. Mode can be also set only for a certain problematic endpoint: 
+```python
+endpoint = inegr.getService( mode = Mode.DEBUG, endpoint = 'presta_api' )
+```
+
+Modes can be combined: 
+```python
+inegr = Integrations( Mode.VERBOSE | Mode.PRETEND )
+```
+In above case framework will pretned that is "doing changes", but also be "verbosable".
+
 # References
 
 * [PrestaShop 1.7 API](https://devdocs.prestashop-project.org/1.7/webservice/)
 * [PrestaShop 8 API](https://devdocs.prestashop-project.org/8/webservice/)
+* [PrestaShop API access Pyton module - Prestapyt](https://github.com/prestapyt/prestapyt)
 * [Docker container with Prestashop tuned for development environment](https://hub.docker.com/r/200ms/prestashop_dev2)
 * [OpenAI API reference](https://platform.openai.com/docs/api-reference)

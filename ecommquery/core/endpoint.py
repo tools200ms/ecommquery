@@ -7,10 +7,10 @@ from ecommquery.exceptions import DataformatError, CallError
 
 class Endpoint:
     class Constr:
-        def __init__(self, name, validator, obligatory: bool = True):
+        def __init__( self, name, validator, obligatory: bool = True ):
             self.name = name
 
-            if isinstance(validator, ParamValidator):
+            if isinstance( validator, ParamValidator ):
                 self.validate = validator.validate
                 self.getDefaultValue = validator.getDefaultValue
             else:
@@ -27,11 +27,11 @@ class Endpoint:
     _id = 0
 
     @staticmethod
-    def register(ep_class):
+    def register( ep_class ):
         Endpoint.__endpointtypes[ep_class.reg_name()] = ep_class;
 
     @staticmethod
-    def getClass(type):
+    def getClass( type ):
         #global endpointtypes
         if not type in Endpoint.__endpointtypes:
             raise Exception('Endpoint of \'' + type + '\' has not been defined')
@@ -48,7 +48,7 @@ class Endpoint:
     def name():
         pass
 
-    def __init__(self, attr_list : {}, params : {}):
+    def __init__( self, attr_list : {}, params : {} ):
         comm_attr_list = {'memo': Endpoint.Constr('_memo', Validator.text, False)}
 
         all_attr_list = comm_attr_list | attr_list
@@ -84,7 +84,7 @@ class Endpoint:
         self._srv = None
         self.__attr_list = all_attr_list
 
-    def id(self):
+    def id( self ):
         return self._id
 
     @abstractmethod

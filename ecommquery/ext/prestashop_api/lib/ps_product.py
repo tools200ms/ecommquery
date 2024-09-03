@@ -5,13 +5,13 @@ from ecommquery.lib.atomic.description import SimpleDescription, HTMLDescription
 from ecommquery.lib.product import Product
 
 class PSProduct(Product):
-    def __init__(self, raw):
+    def __init__( self, raw ):
         super().__init__()
 
         self.__raw = raw
 
         if 'product' not in raw:
-            raise Exception('Missing data (product)')
+            raise Exception( 'Missing data (product)' )
 
         self.__raw_prod_buf = raw['product']
         self.__raw_assoc_buf = self.__raw_prod_buf['associations']
@@ -22,15 +22,19 @@ class PSProduct(Product):
 
         self._item_no = self.__raw_prod_buf['id']
 
-        self._name.text(self.__raw_prod_buf['name']['language']['value'])
-        self._sdescr.text(self.__raw_prod_buf['description_short']['language']['value'])
-        self._descr.text(self.__raw_prod_buf['description']['language']['value'])
+        self._name.text( self.__raw_prod_buf['name']['language']['value'] )
+        self._sdescr.text( self.__raw_prod_buf['description_short']['language']['value'] )
+        self._descr.text( self.__raw_prod_buf['description']['language']['value'] )
+
+        self._price = PSNumber()
+        self._price.rawValue( self.__raw_prod_buf['price'] )
 
         self._weight = PSNumber()
         self._weight.rawValue( self.__raw_prod_buf['weight'] );
 
         # self._short_description = HTMLDescription.Generator().newDescription()
         # self._short_description = ...
+
 
     # append
     def set_features(self, list: []):
@@ -46,6 +50,10 @@ class PSProduct(Product):
 
     def getRaw(self):
         return self.__raw
+
+
+    def price(self, price = None):
+        return self._price.value(price)
 
     def weight(self, weight = None):
         return self._weight.value(weight)
@@ -206,6 +214,10 @@ class PSProduct(Product):
         if self._descr.hasChanged():
             changes.append(self._descr.text)
             self.__raw_prod_buf['description']['language']['value'] = self._descr.text()
+
+        if self._price.hasChanged():
+            changes.append(self._price.rawValue)
+            self.__raw_prod_buf['price'] = self._price.rawValue()
 
         if self._weight.hasChanged():
             changes.append(self._weight.rawValue)
