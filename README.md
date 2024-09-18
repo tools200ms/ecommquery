@@ -251,3 +251,5 @@ In above case framework will pretned that is "doing changes", but also be "verbo
 * [PrestaShop API access Pyton module - Prestapyt](https://github.com/prestapyt/prestapyt)
 * [Docker container with Prestashop tuned for development environment](https://hub.docker.com/r/200ms/prestashop_dev2)
 * [OpenAI API reference](https://platform.openai.com/docs/api-reference)
+* [Amazon SP API samples](https://github.com/amzn/selling-partner-api-samples/tree/main)
+
