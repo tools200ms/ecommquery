@@ -100,7 +100,7 @@ class ServiceAmSP(ManagementService):
 
         # Example query parameters
         marketplace_id = "A1C3SOZRARQ6R3"  # Germany, change as needed
-        seller_sku = "A264MKJK7XEWVL"
+        seller_sku = "3S-MIKQ-225M"
 
         # Construct the full API URL with query parameters
         api_url = f"{listings_url}?sellerId=Foodieshop24&marketplaceIds={marketplace_id}&sku={seller_sku}"
