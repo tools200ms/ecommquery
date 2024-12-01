@@ -16,7 +16,7 @@ class EndpointPS(Endpoint):
     def name():
         return "PrestaShop API"
 
-    def __init__(self, params : {}):
+    def __init__( self, params : {} ):
         super().__init__({'url': Endpoint.Constr('_url', validators.url),
                           'api_secret_key': Endpoint.Constr('_key',
                             # don't do to strict validation, if API provider would
@@ -25,7 +25,7 @@ class EndpointPS(Endpoint):
                             # this code sould handle change without updates.
                             # Exact validation is made by library that talks to API
                             RegExValidator('[a-zA-Z0-9|\-|\_]{16,96}'))},
-                        params)
+                        params )
 
     def info(self):
         info = self._url
@@ -33,7 +33,7 @@ class EndpointPS(Endpoint):
 
         return info
 
-    def _getService(self, mode: Mode):
+    def _getService( self, mode: Mode ):
         return ServicePS( self._url, self._key, **Mode.as_args(mode) )
 
-Endpoint.register(EndpointPS)
+Endpoint.register( EndpointPS )

@@ -21,8 +21,29 @@ class ServicePS(ManagementService, PrestaShopWebServiceDict):
 
         return res
 
-    def getProduct(self, item_no):
-        return PSProduct(self.get('products', item_no))
+    def getProductListByCategories(self, cat_id:int|list|tuple):
+
+        prod_ids = []
+
+        if isinstance(cat_id, list|tuple):
+            for cid in cat_id:
+                prod_ids += self.getProductListByCategories( cid )
+
+            return prod_ids
+
+        res = self.get('categories', cat_id )
+
+
+        if 'category' not in res:
+            raise Exception( 'Missing data (category)' )
+
+        for prod_id in res['category']['associations']['products']['product']:
+            prod_ids.append(prod_id['id'])
+
+        return prod_ids
+
+    def getProduct( self, item_no ):
+        return PSProduct( self.get( 'products', item_no ) )
 
     def getFeatures(self):
         feat_raw_list = PSFeature.getProductFeaturesList(self.get('product_features'))

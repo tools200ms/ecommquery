@@ -1,6 +1,7 @@
 import validators
 
 from ecommquery import Endpoint
+from ecommquery.core.validators import RegExValidator
 from ecommquery.ecommquery import Mode
 from ecommquery.ext.web_scrap.core.servicescrap_web import ServiceWEBScrap
 
@@ -12,7 +13,7 @@ class EndpointScrapWEB(Endpoint):
         return 'web_scrap'
 
     def __init__(self, params : {}):
-        super().__init__({'url': Endpoint.Constr('_url', validators.url)},
+        super().__init__({'url': Endpoint.Constr( '_url', validators.url )},
                          params)
 
     @staticmethod

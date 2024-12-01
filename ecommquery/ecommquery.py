@@ -21,11 +21,11 @@ class Mode(Enum):
 class Integrations:
 
     class LoadedConf:
-        def __init__(self, loader, conf):
+        def __init__( self, loader, conf ):
             self.loader = loader
             self.conf = conf
 
-    def __init__(self, mode: Mode = Mode.WORK):
+    def __init__( self, mode: Mode = Mode.WORK ):
         self.__inte = {}
         # default mode
         self._def_mode = mode
