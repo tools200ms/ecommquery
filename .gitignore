@@ -26,12 +26,17 @@ report/
 *.ini
 !example.ini
 
-*.env
-
-# Compiled Python bytecode
-*.py[cod]
-# python .venv fo virtual environment
+# Ignore project build and test directories:
+dist/
+venv/
 .venv/
+*.log
+
+# Igonore compiled Python bytecode or other temporary files
+# gnerated by Python
+*~
+*.py[cod]
+*.egg-info/
 
 # Log files
 *.log
