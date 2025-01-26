@@ -4,6 +4,10 @@ from ecommquery.core.endpoint import Endpoint
 
 from .lib import *
 
+from .ext.filesystem.core.endpoint_fs import EndpointFS
+from .ext.filesystem.core import *
+from .ext.filesystem.lib import *
+
 # Import extensions:
 from .ext.amazon_api0sp.core.endpoint_amsp import EndpointAmSP
 from .ext.amazon_api0sp.core import *

@@ -8,7 +8,7 @@ def main():
     ret_code = 0
     try:
         inegr = Integrations()
-        inegr.addLoaderAndRead( IniLoader('example.ini') )
+        inegr.addLoaderAndRead(IniLoader('example-all.ini'))
 
         inegr.print()
 

@@ -3,6 +3,9 @@ from abc import abstractmethod
 
 class ManagementService:
 
+    def establish(self):
+        pass
+
     @abstractmethod
     def getProductList(self, criteria = None):
         pass

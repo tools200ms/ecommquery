@@ -28,4 +28,4 @@ class ServiceWEBScrap(ManagementService):
         if response.status_code != 200:
             return False
 
-        return WPSProduct(BeautifulSoup(response.text, 'html.parser'))
+        return WEBProduct(BeautifulSoup(response.text, 'html.parser'))
