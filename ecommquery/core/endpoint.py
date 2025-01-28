@@ -10,7 +10,10 @@ from ecommquery.exceptions import DataformatError, CallError
 class Endpoint:
     class Constr:
         _re_name = None
-        def __init__( self, validator: Validator | Callable[[str], bool], obligatory: bool = True, re_name: str = None ):
+        def __init__( self,
+                      validator: Validator | Callable[[str], bool],
+                      obligatory: bool = True,
+                      re_name: str = None ):
 
             if isinstance( validator, ParamValidator ):
                 self.validate = validator.validate
@@ -119,7 +122,7 @@ class Endpoint:
             return True
 
         for name, value in self.__attr_list.items():
-            attr = getattr(self, value.name)
+            attr = getattr(self, value.getVarName(name))
             if attr == None:
                 continue
 

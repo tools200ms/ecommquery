@@ -1,3 +1,4 @@
+from .ecommquery import Mode
 from .ecommquery import Integrations
 
 from ecommquery.core.endpoint import Endpoint

@@ -65,7 +65,7 @@ class Integrations:
             print( ' ' + (len(inte_msg) * '=') )
 
 
-    def getService(self, conf_id = None, ep_id: str = None, endpoint = None, mode: Mode = None):
+    def getService(self, conf_id = None, ep_id: str = None, endpoint: str = None, mode: Mode = None):
         ep = None
 
         if mode == None:
