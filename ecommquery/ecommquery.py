@@ -60,9 +60,7 @@ class Integrations:
             print(inte_msg)
 
             for e in inte.conf.endpoints():
-                print(' Id # %s' % ( e.id() ) )
-                print(' %sname: %s' % ( 4 * ' ', e.name() ) )
-                print(' %shost: %s' % ( 4 * ' ', e.info() ) )
+                print(f" Id #{e.id()}\n\tname: {e.name()}\n\thost: {e.info()}" )
 
             print( ' ' + (len(inte_msg) * '=') )
 

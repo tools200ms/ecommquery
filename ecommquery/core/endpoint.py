@@ -1,3 +1,5 @@
+from typing import Callable
+
 from abc import abstractmethod
 
 from ecommquery.core.validators import Validator, ParamValidator
@@ -7,8 +9,8 @@ from ecommquery.exceptions import DataformatError, CallError
 
 class Endpoint:
     class Constr:
-        def __init__( self, name, validator, obligatory: bool = True ):
-            self.name = name
+        _re_name = None
+        def __init__( self, validator: Validator | Callable[[str], bool], obligatory: bool = True, re_name: str = None ):
 
             if isinstance( validator, ParamValidator ):
                 self.validate = validator.validate
@@ -19,6 +21,13 @@ class Endpoint:
 
 
             self.__obligatory = obligatory
+            self._re_name = re_name
+
+        def getVarName(self, name: str):
+            if self._re_name is None:
+                return '_' + name
+
+            return '_' + self._re_name
 
         def isObligatory(self):
             return self.__obligatory
@@ -45,13 +54,14 @@ class Endpoint:
 
     @staticmethod
     @abstractmethod
-    def name():
+    def name() -> str:
         pass
 
     def __init__( self, attr_list : {}, params : {} ):
-        comm_attr_list = {'memo': Endpoint.Constr('_memo', Validator.text, False)}
+        comm_attr_list = {'memo': Endpoint.Constr(Validator.text, False)}
 
         all_attr_list = comm_attr_list | attr_list
+
         used = {}
 
         for name, value in params.items():
@@ -61,10 +71,12 @@ class Endpoint:
             if name in used:
                 raise DataformatError(f"Parameter {name} already used, endpoint: {self.reg_name()}")
 
-            if all_attr_list[name].validate(value) == False:
+            c_attr = all_attr_list[name]
+            if c_attr.validate(value) == False:
                 raise DataformatError(f"Illegal value of '{name}' parameter, endpoint: {self.reg_name()}")
 
-            setattr(self, all_attr_list[name].name, value)
+            setattr(self, c_attr.getVarName(name), value)
+
             used[name] = 1
 
         # Set none for attributes that has been not mentioned in configuration
@@ -77,7 +89,7 @@ class Endpoint:
             if attr.isObligatory() and def_value == None:
                 raise CallError(f"'{name}' is obligatory but value is missing, endpoint: {self.reg_name()}")
 
-            setattr(self, attr.name, def_value)
+            setattr(self, attr.getVarName(name), def_value)
 
         self._id = str(Endpoint._id) + "" + self.reg_name()
         Endpoint._id += 1

@@ -18,7 +18,7 @@ class Validator:
 
 class ParamValidator:
     @abstractmethod
-    def validate(self, name):
+    def validate(self, value: str) -> bool:
         pass
 
     def getDefaultValue(self):
@@ -33,8 +33,8 @@ class ListValidator (ParamValidator):
         self.__list = list
         self.__def_idx = def_idx
 
-    def validate(self, name):
-        return name.strip().lower() in self.__list
+    def validate(self, value: str) -> bool:
+        return value.strip().lower() in self.__list
 
     def getDefaultValue(self):
         if self.__def_idx == None:
@@ -47,8 +47,8 @@ class RegExValidator (ParamValidator):
     def __init__(self, pattern):
         self.__re = re.compile( pattern )
 
-    def validate(self, str):
-        return self.__re.match(str)
+    def validate(self, value: str) -> bool:
+        return self.__re.match(value)
 
 class PathValidator(ParamValidator):
     def __init__(self, def_path: str):
@@ -57,7 +57,7 @@ class PathValidator(ParamValidator):
 
         self.__def_path = def_path
 
-    def validate( self, path ):
+    def validate(self, path: str) -> bool:
         try:
             Path(path).resolve()
         except (OSError, RuntimeError):

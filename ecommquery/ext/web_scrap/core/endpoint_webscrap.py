@@ -13,7 +13,7 @@ class EndpointWebScrap(Endpoint):
         return 'web_scrap'
 
     def __init__(self, params : {}):
-        super().__init__({'url': Endpoint.Constr( '_url', validators.url )},
+        super().__init__({'url': Endpoint.Constr( validators.url )},
                          params)
 
     @staticmethod

@@ -14,16 +14,16 @@ class EndpointFS(Endpoint):
         return 'filesystem'
 
     @staticmethod
-    def name():
+    def name() -> str:
         return "File system access"
 
     def __init__(self, params : {}):
-        super().__init__({'path': Endpoint.Constr('_path', PathValidator)},
+        super().__init__({'path': Endpoint.Constr(PathValidator)},
                         params)
 
     def info(self):
         info = self._path
-        if self._memo != None: info += "\n" + self._memo
+        if self._memo != None: info += "\n\t" + self._memo
 
         return info
 

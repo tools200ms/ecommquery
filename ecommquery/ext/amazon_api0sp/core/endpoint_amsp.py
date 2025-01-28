@@ -21,9 +21,9 @@ class EndpointAmSP(Endpoint):
         am_validator = RegExValidator('[a-z0-9|\.|\-]{16,96}')
         rt_validator = RegExValidator('[a-zA-Z0-9|_|\-|\|]{128,512}')
 
-        super().__init__({'client_id': Endpoint.Constr('_client_id', am_validator),
-                          'client_secret_key': Endpoint.Constr('_client_secret_key', am_validator),
-                          'refresh_token': Endpoint.Constr('_refresh_token', rt_validator)},
+        super().__init__({'client_id': Endpoint.Constr(am_validator),
+                          'client_secret_key': Endpoint.Constr(am_validator),
+                          'refresh_token': Endpoint.Constr(rt_validator)},
                         params)
 
     def info(self):
