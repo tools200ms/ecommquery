@@ -1,7 +1,6 @@
 import os.path
 import configparser
 
-from ecommquery import EndpointPS
 from ecommquery.core.endpoint import Endpoint
 from ecommquery.core.loader import Loader
 from ecommquery.exceptions import DataformatError

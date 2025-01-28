@@ -244,10 +244,18 @@ inegr = Integrations( Mode.VERBOSE | Mode.PRETEND )
 ```
 In above case framework will pretned that is "doing changes", but also be "verbosable".
 
+## Known issues
+
+`prestapyt` requiers `packaging` module, but it is not automatically pulled, if you see: 
+> ModuleNotFoundError: No module named 'distutils'
+
+and Python version is `>= 3.12`, install `packaging` module, it solves the issue.
+
 # References
 
 * [PrestaShop 1.7 API](https://devdocs.prestashop-project.org/1.7/webservice/)
 * [PrestaShop 8 API](https://devdocs.prestashop-project.org/8/webservice/)
+* [Python PrestaShop API access module](https://github.com/prestapyt/prestapyt)
 * [PrestaShop API access Pyton module - Prestapyt](https://github.com/prestapyt/prestapyt)
 * [Docker container with Prestashop tuned for development environment](https://hub.docker.com/r/200ms/prestashop_dev2)
 * [OpenAI API reference](https://platform.openai.com/docs/api-reference)

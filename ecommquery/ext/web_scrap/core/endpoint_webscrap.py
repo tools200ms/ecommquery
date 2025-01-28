@@ -3,10 +3,10 @@ import validators
 from ecommquery import Endpoint
 from ecommquery.core.validators import RegExValidator
 from ecommquery.ecommquery import Mode
-from ecommquery.ext.web_scrap.core.servicescrap_web import ServiceWEBScrap
+from ecommquery.ext.web_scrap.core.service_webscrap import ServiceWebScrap
 
 
-class EndpointScrapWEB(Endpoint):
+class EndpointWebScrap(Endpoint):
 
     @staticmethod
     def reg_name():
@@ -26,4 +26,4 @@ class EndpointScrapWEB(Endpoint):
     def _getService(self, mode: Mode):
         return ServiceWEBScrap(self._url, **Mode.as_args(mode))
 
-Endpoint.register(EndpointScrapWEB)
+Endpoint.register(EndpointWebScrap)

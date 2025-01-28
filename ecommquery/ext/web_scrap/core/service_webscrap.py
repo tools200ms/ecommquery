@@ -6,7 +6,7 @@ from ecommquery.core.service_management import ManagementService
 from ecommquery.ext.web_scrap.lib.web_product import WEBProduct
 
 
-class ServiceWEBScrap(ManagementService):
+class ServiceWebScrap(ManagementService):
 
     def __init__(self, url, verbose: bool, debug: bool, pretend: bool):
         self.__verbose = verbose
