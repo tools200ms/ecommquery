@@ -16,6 +16,7 @@ keywords = ["ai", "api", "python"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
+prestapyt = "^0.11.1"
 
 [poetry.group.dev.dependencies]
 pytest = "^7.4" # For testing
