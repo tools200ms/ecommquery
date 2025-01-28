@@ -178,16 +178,20 @@ sentence
         self.assertEqual(expected4, out)
 
     def test_to_plain_text_file1(self):
-        f_in = open("../tests/files/htmlfun_2-input.txt", 'r')
-        f_exp = open("../tests/files/htmlfun_2-expected.txt", 'r')
+        with open("../tests/files/htmlfun_2-input.txt", 'r') as f_in:
+            text_test = f_in.read()
+        with open("../tests/files/htmlfun_2-expected.txt", 'r') as f_exp:
+            text_exp = f_exp.read()
 
-        text = HTMLfun.getPlainTextSuper(f_in.read())
-        print("BEGIN: \n" + text + "\nEND ---")
+        text_test = HTMLfun.getPlainTextSuper(text_test)
+        line_exp_it = iter(text_exp.splitlines())
 
-        self.assertEqual(text, f_exp.read())
+        for line_test in text_test.splitlines():
+            # pyCharm removes automatically line :-/, do less precise test
+            self.assertEqual(next(line_exp_it).strip(), line_test.strip())
 
-        f_exp.close()
-        f_in.close()
+        with self.assertRaises(StopIteration):
+            next(line_exp_it)
 
 if __name__ == '__main__':
     unittest.main()
