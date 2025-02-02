@@ -44,27 +44,27 @@ class ServiceChatGPT(AnalyticalService):
                     { "role": "assistant",
                       "content": prompt },
                 ],
-                functions = [
-                { "name": "createResultObject",
-                  "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "ciemna": {
-                                "type": "boolean"
-                            },
-                            "mleczna": {
-                                "type": "boolean"
-                            },
-                            "biala": {
-                                "type": "boolean"
-                            },
-                            "owocowa": {
-                                "type": "boolean"
-                            }
-                        }
-                    }
-                }],
-                function_call = {"name": "createResultObject"},
+                # functfions = [
+                # { "name": "createResultObject",
+                #   "parameters": {
+                #         "type": "object",
+                #         "properties": {
+                #             "ciemna": {
+                #                 "type": "boolean"
+                #             },
+                #             "mleczna": {
+                #                 "type": "boolean"
+                #             },
+                #             "biala": {
+                #                 "type": "boolean"
+                #             },
+                #             "owocowa": {
+                #                 "type": "boolean"
+                #             }
+                #         }
+                #     }
+                # }],
+                # function_call = {"name": "createResultObject"},
                 stream = False,
                 max_tokens = 1080  # Maximum number of tokens to generate in the completion
             )
@@ -93,21 +93,29 @@ class ServiceChatGPT(AnalyticalService):
         return self._process_answer(response)
 
     def _process_answer(self, response):
-        chooses_list = []
-        j = None
+        resp_text=""
+        r = response.choices
+        #generated_texts = [
+        #    choice.message["content"].strip() for choice in response["choices"]
+        #]
+
+        #chooses_list = []
+        #j = None
 
         for ch in response.choices:
-            try:
-                functionCall = ch.message.function_call
-                print("BEGIN: \n" + functionCall.arguments + "\nEND--")
-                j = json.loads(functionCall.arguments)
+            resp_text = resp_text + ch.message.content
+        #     try:
+        #         functionCall = ch.message.function_call
+        #         print("BEGIN: \n" + functionCall.arguments + "\nEND--")
+        #         j = json.loads(functionCall.arguments)
+        #
+        #         chooses_list.append(j)
+        #     except json.decoder.JSONDecodeError:
+        #         print("JSON decoder exception")
+        #         pprint(ch.message.content)
 
-                chooses_list.append(j)
-            except json.decoder.JSONDecodeError:
-                print("JSON decoder exception")
-                pprint(ch.message.content)
-
-        return chooses_list
+        #return chooses_list
+        return resp_text
 
     def getTotalTokensUsed(self):
         return self.__tomens_used
