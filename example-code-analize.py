@@ -19,13 +19,8 @@ def main():
         fss = integr.getService(endpoint='filesystem')
         file = fss.get_file("docs.py")
 
-        print(file.file_size)
         res = gpt.sendPrompt('report_py_code_summary', [file])
-        #res = gpt.test()
-        #res = gpt.sendPrompt('test', [])
-        #res = res[0]
 
-#        pprint(res)
         print("============\n" + res + "============\n")
     except FileNotFoundError as err:
         print(err)

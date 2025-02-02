@@ -1,27 +1,106 @@
 # EcommQuery
 
-Python e-commerce integration framework. This project has been 
-developed to handle automation tasks for eCommerce. 
+AI integration framework for e-commerce. The project's aim is to provide a tool to automate eCommerce tasks with AI. 
 
-Its concept is based on endpoints that can be of type: 
-- **Data source**
-- or **AI assistant**
+Its concept is based on endpoints that can be of type:
+- **Data source** is an endpoint allowing product and product related data access. One of the data sources is PrestaShop API.
+- **AI assistant** is an interface for prompting AI (such as OpenAI's ChatGPT) with purpose of doing a certain operations on product or product related data.
 
-User defines the **Task** that is a Python code calling appropriately endpoints to do a desired job in eCommerce system.
+EcommQuery uses a simple self-explaing prompt file format: 
+```
+# file: product.prompt.txt
 
-EcomQuery operates on: 
-- product data (name, description, ...) and metadata (weight, codes, ...)
-- and product related data (categories, brands, ...) and its metadata (category index, ...)
+@generate_short_descr_of product
+Below text is a description of a product:
+=== Text Begin ===
+{product.descr}
+=== Text End ===
 
-**Data source** is an end that allows on product and product related data access. One of the data sources is PrestaShop API. 
+Generate short description, return only generated short description in a plain text.
+```
 
-**AI assistant** is an interface for prompting AI (such as OpenAI's ChatGPT) with purpose of doing a certain operations on product or product related data. It could be for instance data extraction (e.g. to place product in desired categories), or improvement of description quality.
+## Usage
+To use the framework: 
+- configure endpoints
+- develop prompt
+- develop 'task'
+- test and run
 
-The framework provides common (regardless of eCommerce at the backend) interface for accessing product and other data. 
-EcomQuery operates in 'language context'. Textual data such as names, descriptions must be linked with a language that are written in. It means also that one text can hold multiple language versions. This is to cover multilingual shops.
+### Configuration files - configuring endpoints
+The configuration is stored in an INI file: 
+```
+[ecommquery]
+memo = <Explanation of the contents of this configuration.>
 
-# Configuration
-ECommQuery endpoints have to be configured by parameters, bellow the list of endpoints and its parameters:
+# Endpoint for accessing PrestaShop:
+[presta_api]
+memo = <optional description>
+url = https://www.example.com/grocerystore
+api_secret_key = TEST06LGUHL19KBQYMK8RNVU45ZK1C1Q
+
+# Endpoint for accessing OpenAI's ChatGPT
+[chatgpt]
+memo = Chat GPT assistant API
+key = DUMMY_KEY-ohsazaejou83d
+queries = ~/prompts/
+```
+### Prompt file format
+Line `queries = ~/prompts/` indicates where prompt files are located. User defines AI prompts in Machine/Model Prompt (*.mp.txt) file, simple example: 
+```
+@assign_cat_for product
+Can you determine categories that fit to the 
+following product description?:
+=== Description Begin ===
+{product.name}
+{product.cdescr}
+=== Description End ===
+
+Aim to find one or maximum three best categories. Categories are
+limited to the names from the list below:
+... THE LIST ...
+.... .... ....
+
+Format output as JSON array.
+@end
+
+# next prompt definitins ...
+```
+Content between `@assign_cat_for` and `@end` sections is a prompt message.
+
+`@assign_cat_for` is a prompt name, followed by a class name of the object that is to be datasource for prompt.
+In this case `{product.descr}` inserts Product's description into a prompt message.
+
+### Developing tasks
+Let's develop a task that will assign product categories based on AI prompt response: 
+
+```python
+from ecommquery import *
+from ecommquery.core.loader_ini import IniLoader
+from ecommquery.exceptions import EcommQueryError
+
+try:
+    integr = Integrations()
+    integr.addLoaderAndRead(IniLoader('./config.ini'))
+
+    ps = inegr.getService(endpoint='prestashop')
+    ai = inegr.getService(endpoint='chatgpt')
+
+    for prod_id in ps.getProductList():
+        prod = ps.getProduct(prod_id)
+        
+        res = ai.sendPrompt('assign_cat_for', [prod])
+        
+        prod.addCat(json.loads(res))
+        ps.commitProduct(the_prod)
+
+    ai.close()
+    ps.close()
+except EcommQueryError as ecq_err:
+    print(ecq_err.message)
+```
+
+# Implemented endpoints
+Below the list of supported endpoints and its parameters: 
 
 Data Source: 
 * `presta_api`- PrestaShop API endpoint
@@ -36,78 +115,38 @@ AI assistant:
   * *key* - ChatGPT key
   * *queries* - path to directory with prompt files (see )
 
-## Configuration files
-Configuration is hold in ini file, the format is: 
-```
-[ecommquery]
-memo = <Description of what is in this config.>
+# Detailed usage
+`Integrations()` object can be used to load more than one configuration file. In such a case, configurations are merged. Look at an example below: 
 
-# Endpoint, e.g.:
-[presta_api]
-memo = <optional description>
-url = https://www.example.com/grocerystore
-api_secret_key = TEST06LGUHL19KBQYMK8RNVU45ZK1C1Q
-
-[web_scrap]
-memo = <optional description>
-url = https://example.com/store
-```
-
-## Propmpt files
-User defines AI prompts in Machine/Model Prompt (*.mp.txt) file, simple example: 
-```
-@lookup_for_categories product
-Please lookup of categories of the product 
-of which description is below: 
-=== Description Begin ===
-{product.descr}
-=== Description End ===
-
-Return your responce in JSON foramt.
-@end
-
-# next prompt definitins ...
-```
-Content between `@lookup_for_categories` and `@end` sections is a prompt message.
-
-`@lookup_for_categories` is a prompt name, followed by a class name of the object that is to be datasource for prompt.
-In this case `{product.descr}` inserts Product's description into prompt message.
-
-# Usage Examples
-User defines tasks that operate on endpoints to achieve desired results.
-Bellow are an example code scraps demonstrating usage.
-
-## Loading configurations
-
-Starting point is `Integrations` object that is used for loading configurations. One configuration file might hold multiple endpoints. There might be one or more configuration files that can be loaded into 'Integration', see example:
 ```python
 from ecommquery import *
 from ecommquery.core.loader_ini import IniLoader
 from ecommquery.exceptions import EcommQueryError
 
 try:
-    inegr = Integrations()
-    inegr.addLoaderAndRead(IniLoader('./configurations/testing-noe.ini'))
-    inegr.addLoaderAndRead(IniLoader('./configurations/testing-sim.ini'))
+    integr = Integrations()
+    integr.addLoaderAndRead(IniLoader('./configurations/testing-noe.ini'))
+    integr.addLoaderAndRead(IniLoader('./configurations/testing-sim.ini'))
 
-    inegr.print()
+    # print 
+    integr.print()
     
-    do_stuff(inegr)
+    do_stuff(integr)
 except EcommQueryError as ecq_err:
     print(ecq_err.message)
 ```
 Output of `inegr.print()` might be following:
 ```
  INI file: ./configurations/testing-noe.ini (ini:PRODUCTION)
- Id # 0
+ Id #0
      name: PrestaShop API
      host: https://noe-test.example.com/grocerystore
- Id # 1
+ Id #1
      name: PrestaShop API
      host: https://noe-test.example.com/electronic-shop
  ==========================================================
  INI file: ./configurations/testing-sim.ini (ini:testing)
- Id # 2
+ Id #2
      name: PrestaShop API
      host: https://sim-test.example.com/grocerystore-test01
  ====================================================
@@ -138,11 +177,9 @@ url = https://sim-test.example.com/grocerystore-test01
 api_secret_key = ...
 ```
 
-Once configuration is loaded task is ready for accessing resources.
-
 ## Accessing service
 Store products, manufacturers, taxes etc. can be accessed via 
-service object that is created from endpoint using 
+a service object that is created by endpoint with 
 `.getService()` method:
 ```python
 def do_stuff(inegr):
@@ -161,9 +198,9 @@ def do_stuff(inegr):
 ```
 
 ## HTML sterilisation
-While working for custommers I found a common issue that HTML descriptions hold leftovers from data migration from a previus system. For instance, HTML code can contain 'div' elemets having defined classes that are nonexistent in a new system, or have 'img' elements with urls pointing to an old system.
+While working for custommers, I found a common issue that HTML descriptions hold leftovers from data migration from a previous system. For instance, HTML code can contain 'div' elemets having defined classes that are nonexistent in a new system, or have 'img' elements with urls pointing to an old system.
 
-Therefore, code sterilisation is a vital part of migration process.
+Therefore, code sterilization is a vital part of migration process.
 Function `HTMLfun.sanitize(html: str)` cleansup code as follows: 
 * unwrap (remove tag keeping its content) all elements that are **not**: 
   * `h1`, `h2`, `h3`, `h4`, `h5`, `h6` - header tags
@@ -180,7 +217,7 @@ Function `HTMLfun.sanitize(html: str)` cleansup code as follows:
 * purge `style` or `class` tag arguments if argument: 
   `purge_classes = True` or `purge_styles = True` is provided.
 
-When sterilized HTML code is translated to plain text it looks better (no muliple new lines, no strange spaces).
+When sterilized HTML code is translated to plain text, it looks better (no multiple new lines, no strange spaces).
 Plain text is a way to communicate with AI, thus machine recives well formatted text. For instance, while translating unsterilized `<b>Co</b><b>conut</b>` to text the output is `Co conut`, thus tag merging is kind important.
 
 # Implementation status
@@ -223,17 +260,20 @@ Data source for Brands:
 The fastest way to diagnose issues is to change framework's mode.
 
 ## Modes
-Framework provides following modes: 
+The Framework provides the following modes: 
 
-- Mode.WORK, normal operation, no output messages, only if print( ... ) function is called from task.
+- Mode.WORK, normal operation, no output messages, only if print( ... ) function is called from a task.
 - Mode.DEBUG, print a lot of detailed messages, including those from modules used by framework (`prestapyt`, `openai`).
 - Mode.VERBOSE, print only `ecommquery` related messages (no output messages from modules).
+- Mode.PRETEND, 'dry run', do not change the system's state:
+  - for **Data source** any read operation is performed normally, while modificatins are skiped - system prints only message what would be done.
+  - for **AI assistant** prompts are not sent to AI but simply print.
 
 Mode can be passed to `Integrations` object: 
 ```python
 inegr = Integrations( Mode.DEBUG )
 ```
-in this case the `Mode.DEBUG` will apply to all endpoints. Mode can be also set only for a certain problematic endpoint: 
+in this case the `Mode.DEBUG` will apply to all endpoints. Mode can be also set only for a certain 'problematic' endpoint: 
 ```python
 endpoint = inegr.getService( mode = Mode.DEBUG, endpoint = 'presta_api' )
 ```
@@ -242,11 +282,11 @@ Modes can be combined:
 ```python
 inegr = Integrations( Mode.VERBOSE | Mode.PRETEND )
 ```
-In above case framework will pretned that is "doing changes", but also be "verbosable".
+In above case framework will pretend that is "doing changes" but also be "verbosable".
 
 ## Known issues
 
-`prestapyt` requiers `packaging` module, but it is not automatically pulled, if you see: 
+`prestapyt` requires `packaging` module, but it is not automatically pulled, if you see: 
 > ModuleNotFoundError: No module named 'distutils'
 
 and Python version is `>= 3.12`, install `packaging` module, it solves the issue.

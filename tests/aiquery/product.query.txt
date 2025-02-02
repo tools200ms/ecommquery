@@ -1,5 +1,0 @@
-
-@summary product
-Generate 2-3 sentence summary of product description that is given below:
-{product.descr}
-@end
