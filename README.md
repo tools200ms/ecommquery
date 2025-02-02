@@ -168,7 +168,7 @@ api_secret_key = ...
 ```
 and 
 ```
-# file: configurations/testing.ini
+# file: configurations/testing-sim.ini
 [ecommquery]
 memo = Testing setups @ Sim
 
@@ -179,7 +179,7 @@ api_secret_key = ...
 
 ## Accessing service
 Store products, manufacturers, taxes etc. can be accessed via 
-a service object that is created by endpoint with 
+a service object created by endpoint with 
 `.getService()` method:
 ```python
 def do_stuff(inegr):
@@ -198,10 +198,9 @@ def do_stuff(inegr):
 ```
 
 ## HTML sterilisation
-While working for custommers, I found a common issue that HTML descriptions hold leftovers from data migration from a previous system. For instance, HTML code can contain 'div' elemets having defined classes that are nonexistent in a new system, or have 'img' elements with urls pointing to an old system.
+When processing HTML data, 'sterilization' is a good practice to ensure that there are not any 'meaningless' tags or attributes.
 
-Therefore, code sterilization is a vital part of migration process.
-Function `HTMLfun.sanitize(html: str)` cleansup code as follows: 
+Function `HTMLfun.sanitize(html: str)` provided by eCommQuery cleans up HTML as follows: 
 * unwrap (remove tag keeping its content) all elements that are **not**: 
   * `h1`, `h2`, `h3`, `h4`, `h5`, `h6` - header tags
   * `p`, `br` - format tags
@@ -213,12 +212,12 @@ Function `HTMLfun.sanitize(html: str)` cleansup code as follows:
 * `h1` element is kind of special, only one `h1` element should be defined on page. In templates used by eCommerce platforms `h1` is usually a product or category name. It is a good idea from SEO point of view. It means also that when sterilizing description any encounted `h1` tags should be shifted to become `h2`. Argument `start_hlevel=2` forces all `Header` elements to start from `h2`. 
 * remove empty **style** elements, such as `<b></b>`
 * merge consecutive style elements, for instance `<b>B</b><b>old</b>` merges to `<b>Bold</b>`. 
-  This it to eliminate an over definition. I found that this can exist surprisingly often.
+  This is to eliminate an over definition. I found that this can exist surprisingly often.
 * purge `style` or `class` tag arguments if argument: 
   `purge_classes = True` or `purge_styles = True` is provided.
 
 When sterilized HTML code is translated to plain text, it looks better (no multiple new lines, no strange spaces).
-Plain text is a way to communicate with AI, thus machine recives well formatted text. For instance, while translating unsterilized `<b>Co</b><b>conut</b>` to text the output is `Co conut`, thus tag merging is kind important.
+Plain text is a way to communicate with AI, thus machine receives well-formatted text. For instance, while translating unsterilized `<b>Co</b><b>conut</b>` to text the output is `Co conut`, thus tag merging is kind important.
 
 # Implementation status
 
