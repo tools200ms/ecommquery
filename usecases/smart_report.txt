@@ -1,0 +1,12 @@
+
+@report_smart_hdd file
+Basing on below 'smartctl -x' output for HDD drive, please find and determinate: 
+- Health condition
+- Time of the last tests
+- Estimated live time of the HDD
+
+===~~- SMART data begin
+{file.content}
+===~~- SMART data end
+
+@end
