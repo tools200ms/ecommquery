@@ -12,7 +12,10 @@ license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/tools200ms/ecommquery"
 repository = "https://github.com/tools200ms/ecommquery"
-keywords = ["ai", "api", "python"]
+keywords = ["ai", "api", "ecommerce", "integrations", "python"]
+
+[tool.poetry.scripts]
+cmd = "ecommquery.__main__:main"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"

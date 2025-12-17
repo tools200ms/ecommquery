@@ -11,11 +11,16 @@ class Endpoint:
     class Constr:
         _re_name = None
         def __init__( self,
-                      validator: Validator | Callable[[str], bool],
+                      validator: ParamValidator | Callable[[str], bool],
                       obligatory: bool = True,
-                      re_name: str = None ):
+                      # Alternative name for the attribute in case of name conflicts
+                      alt_name: str = None ):
 
-            if isinstance( validator, ParamValidator ):
+            
+            if isinstance(validator, type):
+                validator = validator()
+
+            if isinstance(validator, ParamValidator):
                 self.validate = validator.validate
                 self.getDefaultValue = validator.getDefaultValue
             else:
@@ -24,13 +29,13 @@ class Endpoint:
 
 
             self.__obligatory = obligatory
-            self._re_name = re_name
+            self._alt_name = alt_name
 
         def getVarName(self, name: str):
-            if self._re_name is None:
+            if self._alt_name is None:
                 return '_' + name
 
-            return '_' + self._re_name
+            return '_' + self._alt_name
 
         def isObligatory(self):
             return self.__obligatory
@@ -77,6 +82,10 @@ class Endpoint:
             c_attr = all_attr_list[name]
             if c_attr.validate(value) == False:
                 raise DataformatError(f"Illegal value of '{name}' parameter, endpoint: {self.reg_name()}")
+
+            if hasattr(c_attr, 'normValue'):
+                # normalize value:
+                value = c_attr.normValue()
 
             setattr(self, c_attr.getVarName(name), value)
 
@@ -130,6 +139,7 @@ class Endpoint:
                 return True
 
         return False
+
     @abstractmethod
     def info(self):
         pass

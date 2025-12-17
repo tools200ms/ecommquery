@@ -50,6 +50,35 @@ class RegExValidator (ParamValidator):
     def validate(self, value: str) -> bool:
         return self.__re.match(value)
 
+class GenericKeyValidator (RegExValidator):
+    def __init__(self):
+        super().__init__('[a-z0-9|\.|\-]{16,512}')
+
+class YesNoValidator (ParamValidator):
+
+    def __init__(self, default: bool = False):
+        self.__def_val = default
+        self.__val = None
+
+    def normValue(self):
+        if self.__val == None:
+            raise CallError('Value not set')
+
+        return self.__val
+
+    def validate(self, value: str) -> bool:
+        if value.lower() in {"y", "yes", "1", "on"}:
+            self.__val = True
+        elif value.lower() in {"n", "no", "0", "non"}:
+            self.__val = False
+        else:
+            return False
+
+        return True
+
+    def getDefaultValue(self):
+        return self.__def_val
+
 class PathValidator(ParamValidator):
     def __init__(self, def_path: str):
         if not self.validate(def_path):

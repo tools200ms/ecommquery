@@ -299,4 +299,5 @@ and Python version is `>= 3.12`, install `packaging` module, it solves the issue
 * [Docker container with Prestashop tuned for development environment](https://hub.docker.com/r/200ms/prestashop_dev2)
 * [OpenAI API reference](https://platform.openai.com/docs/api-reference)
 * [Amazon SP API samples](https://github.com/amzn/selling-partner-api-samples/tree/main)
+* [Allegro REST API](https://developer.allegro.pl/tutorials/uwierzytelnianie-i-autoryzacja-zlq9e75GdIR)
 

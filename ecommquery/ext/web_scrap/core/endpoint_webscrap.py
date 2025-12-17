@@ -24,6 +24,6 @@ class EndpointWebScrap(Endpoint):
         return self._url
 
     def _getService(self, mode: Mode):
-        return ServiceWEBScrap(self._url, **Mode.as_args(mode))
+        return ServiceWebScrap(self._url, **Mode.as_args(mode))
 
 Endpoint.register(EndpointWebScrap)
