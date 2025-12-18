@@ -9,8 +9,8 @@ from .ext.filesystem.core.endpoint_fs import ServiceFS
 from .ext.filesystem.lib import *
 
 # Import extensions:
-from .ext.allegro_api.core.endpoint_alle import EndpointAlle
-from .ext.allegro_api.core.service_alle import ServiceAlle
+from .ext.allegro_api.endpoint import EndpointAlle
+from ecommquery.ext.allegro_api.service import ServiceAlle
 from .ext.allegro_api.lib import *
 
 from .ext.amazon_api0sp.core.endpoint_amsp import EndpointAmSP

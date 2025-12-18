@@ -1,9 +1,9 @@
+
 from ecommquery.ecommquery import Mode
-from ecommquery.core.validators import RegExValidator, YesNoValidator, GenericKeyValidator
+from ecommquery.core.validators import YesNoValidator, GenericKeyValidator
 
 from ecommquery.core.endpoint import Endpoint
-from ecommquery.ext.amazon_api0sp.core.service_amsp import ServiceAmSP
-
+from ecommquery.ext.allegro_api.service import ServiceAlle
 
 # Amazon Selling Partnr API
 class EndpointAlle(Endpoint):
@@ -30,7 +30,7 @@ class EndpointAlle(Endpoint):
         return info
 
     def _getService(self, mode: Mode):
-        return ServiceAlle( self._client_id, self._client_secret, self._sandbox, **Mode.as_args(mode) )
+        return ServiceAlle(self._client_id, self._client_secret, self._sandbox, **Mode.as_args(mode))
 
-Endpoint.register(EndpointAlle)
+Endpoint.register(EndpointAlle, ServiceAlle)
 

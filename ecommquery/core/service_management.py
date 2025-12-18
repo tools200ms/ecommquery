@@ -6,6 +6,9 @@ class ManagementService:
     def establish(self):
         pass
 
+    def id(self)-> str:
+        pass
+
     @abstractmethod
     def getProductList(self, criteria = None):
         pass

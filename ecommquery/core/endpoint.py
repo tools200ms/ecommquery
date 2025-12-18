@@ -9,7 +9,7 @@ from ecommquery.exceptions import DataformatError, CallError
 
 class Endpoint:
     class Constr:
-        _re_name = None
+
         def __init__( self,
                       validator: ParamValidator | Callable[[str], bool],
                       obligatory: bool = True,
@@ -27,7 +27,6 @@ class Endpoint:
                 self.validate = validator
                 self.getDefaultValue = ParamValidator.getNone
 
-
             self.__obligatory = obligatory
             self._alt_name = alt_name
 
@@ -40,20 +39,28 @@ class Endpoint:
         def isObligatory(self):
             return self.__obligatory
 
-    __endpointtypes = {}
+    __loaded = {}
     _id = 0
 
     @staticmethod
-    def register( ep_class ):
-        Endpoint.__endpointtypes[ep_class.reg_name()] = ep_class;
+    def register(ep_class, srv_class = None):
+        Endpoint.__loaded[ep_class.reg_name()] = (ep_class, srv_class);
 
     @staticmethod
-    def getClass( type ):
+    def getClass(ep_name):
         #global endpointtypes
-        if not type in Endpoint.__endpointtypes:
-            raise Exception('Endpoint of \'' + type + '\' has not been defined')
+        if not type in Endpoint.__loaded:
+            raise Exception('Endpoint of \'' + ep_name + '\' has not been defined')
 
-        return Endpoint.__endpointtypes[type]
+        return Endpoint.__loaded[ep_name][0]
+
+    @staticmethod
+    def getEpName(srv_class):
+        for ep_name, ep_info in Endpoint.__loaded.items():
+            if ep_info[1] == srv_class:
+                return ep_name
+
+        raise Exception('Endpoint of \'' + srv_class + '\' has not been defined')
 
     @staticmethod
     @abstractmethod
