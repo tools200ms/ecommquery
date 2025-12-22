@@ -67,9 +67,9 @@ class YesNoValidator (ParamValidator):
         return self.__val
 
     def validate(self, value: str) -> bool:
-        if value.lower() in {"y", "yes", "1", "on"}:
+        if value.lower() in {"y", "yes", "true", "1", "on"}:
             self.__val = True
-        elif value.lower() in {"n", "no", "0", "non"}:
+        elif value.lower() in {"n", "no", "false", "0", "non"}:
             self.__val = False
         else:
             return False

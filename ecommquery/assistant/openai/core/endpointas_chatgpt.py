@@ -48,7 +48,7 @@ class EndpointAsOpenAI(Endpoint):
                                         # Exact validation is made by library that talks to API
                                         RegExValidator('[a-zA-Z0-9|-|_]{16,96}')),
                            'queries': Endpoint.Constr(PathValidator('queries'),
-                                re_name = 'queries_path')
+                                alt_name = 'queries_path')
                                     },
                          params )
 

@@ -49,8 +49,12 @@ class Endpoint:
     @staticmethod
     def getClass(ep_name):
         #global endpointtypes
-        if not type in Endpoint.__loaded:
-            raise Exception('Endpoint of \'' + ep_name + '\' has not been defined')
+        if not ep_name in Endpoint.__loaded:
+
+            raise Exception(f"""Endpoint of '{ep_name}' has not been defined.
+    Avialable modules: 
+      - {"\n      - ".join(Endpoint.__loaded.keys())}
+""")
 
         return Endpoint.__loaded[ep_name][0]
 

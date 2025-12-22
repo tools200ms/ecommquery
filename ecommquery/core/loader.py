@@ -20,7 +20,7 @@ class Loader:
 
         def endpoint(self, id = None, pattern : str = None):
             if len(self.__ep_dict) == 0:
-                raise Loader.CallError('Empty Endpoint set')
+                raise CallError('Empty Endpoint set')
 
             ep_dict_search = None
             ep = None

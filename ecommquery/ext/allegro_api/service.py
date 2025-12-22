@@ -3,6 +3,7 @@ Based on:
 https://developer.allegro.pl/tutorials/uwierzytelnianie-i-autoryzacja-zlq9e75GdIR
 '''
 from datetime import datetime
+from json import JSONDecodeError
 
 from ecommquery import Endpoint
 from ecommquery.core.service_management import ManagementService
@@ -20,8 +21,12 @@ class ServiceAlle(ManagementService):
 
         module = Endpoint.getEpName(self.__class__)
 
-        self._stash = Stash(module, id())
-        self._stash.load()
+        self._stash = Stash(module, self.id())
+
+        try:
+            self._stash.load()
+        except JSONDecodeError as json_err:
+            raise Exception(f"Failed to load stash file. Please check the file format and try again:\n    {json_err}")
 
     def id(self) -> str:
         if self._req.isSandBox():

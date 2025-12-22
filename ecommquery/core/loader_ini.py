@@ -1,4 +1,4 @@
-import os.path
+from pathlib import Path
 import configparser
 
 from ecommquery.core.endpoint import Endpoint
@@ -9,16 +9,18 @@ from ecommquery.exceptions import DataformatError
 class IniLoader(Loader):
     def __init__(self, path = 'integrations.ini'):
         super().__init__()
-        self.__path = path;
+        self.__path = Path(path).expanduser()
+
+
         self.__ini_parser = configparser.ConfigParser()
-        with open(path) as f:
+        with open(self.__path) as f:
             self.__ini_parser.read_file(f)
 
     def getInfo(self):
-        return 'INI file: ' + self.__path;
+        return 'INI file: ' + str(self.__path);
 
     def genName(self):
-        key = os.path.basename(self.__path)
+        key = self.__path.name
         idx = key.lower().rfind('.ini')
         if idx > 0:
             key = key[0:idx]
@@ -40,6 +42,9 @@ class IniLoader(Loader):
                 name = self.genName()
 
             config = Loader.Config(memo, name)
+
+            if len(sect[1:]) == 0:
+                raise DataformatError('No configuration, only [ecommquery] section defined')
 
             for ep_type in sect[1:]:
                 ep_class = Endpoint.getClass(ep_type)

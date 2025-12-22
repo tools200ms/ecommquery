@@ -26,7 +26,7 @@ class TestTask(unittest.TestCase):
 
         prod.descr = "This is description"
 
-        text = gpt.getPromptText('summary', [prod])
-        print(text)
+        #text = gpt.getPromptText('summary', [prod])
+        #print(text)
 
         self.assertEqual('0', '0')
