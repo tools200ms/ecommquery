@@ -108,7 +108,7 @@ Authentication Details:
             pprint(resp_data)
             result = {k: resp_data[k] for k in Authenticator._token_resp_filter if k in resp_data}
 
-            return Session(result)
+            return Session(**result)
 
         print("Authorization timed out.")
         return None

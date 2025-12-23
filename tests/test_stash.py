@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import unittest
 import sys
@@ -41,6 +42,8 @@ class TestTask(unittest.TestCase):
         self.assertEqual( stash_2g.get('prop_a'), 1 )
         self.assertEqual( stash_2g.get('prop_b'), "test")
 
+        self.assertEqual(stash_2g.get('not_existing'), None)
+
         stash_2g.set('prop_a', 2)
         stash_2g.unset('prop_b')
 
@@ -51,3 +54,22 @@ class TestTask(unittest.TestCase):
 
         self.assertEqual( copy['test']['id']['prop_a'], 2 )
         self.assertNotIn('prop_b', copy['test']['id'])
+
+        date_now = datetime.now()
+        date_now_str = date_now.strftime('%Y-%m-%d %H:%M:%S')
+        date_now_norm = datetime.strptime(date_now_str, '%Y-%m-%d %H:%M:%S')
+
+        stash_2g.setDate('date_now', date_now)
+
+        self.assertEqual( date_now_str,
+                          stash_2g.get('date_now') )
+
+        self.assertEqual(date_now_norm,
+                         stash_2g.getDate('date_now') )
+
+        stash_2g.set('none_value', None)
+        self.assertEqual(None,
+                         stash_2g.get('none_value'))
+
+        stash_2g.save()
+        stash_2g.close()

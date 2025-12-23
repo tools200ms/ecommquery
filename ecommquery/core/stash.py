@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 from pathlib import Path
 
 class Stash:
@@ -42,7 +43,7 @@ class Stash:
         if not self._stash_file.is_file():
             raise Exception(f"Stash file path is not a file: {self._stash_file}")
 
-        if Stash._cache == None or Stash._mod_time != self._stash_file.stat().st_mtime:
+        if Stash._mod_time == None or Stash._mod_time != self._stash_file.stat().st_mtime:
             with open(self._stash_file, 'r+') as file:
                 file.seek(0)
                 Stash._cache = json.load(file)
@@ -55,6 +56,7 @@ class Stash:
                     return
 
         self._dom = Stash._cache[self._module][self._id].copy()
+        print(self._dom)
         # end of load
 
     def set(self, prop, value):
@@ -62,16 +64,28 @@ class Stash:
             raise Exception('Stash has not been loaed')
         self._dom[prop] = value
 
+    def setDate(self, prop, date:datetime):
+        if date == None:
+            self.set(prop, None)
+        else:
+            self.set(prop, date.strftime('%Y-%m-%d %H:%M:%S'))
+
     def unset(self, prop):
         if self._dom == None:
             raise Exception('Stash has not been loaed')
         del self._dom[prop]
 
-    def get(self, property):
+    def get(self, prop):
         if self._dom == None:
             raise Exception('Stash has not been loaed')
 
-        return self._dom[property]
+        if not prop in self._dom:
+            return None
+
+        return self._dom[prop]
+
+    def getDate(self, prop)-> datetime:
+        return datetime.strptime(self.get(prop), '%Y-%m-%d %H:%M:%S')
 
     def save(self):
         if self._dom == None:

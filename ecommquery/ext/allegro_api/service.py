@@ -44,12 +44,20 @@ class ServiceAlle(ManagementService):
 
             self._stash.set("access_token", session.access_token)
             self._stash.set("refresh_token", session.refresh_token)
-            self._stash.set("expires_on", session.expires_on.strftime('%Y-%m-%d %H:%M:%S'))
+            self._stash.setDate("expires_on", session.expires_on)
+            self._stash.save()
         else:
             session = Session(self._stash.get("access_token"),
                               self._stash.get("refresh_token"),
-                              datetime.strptime(self._stash.get("expires_on"), '%Y-%m-%d %H:%M:%S')
+                              self._stash.getDate("expires_on")
                               )
 
         # operations on session
         print(auth)
+        return session
+
+    def refresh(self, session: Session) -> Session:
+        pass
+
+    def close(self):
+        pass
