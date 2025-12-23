@@ -17,7 +17,7 @@ class Session:
         if type(expires_in) == int:
             if expires_in <= 0:
                 raise ValueError("Invalid expires_in value")
-            self._expires_on = Session.getExpireOn(expires_in)
+            self._expires_on = Session.__getExpireOn(expires_in)
         elif type(expires_in) == datetime:
             self._expires_on = expires_in
         else:
@@ -31,6 +31,10 @@ class Session:
         self._scope = scope
         self._token_type = token_type
 
+    @staticmethod
+    def __getExpireOn(expires_in: int):
+        return (datetime.now() + timedelta(seconds=expires_in - 1))
+    
     @property
     def access_token(self):
         return self._access_token
@@ -52,27 +56,5 @@ class Session:
     def token_type(self):
         return self._token_type
 
-    @staticmethod
-    def getExpireOn(expires_in: int):
-        return (datetime.now() + timedelta(seconds=expires_in - 5))
-
-    def request(self):
-
-        user_me_url = f"{BASE_URL_SANDBOX}/me"
-        headers = {
-            "Authorization": f"Bearer {self._access_token}",
-            "Accept": "application/vnd.allegro.public.v1+json"
-        }
-
-        try:
-            api_response = requests.get(user_me_url, headers=headers)
-            api_response.raise_for_status()
-            user_data = api_response.json()
-            print(f"API Call Success: Hello, {user_data.get('login')}!")
-            # print(user_data) # Uncomment to see the full response
-        except requests.exceptions.RequestException as e:
-            print(f"Error during example API call: {e}")
-            print(f"Response content: {api_response.text if 'api_response' in locals() else 'N/A'}")
-    
-    def refresh(self):
-        pass
+    def ACValidForSec(self):
+        return int((self._expires_on - datetime.now()).total_seconds())

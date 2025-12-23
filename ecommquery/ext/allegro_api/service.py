@@ -41,8 +41,9 @@ class ServiceAlle(ManagementService):
             auth.printMessage()
             auth.printDetails()
             session = auth.poll_for_token(self._req)
+            access_token = session.access_token
 
-            self._stash.set("access_token", session.access_token)
+            self._stash.set("access_token", access_token)
             self._stash.set("refresh_token", session.refresh_token)
             self._stash.setDate("expires_on", session.expires_on)
             self._stash.save()
@@ -52,8 +53,10 @@ class ServiceAlle(ManagementService):
                               self._stash.getDate("expires_on")
                               )
 
+        session.get, session.post = self._req.getSessionRequestor(access_token)
+
         # operations on session
-        print(auth)
+        #print(auth)
         return session
 
     def refresh(self, session: Session) -> Session:
