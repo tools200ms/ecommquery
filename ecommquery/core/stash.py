@@ -4,6 +4,9 @@ from pathlib import Path
 
 class Stash:
     STASH_DEFAULT_FILE = 'ecommquery_stash.json'
+    _cache = None
+    _mod_time = None
+    _register = set()
 
     def __init__(self, module: str, id: str, stash_file: Path = Path(STASH_DEFAULT_FILE)):
         self._module = module
@@ -11,15 +14,27 @@ class Stash:
         self._stash_file = stash_file
         self._dom = None
 
-    def _load(self):
-        pass
-    
+        self._modid = module + ':' + id
+
+        if self._modid in Stash._register:
+            raise Exception(f"Stash with module '{module}' and id '{id}' already exists")
+
+        Stash._register.add(self._modid)
+
+    def close(self):
+        self._module = None
+        self._id = None
+        self._stash_file = None
+        self._dom = None
+        Stash._register.remove(self._modid)
+
     def load(self):
         if (     not os.path.exists(self._stash_file) or 
                 (self._stash_file.is_file() and self._stash_file.stat().st_size == 0)):
             # if empty create file:
             with open(self._stash_file, 'w') as file:
-                json.dump({self._module: {self._id: {}}}, file, indent=2)
+                Stash._cache = {self._module: {self._id: {}}}
+                json.dump(Stash._cache, file, indent=2)
             self._dom = {}
             return
 
@@ -27,24 +42,30 @@ class Stash:
         if not self._stash_file.is_file():
             raise Exception(f"Stash file path is not a file: {self._stash_file}")
 
-        # else
-        with open(self._stash_file, 'r+') as file:
-            file.seek(0)
-            obj = json.load(file)
-            if self._module not in obj or self._id not in obj[self._module]:
-                obj[self._module] = {self._id: {}}
+        if Stash._cache == None or Stash._mod_time != self._stash_file.stat().st_mtime:
+            with open(self._stash_file, 'r+') as file:
                 file.seek(0)
-                json.dump(obj, file, indent=2)
-                self._dom = {}
-                return
+                Stash._cache = json.load(file)
+                Stash._mod_time = self._stash_file.stat().st_mtime
+                if self._module not in Stash._cache or self._id not in Stash._cache[self._module]:
+                    Stash._cache[self._module] = {self._id: {}}
+                    file.seek(0)
+                    json.dump(Stash._cache, file, indent=2)
+                    self._dom = {}
+                    return
 
-        self._dom = obj[self._module][self._id]
+        self._dom = Stash._cache[self._module][self._id].copy()
         # end of load
 
     def set(self, prop, value):
         if self._dom == None:
             raise Exception('Stash has not been loaed')
         self._dom[prop] = value
+
+    def unset(self, prop):
+        if self._dom == None:
+            raise Exception('Stash has not been loaed')
+        del self._dom[prop]
 
     def get(self, property):
         if self._dom == None:
@@ -56,10 +77,7 @@ class Stash:
         if self._dom == None:
             raise Exception('Stash has not been loaed')
 
-        with open(self._stash_file, 'w+') as file:
-            file.seek(0)
-            obj = json.load(file)
-            obj[self._module][self._id] = self._dom
-            file.seek(0)
-            json.dump(obj, file, indent=2)
+        with open(self._stash_file, 'w') as file:
+            Stash._cache[self._module][self._id] = self._dom
+            json.dump(Stash._cache, file, indent=2)
 

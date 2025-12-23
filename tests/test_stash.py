@@ -1,3 +1,4 @@
+import json
 import unittest
 import sys
 import tempfile
@@ -23,11 +24,30 @@ class TestTask(unittest.TestCase):
 
         stash_1g.save()
 
-        #stash_2g = Stash('test', 'id', Path(temp_file.name))
-        #stash_2g.load()
+        with open(temp_file.name) as temp_file_ref2:
+            copy = json.load(temp_file_ref2)
 
-        #self.assertEqual( stash_2g.get('prop_a'), 1 )
-        #self.assertEqual( stash_2g.get('prop_b'), "test")
+        self.assertEqual( copy['test']['id']['prop_a'], 1 )
+        self.assertEqual( copy['test']['id']['prop_b'], "test")
 
+        with self.assertRaises(Exception):
+            Stash('test', 'id', Path(temp_file.name))
 
-   
+        stash_1g.close()
+        stash_2g = Stash('test', 'id', Path(temp_file.name))
+
+        stash_2g.load()
+
+        self.assertEqual( stash_2g.get('prop_a'), 1 )
+        self.assertEqual( stash_2g.get('prop_b'), "test")
+
+        stash_2g.set('prop_a', 2)
+        stash_2g.unset('prop_b')
+
+        stash_2g.save()
+
+        with open(temp_file.name) as temp_file_ref2:
+            copy = json.load(temp_file_ref2)
+
+        self.assertEqual( copy['test']['id']['prop_a'], 2 )
+        self.assertNotIn('prop_b', copy['test']['id'])
