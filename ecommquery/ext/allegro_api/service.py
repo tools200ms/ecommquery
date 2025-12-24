@@ -36,6 +36,9 @@ class ServiceAlle(ManagementService):
 
     def establish(self):
         access_token = self._stash.get("access_token")
+        refresh_token = self._stash.get("refresh_token")
+        expires_on = self._stash.getDate("expires_on")
+
         if access_token == None:
             auth = Authenticator.start_device_flow(self._req)
             auth.printMessage()
@@ -48,10 +51,12 @@ class ServiceAlle(ManagementService):
             self._stash.setDate("expires_on", session.expires_on)
             self._stash.save()
         else:
-            session = Session(self._stash.get("access_token"),
-                              self._stash.get("refresh_token"),
-                              self._stash.getDate("expires_on")
-                              )
+            session = Session(access_token, refresh_token, expires_on)
+            if not session.isFresh() and not session.isStale():
+                self.refresh(session)
+            else:
+                print("Start device flow authorization.")
+                return None
 
         session.get, session.post = self._req.getSessionRequestor(access_token)
 
@@ -60,7 +65,11 @@ class ServiceAlle(ManagementService):
         return session
 
     def refresh(self, session: Session) -> Session:
-        pass
+        session.refreshAccessToken(self._req)
+        self._stash.set("access_token", session.access_token)
+        self._stash.set("refresh_token", session.refresh_token)
+        self._stash.setDate("expires_on", session.expires_on)
+        self._stash.save()
 
     def close(self):
         pass

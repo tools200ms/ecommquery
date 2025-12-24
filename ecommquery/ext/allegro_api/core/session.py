@@ -3,7 +3,7 @@ import requests
 from ecommquery.ext.allegro_api.core.requestor import Requestor
 from datetime import datetime, timedelta
 
-from ecommquery.ext.allegro_api.lib.constants import BASE_URL_SANDBOX
+from ecommquery.ext.allegro_api.lib.constants import BASE_URL_SANDBOX, PathTo
 
 
 class Session:
@@ -33,11 +33,15 @@ class Session:
 
     @staticmethod
     def __getExpireOn(expires_in: int):
-        return (datetime.now() + timedelta(seconds=expires_in - 1))
+        return (datetime.now() + timedelta(seconds=expires_in))
     
     @property
     def access_token(self):
         return self._access_token
+
+    @property
+    def refresh_token(self):
+        return self._refresh_token
 
     @property
     def allegro_api(self):
@@ -47,9 +51,17 @@ class Session:
     def expires_on(self):
         return self._expires_on
 
-    @property
-    def refresh_token(self):
-        return self._refresh_token
+    def refreshAccessToken(self, req):
+        resp = req.post(PathTo.TOKEN,
+                        {"grant_type": "refresh_token",
+                         "refresh_token": self._refresh_token})
+        resp.raise_for_status()
+
+        ret = resp.json()
+        #self._access_token = ret["access_token"]
+        #self._refresh_token = ret["refresh_token"]
+        #self._expires_on = Session.__getExpireOn(ret["expires_in"])
+        print(ret)
 
 
     @property
@@ -58,3 +70,9 @@ class Session:
 
     def ACValidForSec(self):
         return int((self._expires_on - datetime.now()).total_seconds())
+
+    def isFresh(self):
+        return self.ACValidForSec() > 300
+
+    def isStale(self):
+        return self.ACValidForSec() < -300
