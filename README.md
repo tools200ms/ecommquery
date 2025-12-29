@@ -100,24 +100,55 @@ except EcommQueryError as ecq_err:
 ```
 
 # Implemented endpoints
-Below the list of supported endpoints and its parameters: 
+Below is the list of supported endpoints and its parameters: 
 
 Data Source: 
-* `presta_api`- PrestaShop API endpoint
-  * *url* - store or API URL
-  * *api_secret_key* - API key
-* `web_scrap`- Web scrapping endpoint
-  * *url* - store URL
+* `presta_api`– PrestaShop API endpoint
+  * *url* – store or API URL
+  * *api_secret_key* – API key
+* `allegro_api`– Allegro API
+  * *client_id* – client ID
+  * *client_secret* – client secret
+  * *sandbox* – sandbox mode, default: `False`
+* `web_scrap`– Web scrapping endpoint
+  * *url* – store URL
 
 AI assistant:
 * `chatgpt`- ChatGPT
   * *version* - model version, default: `gpt-3.5-turbo`
-  * *key* - ChatGPT key
-  * *queries* - path to directory with prompt files (see )
+  * *key* – ChatGPT key
+  * *queries* – path to directory with prompt files (see [example/prompts](./example/prompts))
 
 # Detailed usage
 `Integrations()` object can be used to load more than one configuration file. In such a case, configurations are merged. Look at an example below: 
 
+INI file `configurations/testing-noe.ini`: 
+```
+# file: configurations/testing-noe.ini'))
+[ecommquery]
+memo = Testing stores @ Noe
+
+[presta_api]
+url = https://noe-test.example.com/grocerystore
+api_secret_key = TEST06LGUHL19KBQYMK8RNVU45ZK1C1Q
+
+[presta_api 2]
+url = https://noe-test.example.com/electronic-shop
+api_secret_key = ...
+
+```
+INI file `configurations/testing-sim.ini`: 
+```
+# file: configurations/testing-sim.ini
+[ecommquery]
+memo = Testing setups @ Sim
+
+[presta_api]
+url = https://sim-test.example.com/grocerystore-test01
+api_secret_key = ...
+```
+
+Python code: 
 ```python
 from ecommquery import *
 from ecommquery.core.loader_ini import IniLoader
@@ -135,7 +166,7 @@ try:
 except EcommQueryError as ecq_err:
     print(ecq_err.message)
 ```
-Output of `inegr.print()` might be following:
+Output of `inegr.print()` is following:
 ```
  INI file: ./configurations/testing-noe.ini (ini:PRODUCTION)
  Id #0
@@ -151,34 +182,9 @@ Output of `inegr.print()` might be following:
      host: https://sim-test.example.com/grocerystore-test01
  ====================================================
 ```
-and the configuration files might look like bellow: 
-```
-# file: configurations/testing-noe.ini'))
-[ecommquery]
-memo = Testing stores @ Noe
-
-[presta_api]
-url = https://noe-test.example.com/grocerystore
-api_secret_key = TEST06LGUHL19KBQYMK8RNVU45ZK1C1Q
-
-[presta_api 2]
-url = https://noe-test.example.com/electronic-shop
-api_secret_key = ...
-
-```
-and 
-```
-# file: configurations/testing-sim.ini
-[ecommquery]
-memo = Testing setups @ Sim
-
-[presta_api]
-url = https://sim-test.example.com/grocerystore-test01
-api_secret_key = ...
-```
 
 ## Accessing service
-Store products, manufacturers, taxes etc. can be accessed via 
+Store products, manufacturers, taxes, etc. can be accessed via 
 a service object created by endpoint with 
 `.getService()` method:
 ```python
@@ -209,7 +215,7 @@ Function `HTMLfun.sanitize(html: str)` provided by eCommQuery cleans up HTML as 
   * `ul`, `ol`, `li` - list tags
   
   Note that `div` and `span` elements are also removed (unwraped).
-* `h1` element is kind of special, only one `h1` element should be defined on page. In templates used by eCommerce platforms `h1` is usually a product or category name. It is a good idea from SEO point of view. It means also that when sterilizing description any encounted `h1` tags should be shifted to become `h2`. Argument `start_hlevel=2` forces all `Header` elements to start from `h2`. 
+* `h1` element is kind of special, only one `h1` element should be defined on page. In templates used by eCommerce platforms `h1` is usually a product or category name. It is a good idea from an SEO point of view. It means also that when sterilizing description any encounted `h1` tags should be shifted to become `h2`. Argument `start_hlevel=2` forces all `Header` elements to start from `h2`. 
 * remove empty **style** elements, such as `<b></b>`
 * merge consecutive style elements, for instance `<b>B</b><b>old</b>` merges to `<b>Bold</b>`. 
   This is to eliminate an over definition. I found that this can exist surprisingly often.
