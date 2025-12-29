@@ -1,3 +1,5 @@
+from pprint import pprint
+
 import requests
 
 from ecommquery.ext.allegro_api.core.requestor import Requestor
@@ -8,10 +10,12 @@ from ecommquery.ext.allegro_api.lib.constants import BASE_URL_SANDBOX, PathTo
 
 class Session:
     def __init__(self,
+                 req: Requestor,
                  access_token,
                  refresh_token,
                  expires_in: int|datetime,
                  scope = None, allegro_api = None, iss = None, jti = None, token_type = None):
+        self._req = req
         self._access_token = access_token
         self._allegro_api = allegro_api
         if type(expires_in) == int:
@@ -30,6 +34,8 @@ class Session:
         self._jti = jti
         self._scope = scope
         self._token_type = token_type
+
+        self.get, self.post = req.getSessionRequestor(access_token)
 
     @staticmethod
     def __getExpireOn(expires_in: int):
@@ -51,8 +57,8 @@ class Session:
     def expires_on(self):
         return self._expires_on
 
-    def refreshAccessToken(self, req):
-        resp = req.post(PathTo.TOKEN,
+    def refreshAccessToken(self):
+        resp = self._req.post(PathTo.TOKEN,
                         {"grant_type": "refresh_token",
                          "refresh_token": self._refresh_token})
         resp.raise_for_status()
@@ -61,8 +67,7 @@ class Session:
         #self._access_token = ret["access_token"]
         #self._refresh_token = ret["refresh_token"]
         #self._expires_on = Session.__getExpireOn(ret["expires_in"])
-        print(ret)
-
+        pprint(ret)
 
     @property
     def token_type(self):
@@ -72,7 +77,8 @@ class Session:
         return int((self._expires_on - datetime.now()).total_seconds())
 
     def isFresh(self):
-        return self.ACValidForSec() > 300
+        return self.ACValidForSec() >= 300
 
     def isStale(self):
-        return self.ACValidForSec() < -300
+        valid_for_sec = self.ACValidForSec()
+        return -300 <= valid_for_sec < 300

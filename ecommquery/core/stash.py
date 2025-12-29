@@ -85,7 +85,13 @@ class Stash:
         return self._dom[prop]
 
     def getDate(self, prop)-> datetime:
-        return datetime.strptime(self.get(prop), '%Y-%m-%d %H:%M:%S')
+        res = None
+        time_in_str = self.get(prop)
+
+        if time_in_str is not None:
+            res = datetime.strptime(time_in_str, '%Y-%m-%d %H:%M:%S')
+
+        return res
 
     def save(self):
         if self._dom == None:
