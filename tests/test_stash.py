@@ -1,3 +1,5 @@
+import os
+import shutil
 from datetime import datetime
 import json
 import unittest
@@ -13,11 +15,12 @@ sys.path.append('../ecommquery')
 class TestTask(unittest.TestCase):
 
     def test_1(self):
-        temp_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        temp_file.close()
-        print(f"Temporary file '{temp_file.name}' has been created.")
+        tmpdir = tempfile.mkdtemp()
+        temp_file = os.path.join(tmpdir, "stash.sql")
 
-        stash_1g = Stash('test', 'id', Path(temp_file.name))
+        print(f"Temporary file '{temp_file}' has been created.")
+
+        stash_1g = Stash('test', 'id', Path(temp_file))
         stash_1g.load()
 
         stash_1g.set('prop_a', 1)
@@ -25,17 +28,17 @@ class TestTask(unittest.TestCase):
 
         stash_1g.save()
 
-        with open(temp_file.name) as temp_file_ref2:
+        with open(temp_file) as temp_file_ref2:
             copy = json.load(temp_file_ref2)
 
         self.assertEqual( copy['test']['id']['prop_a'], 1 )
         self.assertEqual( copy['test']['id']['prop_b'], "test")
 
         with self.assertRaises(Exception):
-            Stash('test', 'id', Path(temp_file.name))
+            Stash('test', 'id', Path(temp_file))
 
         stash_1g.close()
-        stash_2g = Stash('test', 'id', Path(temp_file.name))
+        stash_2g = Stash('test', 'id', Path(temp_file))
 
         stash_2g.load()
 
@@ -49,7 +52,7 @@ class TestTask(unittest.TestCase):
 
         stash_2g.save()
 
-        with open(temp_file.name) as temp_file_ref2:
+        with open(temp_file) as temp_file_ref2:
             copy = json.load(temp_file_ref2)
 
         self.assertEqual( copy['test']['id']['prop_a'], 2 )
@@ -73,3 +76,5 @@ class TestTask(unittest.TestCase):
 
         stash_2g.save()
         stash_2g.close()
+
+        shutil.rmtree(tmpdir)

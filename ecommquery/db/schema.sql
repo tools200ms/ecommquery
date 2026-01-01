@@ -1,8 +1,15 @@
 
-/* Redundant reference and property database
 
- */
+DROP TABLE IF EXISTS comments;
+CREATE TABLE comments (
+    msg VARCHAR(4096),
+    msg_date DATETIME DEFAULT (datetime('now', 'localtime'))
+);
 
+INSERT INTO comments (msg)
+    VALUES ('Database has been created');
+
+DROP TABLE IF EXISTS prop_def;
 CREATE TABLE prop_def (
     id CHAR(8) NOT NULL,
     ref_name varchar(255),
@@ -14,13 +21,15 @@ CREATE TABLE prop_def (
 
 -- Initialise dictionary ...
 
+DROP TABLE IF EXISTS ns_def;
 CREATE TABLE ns_def (
-    id SMALLINT NOT NULL AUTO_INCREMENT,
+    id SMALLINT NOT NULL,
     name CHAR(16),
     PRIMARY KEY (id),
     UNIQUE (id, name)
 );
 
+DROP TABLE IF EXISTS ns_prop_def;
 CREATE TABLE ns_prop_def (
     ns_id CHAR(8),
     prop_id SMALLINT,
@@ -39,7 +48,7 @@ CREATE TABLE ns_prop_def (
 
 -- END of definitions
 
--- CREATE TABLE set_def (
+-- CREATE TABLE part_def (
 --     id SMALLINT NOT NULL AUTO_INCREMENT,
 --     name CHAR(256),
 --     ns_id SMALLINT,
@@ -48,51 +57,57 @@ CREATE TABLE ns_prop_def (
 --     UNIQUE (id, name)
 -- );
 
-CREATE TABLE set_prop_def (
-    set_id SMALLINT,
+DROP TABLE IF EXISTS part_prop_def;
+CREATE TABLE part_prop_def (
+    part_id SMALLINT,
     prop_id SMALLINT,
     --excl_prop_id SMALLINT,
-    FOREIGN KEY (set_id) REFERENCES set_def(id),
-    FOREIGN KEY (incl_prop_id) REFERENCES ns_prop_def(id),
+    FOREIGN KEY (part_id) REFERENCES part_def(id),
+    FOREIGN KEY (prop_id) REFERENCES ns_prop_def(id)
     --FOREIGN KEY (excl_prop_id) REFERENCES ns_prop_def(id)
 );
 
 -- Object can be cloned into other set
+DROP TABLE IF EXISTS obj;
 CREATE TABLE obj (
-    id INTEGER NOT NULL AUTO_INCREMENT,
-    set_id SMALLINT,
-    PRIMARY KEY (id, set_id),
-    FOREIGN KEY (set_id) REFERENCES ns_prop_def(id),
+    id INTEGER NOT NULL,
+    part_id SMALLINT,
+    PRIMARY KEY (id, part_id),
+    FOREIGN KEY (part_id) REFERENCES ns_prop_def(id)
 );
 
+DROP TABLE IF EXISTS obj_checkout_sources;
 CREATE TABLE obj_checkout_sources (
-    id SMALLINT NOT NULL AUTO_INCREMENT,
+    id SMALLINT NOT NULL,
     name VARCHAR(256),
     params VARCHAR(4096),
     PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS obj_checkout;
 CREATE TABLE obj_checkout (
-    id INTEGER NOT NULL AUTO_INCREMENT,
-    obj_id INTEGER,
-    from DATE NOT NULL,
-    to DATE DEFAULT NULL,
+    id INTEGER NOT NULL,
+    obj_id INTEGER NOT NULL,
+    since DATETIME DEFAULT (datetime('now', 'localtime')),
+    till DATETIME DEFAULT NULL,
     triggered_by SMALLINT,
     -- correction, transaction
     PRIMARY KEY (id),
-    FOREIGN KEY (obj_id)
+    FOREIGN KEY (obj_id) REFERENCES obj(id)
 );
 
+DROP TABLE IF EXISTS obj_prop_nochange;
 CREATE TABLE obj_prop_nochange (
     obj_id INTEGER,
     prop_id SMALLINT,
     checkout_id INTEGER,
     PRIMARY KEY (obj_id, prop_id),
     FOREIGN KEY (obj_id) REFERENCES obj(id),
-    FOREIGN KEY (prop_id) REFERENCES set_prop_def(prop_id),
+    FOREIGN KEY (prop_id) REFERENCES part_prop_def(prop_id),
     FOREIGN KEY (checkout_id) REFERENCES obj_checkout(id)
 );
 
+DROP TABLE IF EXISTS obj_prop_text;
 CREATE TABLE obj_prop_text (
     obj_id INTEGER,
     prop_id SMALLINT,
@@ -100,10 +115,11 @@ CREATE TABLE obj_prop_text (
     value VARCHAR(4096),
     PRIMARY KEY (obj_id, prop_id),
     FOREIGN KEY (obj_id) REFERENCES obj(id),
-    FOREIGN KEY (prop_id) REFERENCES set_prop_def(prop_id),
+    FOREIGN KEY (prop_id) REFERENCES part_prop_def(prop_id),
     FOREIGN KEY (checkout_id) REFERENCES obj_checkout(id)
 );
 
+DROP TABLE IF EXISTS obj_prop_int;
 CREATE TABLE obj_prop_int (
     obj_id INTEGER,
     prop_id SMALLINT,
@@ -116,7 +132,6 @@ CREATE TABLE obj_prop_int (
 );
 
 -- Partitions for historical objects
-
 
 -- # short name
 -- # descriptive name
