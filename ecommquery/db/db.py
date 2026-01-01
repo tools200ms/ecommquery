@@ -1,13 +1,19 @@
+from peewee import *
 import sqlite3
 import os
 from pathlib import Path
 
+db_proxy = Proxy()
 
-class Db:
-    def __init__(self, conn):
-        self._conn = conn
+class Db(Model):
+    class Meta:
+        database = db_proxy
 
-    def _load_schema(self):
+    # def __init__(self, conn):
+    #     self._conn = conn
+
+    @staticmethod
+    def _load_schema(conn):
         # Get the directory where this file is located
         dbpack_dir = os.path.dirname(os.path.abspath(__file__))
         schema_path = os.path.join(dbpack_dir, 'schema.sql')
@@ -15,8 +21,8 @@ class Db:
             schema_sql = schema_file.read()
 
         try:
-            self._conn.executescript(schema_sql)
-            self._conn.commit()
+            conn.executescript(schema_sql)
+            conn.commit()
         except sqlite3.Error as e:
             error_message = f"SQL error in '{schema_path}': \n{type(e).__name__}: {str(e)}"
             raise Exception(error_message) from e
@@ -33,13 +39,15 @@ class Db:
 
         # Create database and execute schema
         conn = sqlite3.connect(db_path)
-        db = cls(conn)
 
         if db_exists == False or recreate == True:
-            db._load_schema()
+            cls._load_schema(conn)
 
+        db_proxy.initialize(conn)
+
+        db = cls()
         return db
 
-    def close(self):
-        self._conn.close()
+    # def close(self):
+    #     self._conn.close()
 

@@ -14,7 +14,20 @@ class TestTask(unittest.TestCase):
 
         db = Db.open(dbfile_path)
         self.assertIsNotNone(db)
-        db.close()
+        
+        # db.close()
 
         shutil.rmtree(tmpdir)
+
+    def test_db_mappings(self):
+        tmpdir = tempfile.mkdtemp()
+        dbfile_path = os.path.join(tmpdir, "miso.db")
+
+        db = Db.open(dbfile_path)
+        self.assertIsNotNone(db)
+
+        # db.close()
+
+        shutil.rmtree(tmpdir)
+
 
