@@ -12,8 +12,8 @@ INSERT INTO comments (msg)
 
 -- Initialise dictionary ...
 
-DROP TABLE IF EXISTS ns_def;
-CREATE TABLE ns_def (
+DROP TABLE IF EXISTS spc_def;
+CREATE TABLE spc_def (
     id SMALLINT NOT NULL,
     name CHAR(16),
     PRIMARY KEY (id),
@@ -21,85 +21,55 @@ CREATE TABLE ns_def (
 );
 
 DROP TABLE IF EXISTS part_def;
-CREATE TABLE part_def {
+CREATE TABLE part_def (
     id SMALLINT NOT NULL,
-    spc_id SMALLINT,
-    name CHAR(16),
+    spc_id SMALLINT NOT NULL,
+    name CHAR(64),
     PRIMARY KEY (id),
+    FOREIGN KEY (spc_id) REFERENCES spc_def(id),
     UNIQUE (id, spc_id, name)
-}
+);
 
 DROP TABLE IF EXISTS prop_def;
 CREATE TABLE prop_def (
     id CHAR(8) NOT NULL,
-    ns_id CHAR(8) DEFAULT NULL,
+    spc_id CHAR(8) DEFAULT NULL,
     ref_name varchar(255),
     type CHAR,
-    validation_pattern varchar(255),
+    validator_fun varchar(255),
     flags CHAR, -- R: reference, P: property
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (spc_id) REFERENCES spc_def(id)
 );
 -- EAN
 -- Name
 -- Detailed name
 
---DROP TABLE IF EXISTS ns_prop_def;
---CREATE TABLE ns_prop_def (
---    ns_id CHAR(8),
---    prop_id SMALLINT,
---    name VARCHAR(512),
---    PRIMARY KEY (ns_id, prop_id),
---    UNIQUE prop_id,
---    FOREIGN KEY (ns_id) REFERENCES ns_def(id),
---    FOREIGN KEY (prop_id) REFERENCES prop_def(id)
---);
--- ProdID (Presta)
--- OferID (Allegro)
-
-
--- END of definitions
-
-
---DROP TABLE IF EXISTS part_prop_def;
---CREATE TABLE part_prop_def (
---    part_id SMALLINT,
---    prop_id SMALLINT,
---    --excl_prop_id SMALLINT,
---    FOREIGN KEY (part_id) REFERENCES part_def(id),
---    FOREIGN KEY (prop_id) REFERENCES ns_prop_def(id)
---    --FOREIGN KEY (excl_prop_id) REFERENCES ns_prop_def(id)
---);
-
--- Object can be cloned into other set
---DROP TABLE IF EXISTS obj;
---CREATE TABLE obj (
---    id INTEGER NOT NULL,
---    --part_id SMALLINT,
---    PRIMARY KEY (id),
---    --FOREIGN KEY (part_id) REFERENCES ns_prop_def(id)
---);
 
 DROP TABLE IF EXISTS checkout_sources_def;
-CREATE TABLE obj_checkout_sources (
+CREATE TABLE checkout_sources_def (
     id SMALLINT NOT NULL,
     name VARCHAR(256),
-    part_id_scope SMALLINT NOT NULL,
+    part_id SMALLINT NOT NULL,
     function VARCHAR,
     triggered_by SMALLINT DEFAULT NULL,
     PRIMARY KEY (id)
+    FOREIGN KEY (part_id) REFERENCES part_def(id)
 );
+
+-- END of definitions
 
 DROP TABLE IF EXISTS obj_checkout;
 CREATE TABLE obj_checkout (
     id INTEGER NOT NULL,
     --part_id SMALLINT,
     obj_id INTEGER NOT NULL,
-    on DATETIME DEFAULT (datetime('now', 'localtime')),
+    timestamp DATETIME DEFAULT (datetime('now', 'localtime')),
     --till DATETIME DEFAULT NULL,
-    triggered_by SMALLINT,
+    src_id SMALLINT,
     -- correction, transaction
-    PRIMARY KEY (id, obj_id)
-    --FOREIGN KEY (obj_id) REFERENCES obj(id)
+    PRIMARY KEY (id, obj_id),
+    FOREIGN KEY (src_id) REFERENCES checkout_sources_def(id)
 );
 
 DROP TABLE IF EXISTS obj_prop_nochange;
@@ -107,9 +77,8 @@ CREATE TABLE obj_prop_nochange (
     --obj_id INTEGER,
     prop_id SMALLINT,
     checkout_id INTEGER,
-    PRIMARY KEY (obj_id, prop_id),
-    FOREIGN KEY (obj_id) REFERENCES obj(id),
-    FOREIGN KEY (prop_id) REFERENCES part_prop_def(prop_id),
+    PRIMARY KEY (prop_id, checkout_id),
+    FOREIGN KEY (prop_id) REFERENCES prop_def(id),
     FOREIGN KEY (checkout_id) REFERENCES obj_checkout(id)
 );
 
@@ -119,9 +88,8 @@ CREATE TABLE obj_prop_text (
     prop_id SMALLINT,
     checkout_id INTEGER,
     value VARCHAR(4096),
-    PRIMARY KEY (obj_id, prop_id),
-    FOREIGN KEY (obj_id) REFERENCES obj(id),
-    FOREIGN KEY (prop_id) REFERENCES part_prop_def(prop_id),
+    PRIMARY KEY (prop_id, checkout_id),
+    FOREIGN KEY (prop_id) REFERENCES prop_def(id),
     FOREIGN KEY (checkout_id) REFERENCES obj_checkout(id)
 );
 
@@ -131,9 +99,8 @@ CREATE TABLE obj_prop_int (
     prop_id SMALLINT,
     checkout_id INTEGER,
     value INTEGER,
-    PRIMARY KEY (obj_id, prop_id),
-    FOREIGN KEY (obj_id) REFERENCES obj(id),
-    FOREIGN KEY (prop_id) REFERENCES ns_prop_def(id),
+    PRIMARY KEY (prop_id, checkout_id),
+    FOREIGN KEY (prop_id) REFERENCES prop_def(id),
     FOREIGN KEY (checkout_id) REFERENCES obj_checkout(id)
 );
 

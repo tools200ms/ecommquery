@@ -3,8 +3,11 @@ import shutil
 import tempfile
 import unittest
 from datetime import datetime
+from pprint import pprint
 
 from ecommquery.db.db import Db
+from ecommquery.db.map.Comment import Comment
+
 
 class TestTask(unittest.TestCase):
 
@@ -12,8 +15,8 @@ class TestTask(unittest.TestCase):
         tmpdir = tempfile.mkdtemp()
         dbfile_path = os.path.join(tmpdir, "miso.db")
 
-        db = Db.open(dbfile_path)
-        self.assertIsNotNone(db)
+        Db.open(dbfile_path)
+        #self.assertIsNotNone(db)
         
         # db.close()
 
@@ -23,9 +26,13 @@ class TestTask(unittest.TestCase):
         tmpdir = tempfile.mkdtemp()
         dbfile_path = os.path.join(tmpdir, "miso.db")
 
-        db = Db.open(dbfile_path)
-        self.assertIsNotNone(db)
+        Db.open(dbfile_path)
+        #self.assertIsNotNone(db)
 
+        query = Comment.select()
+        pprint(query.sql())
+        for row in query:
+            print(row.msg)
         # db.close()
 
         shutil.rmtree(tmpdir)

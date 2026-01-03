@@ -1,7 +1,9 @@
 from peewee import CharField, DateTimeField, SQL
 
+from ecommquery.db.db import Db
 
-def Comment(DB):
+
+class Comment(Db):
     msg = CharField(max_length=4096)
 
     msg_date = DateTimeField(
@@ -9,4 +11,6 @@ def Comment(DB):
     )
 
     class Meta:
-        db_table = "comment"
+        table_name = "comments"
+        primary_key = False
+

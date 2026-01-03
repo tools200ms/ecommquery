@@ -45,8 +45,8 @@ class Db(Model):
 
         db_proxy.initialize(conn)
 
-        db = cls()
-        return db
+        #db = cls()
+        #return db
 
     # def close(self):
     #     self._conn.close()
