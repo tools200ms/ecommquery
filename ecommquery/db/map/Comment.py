@@ -1,9 +1,9 @@
 from peewee import CharField, DateTimeField, SQL
 
-from ecommquery.db.db import Db
+from ecommquery.db.db import BaseModel
 
 
-class Comment(Db):
+class Comment(BaseModel):
     msg = CharField(max_length=4096)
 
     msg_date = DateTimeField(

@@ -1,5 +1,4 @@
 
-
 DROP TABLE IF EXISTS comments;
 CREATE TABLE comments (
     msg VARCHAR(4096),
@@ -14,31 +13,28 @@ INSERT INTO comments (msg)
 
 DROP TABLE IF EXISTS spc_def;
 CREATE TABLE spc_def (
-    id SMALLINT NOT NULL,
+    id SMALLINT PRIMARY KEY,
     name CHAR(16),
-    PRIMARY KEY (id),
     UNIQUE (id, name)
 );
 
 DROP TABLE IF EXISTS part_def;
 CREATE TABLE part_def (
-    id SMALLINT NOT NULL,
+    id SMALLINT PRIMARY KEY,
     spc_id SMALLINT NOT NULL,
     name CHAR(64),
-    PRIMARY KEY (id),
     FOREIGN KEY (spc_id) REFERENCES spc_def(id),
     UNIQUE (id, spc_id, name)
 );
 
 DROP TABLE IF EXISTS prop_def;
 CREATE TABLE prop_def (
-    id CHAR(8) NOT NULL,
+    id SMALLINT PRIMARY KEY,
     spc_id CHAR(8) DEFAULT NULL,
     ref_name varchar(255),
     type CHAR,
     validator_fun varchar(255),
     flags CHAR, -- R: reference, P: property
-    PRIMARY KEY (id),
     FOREIGN KEY (spc_id) REFERENCES spc_def(id)
 );
 -- EAN

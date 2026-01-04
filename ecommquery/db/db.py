@@ -1,11 +1,11 @@
 from peewee import *
-import sqlite3
 import os
 from pathlib import Path
 
+
 db_proxy = Proxy()
 
-class Db(Model):
+class BaseModel(Model):
     class Meta:
         database = db_proxy
 
@@ -20,12 +20,22 @@ class Db(Model):
         with open(schema_path, 'r') as schema_file:
             schema_sql = schema_file.read()
 
-        try:
-            conn.executescript(schema_sql)
-            conn.commit()
-        except sqlite3.Error as e:
-            error_message = f"SQL error in '{schema_path}': \n{type(e).__name__}: {str(e)}"
-            raise Exception(error_message) from e
+        for stmt in schema_sql.split(";"):
+            stmt = stmt.strip()
+            if not stmt:
+                continue;
+            try:
+                conn.execute_sql(stmt)
+            except Exception as e:
+                stmt_head = stmt[:16] + ' ...' if len(stmt) > 16 else stmt
+                raise RuntimeError(f"SQL error in '{schema_path}' in statement: \n    {stmt_head}\n    {e}") from e
+
+        # try:
+        #     conn.execute_sql(schema_sql)
+        #     conn.commit()
+        # except sqlite3.Error as e:
+        #     error_message = f"SQL error in '{schema_path}': \n{type(e).__name__}: {str(e)}"
+        #     raise Exception(error_message) from e
 
     @classmethod
     def open(cls, db_path: str = 'data/db/ecommquery.db', recreate: bool = False):
@@ -33,12 +43,12 @@ class Db(Model):
         Open/create database using schema.sql file
         """
 
-        # Check if database exists
+        # Check if a database exists
         db_exists = Path(db_path).exists()
         # If recreate is True and db exists, remove it
 
         # Create database and execute schema
-        conn = sqlite3.connect(db_path)
+        conn = SqliteDatabase(db_path)
 
         if db_exists == False or recreate == True:
             cls._load_schema(conn)
