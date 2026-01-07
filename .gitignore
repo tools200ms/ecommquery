@@ -24,6 +24,8 @@ report/
 
 # Configuration files
 *.ini
+*.json
+
 !example-1.ini
 
 # Ignore project build and test directories:
