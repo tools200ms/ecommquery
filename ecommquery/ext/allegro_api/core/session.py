@@ -64,9 +64,10 @@ class Session:
         resp.raise_for_status()
 
         ret = resp.json()
-        #self._access_token = ret["access_token"]
-        #self._refresh_token = ret["refresh_token"]
-        #self._expires_on = Session.__getExpireOn(ret["expires_in"])
+        self._access_token = ret["access_token"]
+        self._refresh_token = ret["refresh_token"]
+        self._expires_on = Session.__getExpireOn(ret["expires_in"])
+
         pprint(ret)
 
     @property
@@ -80,5 +81,4 @@ class Session:
         return self.ACValidForSec() >= 300
 
     def isStale(self):
-        valid_for_sec = self.ACValidForSec()
-        return -300 <= valid_for_sec < 300
+        return not self.isFresh() and self.ACValidForSec() >= -300

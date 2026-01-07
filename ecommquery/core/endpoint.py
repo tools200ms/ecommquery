@@ -119,7 +119,7 @@ class Endpoint:
         self._srv = None
         self.__attr_list = all_attr_list
 
-    def id( self ):
+    def id(self):
         return self._id
 
     @abstractmethod

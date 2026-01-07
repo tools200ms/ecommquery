@@ -44,12 +44,11 @@ CREATE TABLE prop_def (
 
 DROP TABLE IF EXISTS checkout_sources_def;
 CREATE TABLE checkout_sources_def (
-    id SMALLINT NOT NULL,
+    id SMALLINT PRIMARY KEY,
     name VARCHAR(256),
     part_id SMALLINT NOT NULL,
     function VARCHAR,
     triggered_by SMALLINT DEFAULT NULL,
-    PRIMARY KEY (id)
     FOREIGN KEY (part_id) REFERENCES part_def(id)
 );
 
@@ -57,45 +56,42 @@ CREATE TABLE checkout_sources_def (
 
 DROP TABLE IF EXISTS obj_checkout;
 CREATE TABLE obj_checkout (
-    id INTEGER NOT NULL,
+    id INTEGER PRIMARY KEY,
     --part_id SMALLINT,
-    obj_id INTEGER NOT NULL,
+    --obj_id INTEGER NOT NULL,
     timestamp DATETIME DEFAULT (datetime('now', 'localtime')),
     --till DATETIME DEFAULT NULL,
     src_id SMALLINT,
     -- correction, transaction
-    PRIMARY KEY (id, obj_id),
+    -- PRIMARY KEY (id, obj_id),
     FOREIGN KEY (src_id) REFERENCES checkout_sources_def(id)
 );
 
 DROP TABLE IF EXISTS obj_prop_nochange;
 CREATE TABLE obj_prop_nochange (
-    --obj_id INTEGER,
     prop_id SMALLINT,
     checkout_id INTEGER,
-    PRIMARY KEY (prop_id, checkout_id),
+    UNIQUE (prop_id, checkout_id),
     FOREIGN KEY (prop_id) REFERENCES prop_def(id),
     FOREIGN KEY (checkout_id) REFERENCES obj_checkout(id)
 );
 
 DROP TABLE IF EXISTS obj_prop_text;
 CREATE TABLE obj_prop_text (
-    --obj_id INTEGER,
     prop_id SMALLINT,
     checkout_id INTEGER,
-    value VARCHAR(4096),
-    PRIMARY KEY (prop_id, checkout_id),
+    value CHAR(32),
+    UNIQUE (prop_id, checkout_id),
     FOREIGN KEY (prop_id) REFERENCES prop_def(id),
     FOREIGN KEY (checkout_id) REFERENCES obj_checkout(id)
 );
 
 DROP TABLE IF EXISTS obj_prop_int;
 CREATE TABLE obj_prop_int (
-    --obj_id INTEGER,
     prop_id SMALLINT,
     checkout_id INTEGER,
     value INTEGER,
-    PRIMARY KEY (prop_id, checkout_id),
+    UNIQUE (prop_id, checkout_id),
     FOREIGN KEY (prop_id) REFERENCES prop_def(id),
     FOREIGN KEY (checkout_id) REFERENCES obj_checkout(id)
 );
