@@ -20,7 +20,10 @@ class Puller:
         def callNow(self, time_now):
             call_now = (self._next_call <= time_now)
             if call_now:
+                print(f"Time to call")
                 self._next_call = time_now + timedelta(seconds=Puller.refreshRate(self._freq))
+            else:
+                print(f"Not now")
             return call_now
 
     @staticmethod

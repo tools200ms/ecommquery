@@ -24,8 +24,8 @@ class Endpoint:
                 self.validate = validator.validate
                 self.getDefaultValue = validator.getDefaultValue
             else:
-                self.validate = validator
-                self.getDefaultValue = ParamValidator.getNone
+                self.validate = lambda value: (validator(value), value)
+                self.getDefaultValue = lambda: None
 
             self.__obligatory = obligatory
             self._alt_name = alt_name
@@ -91,14 +91,15 @@ class Endpoint:
                 raise DataformatError(f"Parameter {name} already used, endpoint: {self.reg_name()}")
 
             c_attr = all_attr_list[name]
-            if c_attr.validate(value) == False:
+            res, norm_value = c_attr.validate(value)
+            if res == False:
                 raise DataformatError(f"Illegal value of '{name}' parameter, endpoint: {self.reg_name()}")
 
-            if hasattr(c_attr, 'normValue'):
-                # normalize value:
-                value = c_attr.normValue()
+            # if hasattr(c_attr, 'normValue'):
+            #     # normalize value:
+            #     value = c_attr.normValue()
 
-            setattr(self, c_attr.getVarName(name), value)
+            setattr(self, c_attr.getVarName(name), norm_value)
 
             used[name] = 1
 

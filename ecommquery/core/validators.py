@@ -18,23 +18,26 @@ class Validator:
 
 class ParamValidator:
     @abstractmethod
-    def validate(self, value: str) -> bool:
+    def validate(self, value: str) -> (bool, object):
         pass
 
-    def getDefaultValue(self):
+    def getDefaultValue(self) -> object:
         return None
 
-    @staticmethod
-    def getNone():
-        return None
+    # @staticmethod
+    # def getNone():
+    #     return None
 
 class ListValidator (ParamValidator):
     def __init__(self, list: [], def_idx: int = None):
         self.__list = list
         self.__def_idx = def_idx
 
-    def validate(self, value: str) -> bool:
-        return value.strip().lower() in self.__list
+    def validate(self, value: str) -> (bool, object):
+        val = value.strip().lower()
+        if val in self.__list:
+            return True, val
+        return False, None
 
     def getDefaultValue(self):
         if self.__def_idx == None:
@@ -45,36 +48,37 @@ class ListValidator (ParamValidator):
 
 class RegExValidator (ParamValidator):
     def __init__(self, pattern):
-        self.__re = re.compile( pattern )
+        self.__re = re.compile(pattern)
 
-    def validate(self, value: str) -> bool:
-        return self.__re.match(value)
+    def validate(self, value: str) -> (bool, object):
+        if self.__re.match(value):
+            return True, value
+        return False, None
 
 class GenericKeyValidator (RegExValidator):
     def __init__(self):
-        super().__init__('[a-z0-9|\.|\-]{16,512}')
+        super().__init__('[A-Za-z0-9|\\-|\\.]{16,512}')
 
 class YesNoValidator (ParamValidator):
 
-    def __init__(self, default: bool = False):
+    def __init__(self, default: bool):
         self.__def_val = default
-        self.__val = None
 
-    def normValue(self):
-        if self.__val == None:
-            raise CallError('Value not set')
+    # def normValue(self):
+    #     if self.__val == None:
+    #         raise CallError('Value not set')
+    #
+    #     return self.__val
 
-        return self.__val
-
-    def validate(self, value: str) -> bool:
+    def validate(self, value: str) -> (bool, object):
         if value.lower() in {"y", "yes", "true", "1", "on"}:
-            self.__val = True
+            return True, True
         elif value.lower() in {"n", "no", "false", "0", "non"}:
-            self.__val = False
-        else:
-            return False
+            return True, False
 
-        return True
+        return False, None
+
+
 
     def getDefaultValue(self):
         return self.__def_val

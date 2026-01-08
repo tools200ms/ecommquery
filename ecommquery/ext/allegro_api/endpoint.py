@@ -20,7 +20,7 @@ class EndpointAlle(Endpoint):
 
         super().__init__({'client_id': Endpoint.Constr(GenericKeyValidator),
                           'client_secret': Endpoint.Constr(GenericKeyValidator),
-                          'sandbox': Endpoint.Constr(YesNoValidator, False)},
+                          'sandbox': Endpoint.Constr(YesNoValidator(False), False)},
                         params)
 
     def info(self):

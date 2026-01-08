@@ -5,6 +5,8 @@ https://developer.allegro.pl/tutorials/uwierzytelnianie-i-autoryzacja-zlq9e75GdI
 from datetime import datetime
 from json import JSONDecodeError
 
+from requests import HTTPError
+
 from ecommquery import Endpoint
 from ecommquery.core.service_management import ManagementService
 from ecommquery.core.stash import Stash
@@ -12,6 +14,7 @@ from ecommquery.core.stash import Stash
 from ecommquery.ext.allegro_api.core.authenticator import Authenticator
 from ecommquery.ext.allegro_api.core.requestor import Requestor
 from ecommquery.ext.allegro_api.core.session import Session
+from ecommquery.ext.allegro_api.lib.errors import AllegroConnectionError
 
 
 class ServiceAlle(ManagementService):
@@ -34,7 +37,7 @@ class ServiceAlle(ManagementService):
 
         return self._req.client_id
 
-    def establish(self):
+    def _establish(self):
         access_token = self._stash.get("access_token")
         refresh_token = self._stash.get("refresh_token")
         expires_on = self._stash.getDate("expires_on")
@@ -55,13 +58,21 @@ class ServiceAlle(ManagementService):
                 if session.isStale():
                     self.refresh(session)
                 else:
-                    print("Session is invalid.")
-                    return None
+                    print("Session is stale, trying to connect anyway.")
+                    self.refresh(session)
+
             # session is fresh, let's use it
 
         # operations on session
         #print(auth)
         return session
+
+    def establish(self) -> Session:
+        try:
+            return self._establish()
+        except HTTPError as err:
+            raise AllegroConnectionError() from err
+
 
     def refresh(self, session: Session) -> Session:
         session.refreshAccessToken()

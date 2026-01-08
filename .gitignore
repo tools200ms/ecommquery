@@ -8,6 +8,8 @@ tasks/
 tasks
 confs/
 confs
+conf/
+conf
 aiquery/
 aiquery
 prompts/

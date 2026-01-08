@@ -1,0 +1,4 @@
+
+class AllegroConnectionError(Exception):
+    pass
+
