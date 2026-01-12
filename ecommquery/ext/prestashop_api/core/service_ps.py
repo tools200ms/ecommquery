@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from ecommquery.core.service_management import ManagementService
 from ecommquery.ext.prestashop_api.lib.ps_feature import PSFeature, PSFeatureValue
 from ecommquery.ext.prestashop_api.lib.ps_options import PSOption, PSOptionValue
@@ -10,6 +12,24 @@ class ServicePS(ManagementService, PrestaShopWebServiceDict):
 
     def __init__(self, api_url, api_key, verbose: bool, debug: bool, pretend: bool):
         super().__init__(api_url, api_key, debug = debug, session = None, verbose = verbose)
+
+    def test(self):
+        res = self.get('shops')
+
+        if 'shops' in res:
+
+            res = res['shops']
+            print(f"Fount {len(res)} shop(s): ")
+            for shop in res:
+                shop_id = res[shop]['attrs']['id']
+                shop_res = self.get('shops', shop_id)
+                if not 'shop' in shop_res:
+                    raise Exception("Data integrity error")
+
+                shop_res = shop_res['shop']
+                print(f"    #{shop_id}: '{shop_res['name']}', shop is {'active' if shop_res['active'] == '1' else 'NOT active'}")
+        else:
+            raise Exception("No 'shops' key found in response")
 
     # example criteria filtering:
     # criteria = {'filter[id_category_default]': '269'}

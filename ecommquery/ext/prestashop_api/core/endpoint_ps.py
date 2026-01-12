@@ -23,7 +23,7 @@ class EndpointPS(Endpoint):
                             # Exact validation is made by library that
                             # talks to API.
                             # This is "first" step generic validation.
-                            RegExValidator('[a-zA-Z0-9|-|_]{16,96}'), '_key')},
+                            RegExValidator('[a-zA-Z0-9|-|_]{16,96}'), True, 'key', True)},
                         params )
 
     def info(self):
@@ -33,6 +33,6 @@ class EndpointPS(Endpoint):
         return info
 
     def _getService( self, mode: Mode ):
-        return ServicePS( self._url, self._key, **Mode.as_args(mode) )
+        return ServicePS( self._url, self.__key, **Mode.as_args(mode) )
 
 Endpoint.register( EndpointPS )

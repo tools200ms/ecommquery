@@ -6,6 +6,9 @@ class ManagementService:
     def establish(self):
         pass
 
+    def test(self):
+        pass
+
     def id(self)-> str:
         pass
 

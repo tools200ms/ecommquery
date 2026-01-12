@@ -7,12 +7,12 @@ from ecommquery.core.service_management import ManagementService
 
 class Puller:
     class Config:
-        def __init__(self, service, action, zero_call, freq):
+        def __init__(self, service, action, immediate_call, freq):
             self._freq = freq
             self.srv = service
             self.act = action
 
-            if zero_call:
+            if immediate_call:
                 self._next_call = datetime.now()
             else:
                 self._next_call = datetime.now() + timedelta(seconds=Puller.refreshRate(freq))
@@ -50,17 +50,34 @@ class Puller:
         self._def_freq = def_freq
         self._list = []
         self._last_idx = 0
+
+        self._change_report_stack = []
+        self._change_report_underprocess = None
         
-    def register(self, service:ManagementService, action, zero_call = True, freq = None):
-        self._list.append(Puller.Config(service, action, zero_call, self._def_freq if freq == None else freq))
+    def register(self, service:ManagementService, action, immediate_call = True, freq = None):
+        self._list.append(Puller.Config(service, action, immediate_call, self._def_freq if freq == None else freq))
     
     def probe(self):
         time_now = datetime.now()
 
+        if len(self._change_report_stack) == 0 and self._change_report_underprocess == None:
+            current_change_report, change_report_by = None, None
+        else:
+            if self._change_report_underprocess == None:
+                self._change_report_underprocess = self._change_report_stack.pop()
+            current_change_report, change_report_by = self._change_report_underprocess
+
         for idx, conf in enumerate(self._list, start=self._last_idx):
-            if conf.callNow(time_now):
+            if conf.callNow(time_now) or \
+                (self._change_report_by != None and self._change_report_by != conf.srv):
                 self._last_idx = idx + 1
-                return conf.srv, conf.act
+                return conf.act, conf.srv, (current_change_report, change_report_by)
 
         self._last_idx = 0
-        return None, None
+        self._change_report_underprocess = None
+
+        return None, None, (None, None)
+
+    def update(self, srv, change_report):
+        self._change_report_stack.append((srv, change_report))
+        self._last_idx = 0

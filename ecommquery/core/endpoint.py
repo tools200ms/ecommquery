@@ -14,7 +14,7 @@ class Endpoint:
                       validator: ParamValidator | Callable[[str], bool],
                       obligatory: bool = True,
                       # Alternative name for the attribute in case of name conflicts
-                      alt_name: str = None ):
+                      alt_name: str = None, is_secret = False ):
 
             
             if isinstance(validator, type):
@@ -29,15 +29,21 @@ class Endpoint:
 
             self.__obligatory = obligatory
             self._alt_name = alt_name
+            self._is_secret = is_secret
 
         def getVarName(self, name: str):
-            if self._alt_name is None:
-                return '_' + name
+            pref = '__' if self._is_secret else '_'
 
-            return '_' + self._alt_name
+            if self._alt_name is None:
+                return pref + name
+
+            return pref + self._alt_name
 
         def isObligatory(self):
             return self.__obligatory
+        
+        def isSecret(self):
+            return self._is_secret
 
     __loaded = {}
     _id = 0
@@ -99,10 +105,16 @@ class Endpoint:
             #     # normalize value:
             #     value = c_attr.normValue()
 
-            setattr(self, c_attr.getVarName(name), norm_value)
+            if not c_attr.isSecret():
+                setattr(self, c_attr.getVarName(name), norm_value)
+            else:
+                setattr(self,
+                        f"_{self.__class__.__name__}{c_attr.getVarName(name)}",
+                        norm_value)
 
             used[name] = 1
 
+        self.__attr_list = {}
         # Set none for attributes that has been not mentioned in configuration
         for name, attr in all_attr_list.items():
             if name in used:
@@ -115,10 +127,12 @@ class Endpoint:
 
             setattr(self, attr.getVarName(name), def_value)
 
+            if not attr.isSecret():
+                self.__attr_list[name] = attr
+
         self._id = str(Endpoint._id) + "" + self.reg_name()
         Endpoint._id += 1
         self._srv = None
-        self.__attr_list = all_attr_list
 
     def id(self):
         return self._id
@@ -147,7 +161,7 @@ class Endpoint:
             if attr == None:
                 continue
 
-            if attr.lower().find(pattern) != -1:
+            if isinstance(attr, str) and attr.lower().find(pattern) != -1:
                 return True
 
         return False
