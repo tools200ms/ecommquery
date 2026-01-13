@@ -1,11 +1,10 @@
 from ecommquery.ecommquery import ECommDef
 from ecommquery.exceptions import ExternalResourceAccessError
-from ecommquery.ext.prestashop_api.lib.atomic.ps_number import PSNumber
-from ecommquery.lib.atomic.description import SimpleDescription, HTMLDescription
+from ecommquery.ext.prestashop_api.lib.atomic.ps_fixed_point_numb import PSFixPointNumber
 from ecommquery.lib.product import Product
 
 class PSProduct(Product):
-    def __init__( self, raw ):
+    def __init__(self, raw):
         super().__init__()
 
         self.__raw = raw
@@ -26,11 +25,8 @@ class PSProduct(Product):
         self._sdescr.text( self.__raw_prod_buf['description_short']['language']['value'] )
         self._descr.text( self.__raw_prod_buf['description']['language']['value'] )
 
-        self._price = PSNumber()
-        self._price.rawValue( self.__raw_prod_buf['price'] )
-
-        self._weight = PSNumber()
-        self._weight.rawValue( self.__raw_prod_buf['weight'] );
+        self._price = PSFixPointNumber(self.__raw_prod_buf['price'])
+        self._weight = PSFixPointNumber(self.__raw_prod_buf['weight'])
 
         # self._short_description = HTMLDescription.Generator().newDescription()
         # self._short_description = ...
@@ -53,10 +49,10 @@ class PSProduct(Product):
 
 
     def price(self, price = None):
-        return self._price.value(price)
+        return self._price.rawValue(price)
 
     def weight(self, weight = None):
-        return self._weight.value(weight)
+        return self._weight.rawValue(weight)
 
     def get_def_cat(self):
         return self.__raw_prod_buf['id_category_default']
@@ -100,6 +96,7 @@ class PSProduct(Product):
             return raw_imgs_buf['image']
         else:
             return [raw_imgs_buf['image']]
+
     def images(self):
         img_ids = []
         for img in self.__getImgIdArr():

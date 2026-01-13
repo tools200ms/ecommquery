@@ -4,6 +4,7 @@ from ecommquery.core.service_management import ManagementService
 from ecommquery.ext.prestashop_api.lib.ps_feature import PSFeature, PSFeatureValue
 from ecommquery.ext.prestashop_api.lib.ps_options import PSOption, PSOptionValue
 from ecommquery.ext.prestashop_api.lib.ps_product import PSProduct
+from ecommquery.ext.prestashop_api.lib.ps_stock import PSStock
 from ecommquery.lib.functions.url import URLFun
 from prestapyt import PrestaShopWebServiceDict
 
@@ -65,6 +66,9 @@ class ServicePS(ManagementService, PrestaShopWebServiceDict):
     def getProduct( self, item_no ):
         return PSProduct( self.get( 'products', item_no ) )
 
+    def getStock(self, item_no):
+        return PSStock(self.get( 'stock_availables', item_no))
+
     def getFeatures(self):
         feat_raw_list = PSFeature.getProductFeaturesList(self.get('product_features'))
         feat_list = {}
@@ -96,6 +100,11 @@ class ServicePS(ManagementService, PrestaShopWebServiceDict):
             opt_val = PSOptionValue(None)
 
         return opt_list_by_key
+
+    def commitStock(self, stock):
+        changes = stock.prepareToCommit()
+        if changes != False:
+            self.edit('stock_availables', stock.getRaw())
 
     def commitProduct(self, prod):
         changes = prod.prepareToCommit()

@@ -1,5 +1,3 @@
-from abc import abstractmethod
-
 from ecommquery.lib.atomic.description import HTMLDescription, SimpleDescription
 from ecommquery.lib.functions.html import HTMLfun
 

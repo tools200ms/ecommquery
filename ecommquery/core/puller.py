@@ -1,4 +1,4 @@
-import time
+
 from datetime import datetime, timedelta
 
 from ecommquery import Endpoint
@@ -7,15 +7,15 @@ from ecommquery.core.service_management import ManagementService
 
 class Puller:
     class Config:
-        def __init__(self, service, action, immediate_call, freq):
+        def __init__(self, service, action, freq:str, start_shift:str):
             self._freq = freq
             self.srv = service
             self.act = action
 
-            if immediate_call:
-                self._next_call = datetime.now()
+            if start_shift is not None:
+                self._next_call = datetime.now() + timedelta(seconds=Puller.refreshRate(start_shift))
             else:
-                self._next_call = datetime.now() + timedelta(seconds=Puller.refreshRate(freq))
+                self._next_call = datetime.now()
 
         def callNow(self, time_now):
             call_now = (self._next_call <= time_now)
@@ -54,8 +54,11 @@ class Puller:
         self._change_report_stack = []
         self._change_report_underprocess = None
         
-    def register(self, service:ManagementService, action, immediate_call = True, freq = None):
-        self._list.append(Puller.Config(service, action, immediate_call, self._def_freq if freq == None else freq))
+    def register(self, service:ManagementService, action, freq:str = None, start_shift:str = None):
+        self._list.append(Puller.Config(service,
+                                        action,
+                                        self._def_freq if freq == None else freq,
+                                        start_shift))
     
     def probe(self):
         time_now = datetime.now()
@@ -69,7 +72,7 @@ class Puller:
 
         for idx, conf in enumerate(self._list, start=self._last_idx):
             if conf.callNow(time_now) or \
-                (self._change_report_by != None and self._change_report_by != conf.srv):
+                (change_report_by != None and change_report_by != conf.srv):
                 self._last_idx = idx + 1
                 return conf.act, conf.srv, (current_change_report, change_report_by)
 
