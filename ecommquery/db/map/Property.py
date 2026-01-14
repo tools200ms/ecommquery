@@ -2,6 +2,7 @@ from peewee import ForeignKeyField, CharField, IntegerField
 
 from ecommquery.db.db import BaseModel
 from ecommquery.db.map.Checkout import ObjCheckout
+from ecommquery.db.map.Object import Obj
 from ecommquery.db.map.definitions.Property import PropDef
 
 
@@ -12,6 +13,12 @@ class ObjPropNoChange(BaseModel):
         backref="nochange_props",
         on_delete="CASCADE"
     )
+
+    obj = ForeignKeyField(
+        Obj,
+        column_name="obj_id",
+        backref="nochange_props",
+        on_delete="CASCADE")
 
     checkout = ForeignKeyField(
         ObjCheckout,
@@ -34,6 +41,12 @@ class ObjPropText(BaseModel):
         backref="text_props",
         on_delete="CASCADE"
     )
+
+    obj = ForeignKeyField(
+        Obj,
+        column_name="obj_id",
+        backref="text_props",
+        on_delete="CASCADE")
 
     checkout = ForeignKeyField(
         ObjCheckout,
@@ -58,6 +71,12 @@ class ObjPropInt(BaseModel):
         backref="int_props",
         on_delete="CASCADE"
     )
+
+    obj = ForeignKeyField(
+        Obj,
+        column_name="obj_id",
+        backref="int_props",
+        on_delete="CASCADE")
 
     checkout = ForeignKeyField(
         ObjCheckout,

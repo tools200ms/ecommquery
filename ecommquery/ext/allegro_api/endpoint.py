@@ -16,12 +16,12 @@ class EndpointAlle(Endpoint):
     def name():
         return "Allegro API"
 
-    def __init__(self, params : {}):
+    def __init__(self, params : {}, id:str):
 
         super().__init__({'client_id': Endpoint.Constr(GenericKeyValidator),
                           'client_secret': Endpoint.Constr(GenericKeyValidator),
                           'sandbox': Endpoint.Constr(YesNoValidator(False), False)},
-                        params)
+                        params, id)
 
     def info(self):
         info = self._client_id

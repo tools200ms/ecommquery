@@ -1,12 +1,18 @@
 from peewee import IntegerField, DateTimeField, AutoField, ForeignKeyField, CompositeKey, SQL
 
 from ecommquery.db.db import BaseModel
+from ecommquery.db.map.Object import Obj
 from ecommquery.db.map.definitions.Sources import CheckoutSourceDef
 
 
 class ObjCheckout(BaseModel):
     id = AutoField()
-    #obj_id = IntegerField()
+    # obj = ForeignKeyField(
+    #     Obj,
+    #     column_name="obj_id",
+    #     null=False,
+    #     backref="objs"
+    # )
 
     timestamp = DateTimeField(
         constraints=[SQL("DEFAULT (datetime('now', 'localtime'))")]

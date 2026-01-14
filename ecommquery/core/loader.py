@@ -16,16 +16,16 @@ class Loader:
         def endpointNo(self):
             return len( self.__ep_dict )
         def addEndpoint(self, ep):
-            self.__ep_dict[ep.id()] = ep
+            self.__ep_dict[ep.id] = ep
 
         def endpoint(self, id = None, pattern : str = None):
             if len(self.__ep_dict) == 0:
                 raise CallError('Empty Endpoint set')
 
-            ep_dict_search = None
+            ep_dict_search = {}
             ep = None
 
-            if id == None:
+            if id is None:
                 ep_dict_search = self.__ep_dict
             else:
                 if id in self.__ep_dict:

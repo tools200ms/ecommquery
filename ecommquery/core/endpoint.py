@@ -82,7 +82,7 @@ class Endpoint:
     def name() -> str:
         pass
 
-    def __init__( self, attr_list : {}, params : {} ):
+    def __init__( self, attr_list : {}, params : {}, id:str ):
         comm_attr_list = {'memo': Endpoint.Constr(Validator.text, False)}
 
         all_attr_list = comm_attr_list | attr_list
@@ -130,11 +130,22 @@ class Endpoint:
             if not attr.isSecret():
                 self.__attr_list[name] = attr
 
-        self._id = str(Endpoint._id) + "" + self.reg_name()
-        Endpoint._id += 1
+        if id is not None:
+            self._local_id = id
+        else:
+            self._local_id = str(self.__class__._id)
+            self.__class__._id += 1
+
+        self._id = f"{self.reg_name()}.{self._local_id}"
+
         self._srv = None
 
-    def id(self):
+    @property
+    def local_id(self)->str:
+        return self._local_id
+
+    @property
+    def id(self)->str:
         return self._id
 
     @abstractmethod

@@ -12,9 +12,9 @@ class EndpointWebScrap(Endpoint):
     def reg_name():
         return 'web_scrap'
 
-    def __init__(self, params : {}):
+    def __init__(self, params : {}, id:str):
         super().__init__({'url': Endpoint.Constr( validators.url )},
-                         params)
+                         params, id)
 
     @staticmethod
     def name():

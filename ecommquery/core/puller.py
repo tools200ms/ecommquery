@@ -54,7 +54,7 @@ class Puller:
         self._change_report_stack = []
         self._change_report_underprocess = None
         
-    def register(self, service:ManagementService, action, freq:str = None, start_shift:str = None):
+    def register(self, service, action, freq:str = None, start_shift:str = None):
         self._list.append(Puller.Config(service,
                                         action,
                                         self._def_freq if freq == None else freq,

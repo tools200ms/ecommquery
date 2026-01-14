@@ -16,7 +16,7 @@ class EndpointPS(Endpoint):
     def name():
         return "PrestaShop API"
 
-    def __init__( self, params : {} ):
+    def __init__(self, params : {}, id:str):
         super().__init__({'url': Endpoint.Constr(validators.url),
                           'api_secret_key': Endpoint.Constr(
                             # Validate if string looks "like" a key.
@@ -24,7 +24,7 @@ class EndpointPS(Endpoint):
                             # talks to API.
                             # This is "first" step generic validation.
                             RegExValidator('[a-zA-Z0-9|-|_]{16,96}'), True, 'key', True)},
-                        params )
+                        params, id )
 
     def info(self):
         info = self._url

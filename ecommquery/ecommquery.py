@@ -60,7 +60,7 @@ class Integrations:
             print(inte_msg)
 
             for e in inte.conf.endpoints():
-                print(f" Id #{e.id()}\n\tname: {e.name()}\n\t ref: {e.info()}" )
+                print(f" Id #{e.id}\n\tname: {e.name()}\n\t ref: {e.info()}" )
 
             print( ' ' + (len(inte_msg) * '=') )
 
@@ -103,6 +103,15 @@ class Integrations:
             raise CallError('No endpoint has been found')
 
         return ep.getService(mode)
+
+    def getAll(self):
+        allintegr = {}
+        for conf in self.__inte.values():
+            for ep in conf.conf.endpoints():
+                allintegr[ep.id] = ep
+
+        return allintegr
+
 
 class ECommDef:
     class Unset:

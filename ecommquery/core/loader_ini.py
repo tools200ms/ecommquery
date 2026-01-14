@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 import configparser
 
@@ -46,14 +47,19 @@ class IniLoader(Loader):
             if len(sect[1:]) == 0:
                 raise DataformatError('No configuration, only [ecommquery] section defined')
 
-            for ep_type in sect[1:]:
+            for ep_name in sect[1:]:
+                # Split by space or dot and take first part as ep_type
+                ep_sect_split = re.split(r'[ .]', ep_name)
+                ep_type = ep_sect_split[0]
+                ep_id = ep_sect_split[1] if len(ep_sect_split) == 2 else None
+
                 ep_class = Endpoint.getClass(ep_type)
 
-                if ep_class == None:
+                if ep_class is None:
                     raise DataformatError(f"Unknown endpoint '{ep_type}'")
 
-                res = self.__ini_parser[ep_type]
-                ep = ep_class(res)
+                res = self.__ini_parser[ep_name]
+                ep = ep_class(res, ep_id)
                     #.factory(self.__ini_parser[ep_type])
                 config.addEndpoint(ep)
 

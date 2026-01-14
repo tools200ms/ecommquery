@@ -1,6 +1,7 @@
 from ecommquery.ecommquery import ECommDef
 from ecommquery.exceptions import ExternalResourceAccessError
 from ecommquery.ext.prestashop_api.lib.atomic.ps_fixed_point_numb import PSFixPointNumber
+from ecommquery.ext.prestashop_api.lib.atomic.ps_int_numb import PSIntNumber
 from ecommquery.lib.product import Product
 
 class PSProduct(Product):
@@ -13,6 +14,9 @@ class PSProduct(Product):
             raise Exception( 'Missing data (product)' )
 
         self.__raw_prod_buf = raw['product']
+
+        self.__def_comb_id = PSIntNumber(self.__raw_prod_buf['id_default_combination']['value'])
+
         self.__raw_assoc_buf = self.__raw_prod_buf['associations']
 
         if 'product_features' in self.__raw_assoc_buf:
@@ -31,8 +35,10 @@ class PSProduct(Product):
         # self._short_description = HTMLDescription.Generator().newDescription()
         # self._short_description = ...
 
+    @property
+    def def_comb_id(self):
+        return self.__def_comb_id
 
-    # append
     def set_features(self, list: []):
 
         if 'product_feature' in self._features:

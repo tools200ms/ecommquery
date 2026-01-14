@@ -13,15 +13,15 @@ INSERT INTO comments (msg)
 
 DROP TABLE IF EXISTS spc_def;
 CREATE TABLE spc_def (
-    id SMALLINT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     name CHAR(16),
     UNIQUE (id, name)
 );
 
 DROP TABLE IF EXISTS part_def;
 CREATE TABLE part_def (
-    id SMALLINT PRIMARY KEY,
-    spc_id SMALLINT NOT NULL,
+    id INTEGER PRIMARY KEY,
+    spc_id INTEGER NOT NULL,
     name CHAR(64),
     FOREIGN KEY (spc_id) REFERENCES spc_def(id),
     UNIQUE (id, spc_id, name)
@@ -29,7 +29,7 @@ CREATE TABLE part_def (
 
 DROP TABLE IF EXISTS prop_def;
 CREATE TABLE prop_def (
-    id SMALLINT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     spc_id CHAR(8) DEFAULT NULL,
     ref_name varchar(255),
     type CHAR,
@@ -44,15 +44,19 @@ CREATE TABLE prop_def (
 
 DROP TABLE IF EXISTS checkout_sources_def;
 CREATE TABLE checkout_sources_def (
-    id SMALLINT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     name VARCHAR(256),
-    part_id SMALLINT NOT NULL,
+    part_id INTEGER NOT NULL,
     function VARCHAR,
     triggered_by SMALLINT DEFAULT NULL,
     FOREIGN KEY (part_id) REFERENCES part_def(id)
 );
 
 -- END of definitions
+
+CREATE TABLE obj (
+    id INTEGER PRIMARY KEY
+);
 
 DROP TABLE IF EXISTS obj_checkout;
 CREATE TABLE obj_checkout (
@@ -64,35 +68,42 @@ CREATE TABLE obj_checkout (
     src_id SMALLINT,
     -- correction, transaction
     -- PRIMARY KEY (id, obj_id),
+    --FOREIGN KEY (obj_id) REFERENCES obj(id),
     FOREIGN KEY (src_id) REFERENCES checkout_sources_def(id)
 );
 
 DROP TABLE IF EXISTS obj_prop_nochange;
 CREATE TABLE obj_prop_nochange (
-    prop_id SMALLINT,
+    prop_id INTEGER,
+    obj_id INTEGER,
     checkout_id INTEGER,
-    UNIQUE (prop_id, checkout_id),
+    UNIQUE (prop_id, obj_id, checkout_id),
     FOREIGN KEY (prop_id) REFERENCES prop_def(id),
+    FOREIGN KEY (obj_id) REFERENCES obj(id),
     FOREIGN KEY (checkout_id) REFERENCES obj_checkout(id)
 );
 
 DROP TABLE IF EXISTS obj_prop_text;
 CREATE TABLE obj_prop_text (
-    prop_id SMALLINT,
+    prop_id INTEGER,
+    obj_id INTEGER,
     checkout_id INTEGER,
     value CHAR(32),
-    UNIQUE (prop_id, checkout_id),
+    UNIQUE (prop_id, obj_id, checkout_id),
     FOREIGN KEY (prop_id) REFERENCES prop_def(id),
+    FOREIGN KEY (obj_id) REFERENCES obj(id),
     FOREIGN KEY (checkout_id) REFERENCES obj_checkout(id)
 );
 
 DROP TABLE IF EXISTS obj_prop_int;
 CREATE TABLE obj_prop_int (
-    prop_id SMALLINT,
+    prop_id INTEGER,
+    obj_id INTEGER,
     checkout_id INTEGER,
     value INTEGER,
-    UNIQUE (prop_id, checkout_id),
+    UNIQUE (prop_id, obj_id, checkout_id),
     FOREIGN KEY (prop_id) REFERENCES prop_def(id),
+    FOREIGN KEY (obj_id) REFERENCES obj(id),
     FOREIGN KEY (checkout_id) REFERENCES obj_checkout(id)
 );
 

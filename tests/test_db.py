@@ -6,6 +6,7 @@ import unittest
 from ecommquery.db.db import BaseModel
 from ecommquery.db.map.Checkout import ObjCheckout
 from ecommquery.db.map.Comment import Comment
+from ecommquery.db.map.Object import Obj
 from ecommquery.db.map.Property import ObjPropNoChange, ObjPropText, ObjPropInt
 from ecommquery.db.map.definitions.Partition import PartDef
 from ecommquery.db.map.definitions.Property import PropDef
@@ -94,9 +95,10 @@ class TestTask(unittest.TestCase):
         allegro_api = CheckoutSourceDef.create(name='Allegro API', part=allegro_part)
         presta_api = CheckoutSourceDef.create(name='Presta API', part=presta_part)
 
-        obj = ObjCheckout.create(src=allegro_api)
-        obj = ObjCheckout.create(src=presta_api)
+        obj = Obj.create()
+        ObjCheckout.create(src=allegro_api)
+        ObjCheckout.create(src=presta_api)
 
+        #print('Temporary db: ' + dbfile_path)
         shutil.rmtree(tmpdir)
-
 
