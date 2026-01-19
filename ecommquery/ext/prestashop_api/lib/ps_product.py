@@ -2,6 +2,7 @@ from ecommquery.ecommquery import ECommDef
 from ecommquery.exceptions import ExternalResourceAccessError
 from ecommquery.ext.prestashop_api.lib.atomic.ps_fixed_point_numb import PSFixPointNumber
 from ecommquery.ext.prestashop_api.lib.atomic.ps_int_numb import PSIntNumber
+from ecommquery.ext.prestashop_api.lib.atomic.ps_text import PSText
 from ecommquery.lib.product import Product
 
 class PSProduct(Product):
@@ -31,6 +32,7 @@ class PSProduct(Product):
 
         self._price = PSFixPointNumber(self.__raw_prod_buf['price'])
         self._weight = PSFixPointNumber(self.__raw_prod_buf['weight'])
+        self._ean13 = PSText.get(self.__raw_prod_buf['ean13'])
 
         # self._short_description = HTMLDescription.Generator().newDescription()
         # self._short_description = ...
@@ -59,6 +61,10 @@ class PSProduct(Product):
 
     def weight(self, weight = None):
         return self._weight.rawValue(weight)
+
+    @property
+    def ean13(self, ean13 = None):
+        return self._ean13
 
     def get_def_cat(self):
         return self.__raw_prod_buf['id_category_default']
