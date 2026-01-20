@@ -22,3 +22,6 @@ class PropDef(BaseModel):
 
     class Meta:
         table_name = "prop_def"
+
+    def label(self):
+        return (self.spc.name if self.spc is not None else '') + '.' + self.ref_name

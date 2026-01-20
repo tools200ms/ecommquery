@@ -3,24 +3,27 @@ from ecommquery.lib.atomic.atomic import Atomic
 
 class PSFixPointNumber (Atomic):
 
-    def __init__(self, raw_value):
+    def __init__(self, raw_value, precision = 6):
         super().__init__()
-        self.__number = PSFixPointNumber._getValue(raw_value)
+        self.__number = self.__class__._getValue(raw_value, precision)
+        self._precision = precision
+        self._multiplier = 10**precision
 
     def __str__(self):
-        return f'{self.__number[0]}.{self.__number[1]:06d}'
+        format = f"0{self._precision}d"
+        return f'{self.__number[0]}.{self.__number[1]:{format}}'
 
-    def value(self, number:(int,int) = None):
+    def value(self, number:int = None):
         if number == None:
-            return self.__number
+            return self.__number[0] * self._multiplier + self.__number[1]
 
         if self.__number != number:
             self.markChange()
 
-        self.__number = number
+        self.__number = (int(number / self._multiplier), number % self._multiplier)
 
-    @staticmethod
-    def _getValue(value:str)->(int,int):
+    @classmethod
+    def _getValue(cls, value:str, precision)->(int,int):
         val_arr = value.split('.')
 
         if len(val_arr) != 2:
@@ -29,7 +32,7 @@ class PSFixPointNumber (Atomic):
         if not val_arr[0].lstrip('-').isdigit():
             raise ValueError("Not an integer number")
 
-        if not val_arr[1].isdigit() or len(val_arr[1]) != 6:
+        if not val_arr[1].isdigit() or len(val_arr[1]) != precision:
             raise ValueError("Wrong number format")
 
         return (int(val_arr[0]),int(val_arr[1]))
@@ -38,7 +41,7 @@ class PSFixPointNumber (Atomic):
         if value == None:
             return str(self)
 
-        number = PSFixPointNumber._getValue(value)
+        number = self._getValue(value, self._precision)
 
         if self.__number != number:
             self.markChange()

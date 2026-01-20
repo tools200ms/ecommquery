@@ -55,9 +55,13 @@ class PSProduct(Product):
     def getRaw(self):
         return self.__raw
 
+    @property
+    def item_no(self):
+        return int(self._item_no)
 
-    def price(self, price = None):
-        return self._price.rawValue(price)
+    @property
+    def price(self):
+        return self._price
 
     def weight(self, weight = None):
         return self._weight.rawValue(weight)
