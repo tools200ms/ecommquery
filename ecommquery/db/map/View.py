@@ -23,7 +23,7 @@ class ObjIntLatestView(BaseModel):
         backref="int_props"
     )
 
-    valuei = IntegerField(null=True)
+    value = IntegerField(null=True)
 
     class Meta:
         table_name = "obj_int_latest"
@@ -47,7 +47,7 @@ class ObjTextLatestView(BaseModel):
         backref="int_props"
     )
 
-    valuet = CharField(null=True)
+    value = CharField(null=True)
 
     class Meta:
         table_name = "obj_text_latest"
