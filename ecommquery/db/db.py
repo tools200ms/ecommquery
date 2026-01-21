@@ -45,7 +45,7 @@ class BaseModel(Model):
                     sql = file.read()
                 cls._load_sql(conn, sql)
         except DBLoadError as dbload_err:
-            raise RuntimeError(f"SQL error in '{path}' in statement: \n    {e}") from dbload_err
+            raise RuntimeError(f"SQL error in '{path}' in statement: \n    {dbload_err}") from dbload_err
 
         # try:
         #     conn.execute_sql(schema_sql)
