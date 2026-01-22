@@ -1,0 +1,10 @@
+#!/bin/sh
+
+cd /srv
+
+mkdir -p ./logs
+chown user ./logs
+su user -c "poetry install" > /srv/logs/install.out 2>&1
+#su user -c "poetry run python tasks/$TASK_TO_RUN"
+
+exit 0

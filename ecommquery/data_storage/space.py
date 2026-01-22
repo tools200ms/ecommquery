@@ -30,10 +30,15 @@ class Space:
         return f_part
 
     @classmethod
-    def getSpaces(cls, filter: str):
+    def getSpaces(cls, filter: str = None):
         f_space = {}
-        
-        for s in SpcDef.select().where(SpcDef.name.contains(filter)):
+
+        if filter is None:
+            it = SpcDef.select()
+        else:
+            it = SpcDef.select().where(SpcDef.name.contains(filter))
+
+        for s in it:
             f_space[s.name] = Space(s)
 
         return f_space

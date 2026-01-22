@@ -18,8 +18,8 @@ class EndpointAmSP(Endpoint):
 
     def __init__(self, params : {}, id:str):
         # This should validate Amazon Client ID and secret key
-        am_validator = RegExValidator('[a-z0-9|\.|\-]{16,96}')
-        rt_validator = RegExValidator('[a-zA-Z0-9|_|\-|\|]{128,512}')
+        am_validator = RegExValidator('[a-z0-9|\\.|\\-]{16,96}')
+        rt_validator = RegExValidator('[a-zA-Z0-9|_|\\-|\\|]{128,512}')
 
         super().__init__({'client_id': Endpoint.Constr(am_validator),
                           'client_secret_key': Endpoint.Constr(am_validator, is_secret=True),

@@ -7,25 +7,50 @@ from ecommquery.core.service_management import ManagementService
 
 class Puller:
     class Config:
-        def __init__(self, service, action, freq:str, start_shift:str):
+        def __init__(self, service, action, freq:str, start_shift:str = None):
             self._freq = freq
             self.srv = service
             self.act = action
 
             if start_shift is not None:
-                self._next_call = datetime.now() + timedelta(seconds=Puller.refreshRate(start_shift))
+                self._next_call = datetime.now() + timedelta(seconds=Puller.timeShift(start_shift))
             else:
                 self._next_call = datetime.now()
 
-        def callNow(self, time_now):
+        def callNow(self, time_now = None):
+            if time_now == None:
+                time_now = datetime.now()
+
             call_now = (self._next_call <= time_now)
             if call_now:
-                print(f"Time to call")
-                self._next_call = time_now + timedelta(seconds=Puller.refreshRate(self._freq))
-            else:
-                print(f"Not now")
+                self._next_call = self._next_call + timedelta(seconds=Puller.refreshRate(self._freq))
+
             return call_now
 
+    @staticmethod
+    def timeShift(t_shift:str) -> int:
+
+        pos = next((i for i, c in enumerate(t_shift) if not c.isdigit()), -1)
+        if pos == -1:
+            raise ValueError(f"Invalid time shift format: {t_shift}")
+        f_arr = [t_shift[:pos], t_shift[pos:].strip()]
+
+        t_shift = int(f_arr[0])
+
+        match f_arr[1].lower():
+            case 'd' | 'day' | 'days':
+                period = 86400
+            case 'h' | 'hour' | 'hours':
+                period = 3600
+            case 'm' | 'min' | 'mins':
+                period = 60
+            case 's' | 'sec' | 'secs':
+                period = 1
+            case _:
+                raise ValueError(f"Invalid frequency period: {f_arr[1]}")
+
+        return t_shift * period
+    
     @staticmethod
     def refreshRate(freq) -> int:
         f_arr = freq.split('/')

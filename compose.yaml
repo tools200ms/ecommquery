@@ -1,0 +1,16 @@
+services:
+  app:
+    image: 200ms/alpinenet_dev2
+    environment:
+      - FEATURE=python sudo
+      - SUDOERS=true
+      - PKGS_ADD=poetry sqlite
+      - TASK_TO_RUN=main.py
+    volumes:
+      - ./pyproject.toml:/srv/pyproject.toml:ro
+      - ./README.md:/srv/README.md:ro
+      - ./ecommquery:/srv/ecommquery:ro
+      - ./tasks:/srv/tasks:ro
+      - ./confs:/srv/confs:ro
+      - ./files/sync.start:/etc/local.d/sync.start:ro
+    #entrypoint: [ "sleep", "infinity" ]
