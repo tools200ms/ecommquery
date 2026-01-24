@@ -1,0 +1,8 @@
+-- Set the default database file
+-- .open mydatabase.db
+
+.headers on
+.mode column
+
+-- Custom command to show tables
+--.create_table_command = .tables

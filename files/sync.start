@@ -2,9 +2,15 @@
 
 cd /srv
 
-mkdir -p ./logs
-chown user ./logs
+touch poetry.lock && chown user poetry.lock
+su user -c "poetry lock --regenerate"
+mkdir -p ./logs && chown user ./logs
+
 su user -c "poetry install" > /srv/logs/install.out 2>&1
-#su user -c "poetry run python tasks/$TASK_TO_RUN"
+
+# Watchdog:
+#     ps -o comm,args | grep -q -e "^python.*ecommquery"
+# Missing INIT - let's do 'python' init
+$(su user -c "cd /srv; poetry run python ./tasks/main.py" > /srv/logs/run.out 2>&1)&
 
 exit 0

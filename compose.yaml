@@ -5,7 +5,6 @@ services:
       - FEATURE=python sudo
       - SUDOERS=true
       - PKGS_ADD=poetry sqlite
-      - TASK_TO_RUN=main.py
     volumes:
       - ./pyproject.toml:/srv/pyproject.toml:ro
       - ./README.md:/srv/README.md:ro
@@ -13,4 +12,9 @@ services:
       - ./tasks:/srv/tasks:ro
       - ./confs:/srv/confs:ro
       - ./files/sync.start:/etc/local.d/sync.start:ro
-    #entrypoint: [ "sleep", "infinity" ]
+      - ./files/sqliterc:/root/.sqliterc:ro
+    healthcheck:
+      test: [ "CMD-SHELL", "ps -o comm,args | grep -q -e '^python.*ecommquery'" ]
+      interval: 60s
+      retries: 3
+

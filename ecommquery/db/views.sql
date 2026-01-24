@@ -32,8 +32,15 @@ CREATE VIEW obj_text_latest
                 latestt.checkout_id = allt.checkout_id;
 
 CREATE VIEW obj_comb_latest
-    AS SELECT obj_id, prop_def.spc_id, prop_def.ref_name AS ref_name, checkout_id, obj_text_latest.value AS valuet, obj_int_latest.value AS valuei, oc.timestamp AS timestamp
-        FROM obj_text_latest FULL OUTER JOIN obj_int_latest USING (checkout_id, obj_id, prop_id), obj_checkout oc, prop_def
+    AS SELECT obj_id,
+              prop_def.spc_id,
+              prop_def.ref_name AS ref_name,
+              checkout_id,
+              obj_text_latest.value AS valuet,
+              obj_int_latest.value AS valuei,
+              oc.timestamp AS timestamp
+        FROM obj_text_latest FULL OUTER JOIN obj_int_latest USING (checkout_id, obj_id, prop_id),
+                obj_checkout oc, prop_def
         WHERE oc.id = checkout_id AND prop_def.id = prop_id
         ORDER BY obj_id, spc_id, ref_name;
 
@@ -41,3 +48,9 @@ CREATE VIEW _obj_comb_latest
     AS SELECT obj_id, prop_id, checkout_id, obj_text_latest.value AS valuet, obj_int_latest.value AS valuei
         FROM obj_text_latest FULL OUTER JOIN obj_int_latest USING (checkout_id, obj_id, prop_id), obj_checkout oc
         WHERE oc.id = checkout_id;
+
+
+CREATE VIEW checkout_prop_all
+    AS SELECT obj_id, prop_id, checkout_id, oc.src_id AS src_id, obj_prop_text.value AS valuet, obj_prop_int.value AS valuei
+       FROM obj_prop_int FULL OUTER JOIN obj_prop_text USING (checkout_id, obj_id,prop_id), obj_checkout oc
+       WHERE oc.id = checkout_id;

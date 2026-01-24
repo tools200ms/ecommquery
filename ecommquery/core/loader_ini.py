@@ -10,7 +10,7 @@ from ecommquery.exceptions import DataformatError
 class IniLoader(Loader):
     def __init__(self, path = 'integrations.ini'):
         super().__init__()
-        self.__path = Path(path).expanduser()
+        self.__path = Path(path).absolute()
 
 
         self.__ini_parser = configparser.ConfigParser()
