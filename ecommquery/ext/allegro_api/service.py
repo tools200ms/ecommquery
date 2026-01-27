@@ -2,7 +2,6 @@
 Based on:
 https://developer.allegro.pl/tutorials/uwierzytelnianie-i-autoryzacja-zlq9e75GdIR
 '''
-from datetime import datetime
 from json import JSONDecodeError
 
 from requests import HTTPError
@@ -37,7 +36,7 @@ class ServiceAlle(ManagementService):
 
         return self._req.client_id
 
-    def _establish(self):
+    def _establish(self) -> Session:
         access_token = self._stash.get("access_token")
         refresh_token = self._stash.get("refresh_token")
         expires_on = self._stash.getDate("expires_on")

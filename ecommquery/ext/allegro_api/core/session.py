@@ -1,7 +1,5 @@
 from pprint import pprint
 
-import requests
-
 from ecommquery.ext.allegro_api.core.requestor import Requestor
 from datetime import datetime, timedelta
 

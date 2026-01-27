@@ -3,6 +3,16 @@
 --     AS SELECT id, max(timestamp) AS timestamp
 --        FROM obj_checkout;
 
+CREATE VIEW prop_int_all
+    AS SELECT p.obj_id AS obj_id, p.prop_id AS prop_id, c.timestamp AS timestamp, p.checkout_id AS checkout_id, p.value AS value, c.src_id AS src_id
+    FROM obj_prop_int p, obj_checkout c
+    WHERE p.checkout_id = c.id;
+
+CREATE VIEW prop_text_all
+    AS SELECT p.obj_id AS obj_id, p.prop_id AS prop_id, c.timestamp AS timestamp, p.checkout_id AS checkout_id, p.value AS value, c.src_id AS src_id
+    FROM obj_prop_text p, obj_checkout c
+    WHERE p.checkout_id = c.id;
+
 
 CREATE VIEW prop_int_latest
     AS SELECT pi.obj_id AS obj_id, pi.prop_id AS prop_id, max(timestamp) AS timestamp, c.id AS checkout_id
@@ -45,7 +55,7 @@ CREATE VIEW obj_comb_latest
         ORDER BY obj_id, spc_id, ref_name;
 
 CREATE VIEW _obj_comb_latest
-    AS SELECT obj_id, prop_id, checkout_id, obj_text_latest.value AS valuet, obj_int_latest.value AS valuei
+    AS SELECT obj_id, prop_id, checkout_id, oc.src_id AS src_id, obj_text_latest.value AS valuet, obj_int_latest.value AS valuei
         FROM obj_text_latest FULL OUTER JOIN obj_int_latest USING (checkout_id, obj_id, prop_id), obj_checkout oc
         WHERE oc.id = checkout_id;
 
@@ -54,3 +64,9 @@ CREATE VIEW checkout_prop_all
     AS SELECT obj_id, prop_id, checkout_id, oc.src_id AS src_id, obj_prop_text.value AS valuet, obj_prop_int.value AS valuei
        FROM obj_prop_int FULL OUTER JOIN obj_prop_text USING (checkout_id, obj_id,prop_id), obj_checkout oc
        WHERE oc.id = checkout_id;
+
+CREATE VIEW checkout_details
+    AS SELECT c.id AS id, c.timestamp AS timestamp, c.src_id AS src_id, cd.name as chk_name, cd.function AS chk_function, cd.triggered_by AS chk_triggered_by, pd.name AS part_name, sd.name AS space_name
+       FROM obj_checkout c, checkout_sources_def cd, part_def pd, spc_def sd
+       WHERE c.src_id = cd.id AND cd.part_id = pd.id AND sd.id = pd.spc_id;
+

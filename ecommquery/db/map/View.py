@@ -1,4 +1,4 @@
-from peewee import ForeignKeyField, CharField, IntegerField
+from peewee import ForeignKeyField, CharField, IntegerField, DateTimeField
 
 from ecommquery.db.db import BaseModel
 from ecommquery.db.map.Checkout import ObjCheckout
@@ -6,6 +6,68 @@ from ecommquery.db.map.Object import Obj
 from ecommquery.db.map.definitions.Property import PropDef
 from ecommquery.db.map.definitions.Sources import CheckoutSourceDef
 
+
+class ObjIntAllView(BaseModel):
+    obj = ForeignKeyField(
+        Obj,
+        column_name="obj_id",
+        backref="nochange_props")
+
+    prop = ForeignKeyField(
+        PropDef,
+        column_name="prop_id",
+        backref="nochange_props"
+    )
+
+    checkout = ForeignKeyField(
+        ObjCheckout,
+        column_name="checkout_id",
+        backref="int_props"
+    )
+
+    timestamp = DateTimeField()
+    value = IntegerField(null=True)
+
+    src = ForeignKeyField(
+        CheckoutSourceDef,
+        column_name="src_id"
+    )
+
+    class Meta:
+        table_name = "prop_int_all"
+        primary_key = False  # views typically have no PK
+
+
+class ObjTextAllView(BaseModel):
+    obj = ForeignKeyField(
+        Obj,
+        column_name="obj_id",
+        backref="nochange_props")
+
+    prop = ForeignKeyField(
+        PropDef,
+        column_name="prop_id",
+        backref="nochange_props"
+    )
+
+    checkout = ForeignKeyField(
+        ObjCheckout,
+        column_name="checkout_id",
+        backref="int_props"
+    )
+
+    timestamp = DateTimeField()
+
+    value = IntegerField(null=True)
+
+    src = ForeignKeyField(
+        CheckoutSourceDef,
+        column_name="src_id"
+    )
+
+    class Meta:
+        table_name = "prop_text_all"
+        primary_key = False  # views typically have no PK
 
 class ObjIntLatestView(BaseModel):
     obj = ForeignKeyField(
@@ -72,6 +134,11 @@ class ObjCombLatestView(BaseModel):
         ObjCheckout,
         column_name="checkout_id",
         backref="int_props"
+    )
+
+    src = ForeignKeyField(
+        CheckoutSourceDef,
+        column_name="src_id"
     )
 
     valuet = CharField(null=True)
