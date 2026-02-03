@@ -9,16 +9,26 @@ from ecommquery.lib.functions.url import URLFun
 from prestapyt import PrestaShopWebServiceDict
 
 
+class DummySession:
+    def request(self, *args, **kwargs):
+        raise RuntimeError("Session not initialized")
+
+    def close(self):
+        pass
+
 class ServicePS(ManagementService, PrestaShopWebServiceDict):
 
     def __init__(self, api_url, api_key, verbose: bool, debug: bool, pretend: bool):
-        super().__init__(api_url, api_key, debug = debug, session = None, verbose = verbose)
+        session = None
+        if pretend:
+            session = DummySession
+        super().__init__(api_url, api_key, debug = debug, session = session, verbose = verbose)
+        self._pretend = pretend
 
     def test(self):
         res = self.get('shops')
 
         if 'shops' in res:
-
             res = res['shops']
             print(f"Fount {len(res)} shop(s): ")
             for shop in res:
@@ -31,6 +41,13 @@ class ServicePS(ManagementService, PrestaShopWebServiceDict):
                 print(f"    #{shop_id}: '{shop_res['name']}', shop is {'active' if shop_res['active'] == '1' else 'NOT active'}")
         else:
             raise Exception("No 'shops' key found in response")
+
+    def reestablish(self):
+        return self.__class__(self._api_url, self._api_key, debug = self.debug, verbose = self.verbose, pretend = self._pretend)
+
+    def close(self):
+        self.client.close()
+        self.client = None
 
     # example criteria filtering:
     # criteria = {'filter[id_category_default]': '269'}
