@@ -57,7 +57,7 @@ CREATE VIEW obj_comb_latest
 CREATE VIEW _obj_comb_latest
     AS SELECT obj_id, prop_id, checkout_id, oc.src_id AS src_id, obj_text_latest.value AS valuet, obj_int_latest.value AS valuei
         FROM obj_text_latest FULL OUTER JOIN obj_int_latest USING (checkout_id, obj_id, prop_id), obj_checkout oc
-        WHERE oc.id = checkout_id;
+        WHERE oc.id = checkout_id ORDER BY obj_id;
 
 
 CREATE VIEW checkout_prop_all
