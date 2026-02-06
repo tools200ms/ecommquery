@@ -46,4 +46,5 @@ class Requestor:
         }
 
         return (lambda path, params: requests.get(self._api_base_url + path, headers=headers, params=params),
-                lambda path, params: requests.post(self._api_base_url + path, headers=headers, params=params))
+                lambda path, params: requests.post(self._api_base_url + path, headers=headers, params=params),
+                lambda path, params: requests.patch(self._api_base_url + path, headers=headers, params=params))

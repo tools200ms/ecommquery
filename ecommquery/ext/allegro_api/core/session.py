@@ -33,7 +33,7 @@ class Session:
         self._scope = scope
         self._token_type = token_type
 
-        self.get, self.post = req.getSessionRequestor(access_token)
+        self.get, self.post, self.patch = req.getSessionRequestor(access_token)
 
     @staticmethod
     def __getExpireOn(expires_in: int):

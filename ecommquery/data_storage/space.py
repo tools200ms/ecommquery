@@ -13,6 +13,10 @@ class Space:
             self.name = part.name
             self.space = space
 
+        @property
+        def part(self):
+            return self._part
+
     global_properties = None
 
     def __init__(self, spc):
@@ -24,7 +28,7 @@ class Space:
     def partitions(self, filter:str):
         f_part = {}
         for p in self._spc.parts:
-            if filter in p.name:
+            if filter is None or filter in p.name:
                 f_part[p.name] = Space.Partition(p, self)
 
         return f_part

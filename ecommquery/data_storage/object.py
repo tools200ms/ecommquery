@@ -37,6 +37,10 @@ class MisoObject:
 
         self.__cache_prop_list = None
 
+    @property
+    def id(self):
+        return self._obj.id
+
     @classmethod
     def createNew(cls, key_prop, value, checkout):
         mobj = cls()
@@ -45,7 +49,7 @@ class MisoObject:
         return mobj
 
     @classmethod
-    def get(cls, propd:PropDef, key:int|str):
+    def get(cls, propd:PropDef, key:int|str, unique = True):
         label = propd.label()
         if label not in cls.__cache_view_objs:
             cls.__cache_view_objs[label] = None
@@ -60,20 +64,51 @@ class MisoObject:
             view_class = MisoTextType.determinateType(propd).OBJ_LATEST_VIEW_CLASS
             for obj_comb in (
                     view_class.select().where(view_class.prop == propd)):
-                cache[obj_comb.value] = obj_comb.obj_id
+                if unique:
+                    cache[obj_comb.value] = obj_comb.obj_id
+                else:
+                    if obj_comb.value in cache:
+                        cache[obj_comb.value].append(obj_comb.obj_id)
+                    else:
+                        cache[obj_comb.value] = [obj_comb.obj_id]
 
         if key in cache:
-            obj_id = cache[key]
+            obj_ids = cache[key]
         else:
-            return None
+            return None if unique else []
 
-        obj = Obj.get(Obj.id == obj_id)
+        if unique:
+            obj = Obj.get(Obj.id == obj_ids)
+            return MisoObject(obj)
+        # else
+        res = []
+        for id in obj_ids:
+            res.append(MisoObject(Obj.get(Obj.id == id)))
 
-        return MisoObject(obj)
+        return res
 
+    # set a new checkout
     def setCheckout(self, checkout: ObjCheckout):
         self._checkout = checkout
         self.__cache_prop_list = None
+
+    def _cache_properties(self):
+        self.__cache_prop_list = {}
+        for obj_l_view in (
+                ObjIntLatestView.select().where(ObjIntLatestView.obj == self._obj)):
+            self.__cache_prop_list[obj_l_view.prop.id] = obj_l_view.value
+        for obj_l_view in (
+                ObjTextLatestView.select().where(ObjTextLatestView.obj == self._obj)):
+            self.__cache_prop_list[obj_l_view.prop.id] = obj_l_view.value
+
+    def getValue(self, prop_d:PropDef) -> str|int:
+        if self.__cache_prop_list is None:
+            self._cache_properties()
+
+        if prop_d.id in self.__cache_prop_list:
+            return self.__cache_prop_list[prop_d.id]
+
+        return None
 
     def update(self, prop_d:PropDef, value:str|int):
         data_type = MisoTextType.determinateType(prop_d)
@@ -81,14 +116,7 @@ class MisoObject:
         obj_prop_class = data_type.OBJ_PROP_CLASS
 
         if self.__cache_prop_list is None:
-            self.__cache_prop_list = {}
-            for obj_l_view in (
-                ObjIntLatestView.select().where(ObjIntLatestView.obj == self._obj)):
-                self.__cache_prop_list[obj_l_view.prop.id] = obj_l_view.value
-            for obj_l_view in (
-                ObjTextLatestView.select().where(ObjTextLatestView.obj == self._obj)):
-                self.__cache_prop_list[obj_l_view.prop.id] = obj_l_view.value
-
+            self._cache_properties()
 
         if prop_d.id in self.__cache_prop_list:
             if self.__cache_prop_list[prop_d.id] == value:
@@ -99,3 +127,6 @@ class MisoObject:
         obj_prop_class.create(
             checkout=self._checkout,
             obj=self._obj, prop=prop_d, value=value)
+
+        # update cache
+        self.__cache_prop_list[prop_d.id] = value
