@@ -4,12 +4,12 @@ from datetime import datetime
 from pathlib import Path
 
 class Stash:
-    STASH_DEFAULT_FILE = 'ecommquery_stash.json'
+    STASH_FILE_PATH = 'stash.json'
     _cache = None
     _mod_time = None
     _register = set()
 
-    def __init__(self, module: str, id: str, stash_file: Path = Path(STASH_DEFAULT_FILE)):
+    def __init__(self, module: str, id: str, stash_file: Path = Path(STASH_FILE_PATH)):
         self._module = module
         self._id = id
         self._stash_file = stash_file

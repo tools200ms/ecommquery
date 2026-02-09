@@ -29,8 +29,9 @@ class MisoObject:
     def __init__(self, obj:Obj = None):
         if obj is None:
             obj = Obj.create()
-            # invalidate casche
-            self.__class__.__cache_view_objs = {}
+
+        # invalidate casche
+        self.__class__.__cache_view_objs = {}
 
         self._obj = obj
         self._checkout = None
@@ -40,6 +41,10 @@ class MisoObject:
     @property
     def id(self):
         return self._obj.id
+
+    @property
+    def obj(self):
+        return self._obj
 
     @classmethod
     def createNew(cls, key_prop, value, checkout):
@@ -62,8 +67,7 @@ class MisoObject:
             cls.__cache_view_objs[label] = cache
 
             view_class = MisoTextType.determinateType(propd).OBJ_LATEST_VIEW_CLASS
-            for obj_comb in (
-                    view_class.select().where(view_class.prop == propd)):
+            for obj_comb in (view_class.select().where(view_class.prop == propd)):
                 if unique:
                     cache[obj_comb.value] = obj_comb.obj_id
                 else:

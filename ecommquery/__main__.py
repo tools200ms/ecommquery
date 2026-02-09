@@ -2,6 +2,8 @@ import logging
 import code
 import sys
 
+from ecommquery.about import about
+
 
 def main():
     logging.basicConfig(
@@ -11,7 +13,7 @@ def main():
     logger = logging.getLogger(__name__)
     logger.info("Application started")
 
-    code.interact(local=locals())
+    code.interact(banner=about.BANNER, local=locals())
 
     return 0
 
