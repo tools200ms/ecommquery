@@ -47,4 +47,4 @@ class Requestor:
 
         return (lambda path, params: requests.get(self._api_base_url + path, headers=headers, params=params),
                 lambda path, params: requests.post(self._api_base_url + path, headers=headers, params=params),
-                lambda path, params: requests.patch(self._api_base_url + path, headers=headers, params=params))
+                lambda path, params, payload: requests.patch(self._api_base_url + path, headers=(headers | {"Content-Type": "application/vnd.allegro.public.v1+json"}), params=params, json=payload))
