@@ -124,7 +124,6 @@ class MisoObject:
 
         if prop_d.id in self.__cache_prop_list:
             if self.__cache_prop_list[prop_d.id] == value:
-                print("# no update needed")
                 return
 
         # Update

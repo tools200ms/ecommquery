@@ -1,0 +1,7 @@
+
+map:
+  dir:
+    - <config>:/app/conf
+    - <logs>:/app/logs
+  file:
+    - <secret>:/app/stash.json
