@@ -1,4 +1,4 @@
-from enum import Enum
+
 import base64
 import requests
 
@@ -29,22 +29,26 @@ class Requestor:
             self._base_url = BASE_URL_SANDBOX
             self._api_base_url = API_BASE_URL_SANDBOX
 
+
     def isSandBox(self):
         return self._base_url == BASE_URL_SANDBOX
 
     def post(self, request_to: PathTo, params):
         return requests.post(
-            self._base_url + request_to.getPath(),
-            headers=self.headers,
-            params=params
-        )
+             self._base_url + request_to.getPath(),
+             headers=self.headers,
+             params=params
+         )
 
     def getSessionRequestor(self, access_token:str):
         headers = {
             "Authorization": f"Bearer {access_token}",
-            "Accept": "application/vnd.allegro.public.v1+json"
+            "Accept": "application/vnd.allegro.public.v1+json",
+            "Content-Type": "application/vnd.allegro.public.v1+json"
         }
 
-        return (lambda path, params: requests.get(self._api_base_url + path, headers=headers, params=params),
-                lambda path, params: requests.post(self._api_base_url + path, headers=headers, params=params),
-                lambda path, params, payload: requests.patch(self._api_base_url + path, headers=(headers | {"Content-Type": "application/vnd.allegro.public.v1+json"}), params=params, json=payload))
+        session = requests.Session()
+
+        return (lambda path, params: session.get(self._api_base_url + path, headers=headers, params=params),
+                lambda path, params: session.post(self._api_base_url + path, headers=headers, params=params),
+                lambda path, params, payload: session.patch(self._api_base_url + path, headers=headers, params=params, json=payload))

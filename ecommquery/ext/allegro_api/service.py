@@ -80,5 +80,9 @@ class ServiceAlle(ManagementService):
         self._stash.setDate("expires_on", session.expires_on)
         self._stash.save()
 
+    def clear(self):
+        # clear stash ...
+        ...
+
     def close(self):
         pass
