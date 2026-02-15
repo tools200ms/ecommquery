@@ -66,7 +66,7 @@ class Session:
         self._refresh_token = ret["refresh_token"]
         self._expires_on = Session.__getExpireOn(ret["expires_in"])
 
-        pprint(ret)
+        self.get, self.post, self.patch = self._req.getSessionRequestor(self._access_token)
 
     @property
     def token_type(self):

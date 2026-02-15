@@ -36,12 +36,12 @@ class ServiceAlle(ManagementService):
 
         return self._req.client_id
 
-    def _establish(self) -> Session:
+    def _establish(self, reset:bool = False) -> Session:
         access_token = self._stash.get("access_token")
         refresh_token = self._stash.get("refresh_token")
         expires_on = self._stash.getDate("expires_on")
 
-        if access_token == None:
+        if access_token == None or reset:
             auth = Authenticator.start_device_flow(self._req)
             auth.printMessage()
             auth.printDetails()
@@ -66,9 +66,9 @@ class ServiceAlle(ManagementService):
         #print(auth)
         return session
 
-    def establish(self) -> Session:
+    def establish(self, reset:bool = False) -> Session:
         try:
-            return self._establish()
+            return self._establish(reset)
         except HTTPError as err:
             raise AllegroConnectionError() from err
 
