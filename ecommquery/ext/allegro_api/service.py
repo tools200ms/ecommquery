@@ -66,12 +66,16 @@ class ServiceAlle(ManagementService):
         #print(auth)
         return session
 
-    def establish(self, reset:bool = False) -> Session:
+    def establish(self) -> Session:
         try:
-            return self._establish(reset)
+            session = self._establish()
         except HTTPError as err:
-            raise AllegroConnectionError() from err
+            try:
+                session = self._establish(reset=True)
+            except HTTPError as err:
+                raise AllegroConnectionError() from err
 
+        return session
 
     def refresh(self, session: Session) -> Session:
         session.refreshAccessToken()
