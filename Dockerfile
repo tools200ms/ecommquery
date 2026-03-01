@@ -35,12 +35,8 @@ WORKDIR /app
 COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-COPY ./task/main.py main.py
-
 # Copy application code
 COPY ecommquery/ ecommquery/
-
-COPY conf/ conf/
 
 RUN touch stash.json && chown -R appuser:appuser stash.json
 RUN mkdir -p logs && chown -R appuser:appuser logs

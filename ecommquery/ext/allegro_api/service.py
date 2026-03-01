@@ -25,10 +25,10 @@ class ServiceAlle(ManagementService):
 
         self._stash = Stash(module, self.id())
 
-        try:
-            self._stash.load()
-        except JSONDecodeError as json_err:
-            raise Exception(f"Failed to load stash file. Please check the file format and try again:\n    {json_err}")
+        #try:
+        self._stash.load(recreate_if_broken=True)
+        #except JSONDecodeError as json_err:
+        #    raise Exception(f"Failed to load stash file. Please check the file format and try again:\n    {json_err}")
 
     def id(self) -> str:
         if self._req.isSandBox():

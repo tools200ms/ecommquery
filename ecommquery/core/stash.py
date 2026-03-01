@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from json import JSONDecodeError
 from pathlib import Path
 
 class Stash:
@@ -29,35 +30,49 @@ class Stash:
         self._dom = None
         Stash._register.remove(self._modid)
 
-    def load(self):
+    def _load_stash_file(self):
+        if Stash._mod_time == None or Stash._mod_time != self._stash_file.stat().st_mtime:
+            with open(self._stash_file, 'r+') as file:
+                file.seek(0)
+                # TODO: check-out what kind of objects can be represented by Stash._cache
+                Stash._cache = json.load(file)
+                Stash._mod_time = self._stash_file.stat().st_mtime
+                if self._module in Stash._cache and self._id in Stash._cache[self._module]:
+                    self._dom = Stash._cache[self._module][self._id].copy()
+                else:
+                    Stash._cache[self._module] = {self._id: {}}
+                    file.seek(0)
+                    json.dump(Stash._cache, file, indent=2)
+                    self._dom = {}
+        
+    # end of _load_stash_file function
+    
+    def _create_empty_stash_file(self):
+        with open(self._stash_file, 'w') as file:
+            Stash._cache = {self._module: {self._id: {}}}
+            json.dump(Stash._cache, file, indent=2)
+        self._dom = {}
+    
+    def load(self, recreate_if_broken = False):
         if (     not os.path.exists(self._stash_file) or 
                 (self._stash_file.is_file() and self._stash_file.stat().st_size == 0)):
-            # if empty create file:
-            with open(self._stash_file, 'w') as file:
-                Stash._cache = {self._module: {self._id: {}}}
-                json.dump(Stash._cache, file, indent=2)
-            self._dom = {}
+            self._create_empty_stash_file()
             return
 
         # Check if _stash_file is a file type
         if not self._stash_file.is_file():
             raise Exception(f"Stash file path is not a file: {self._stash_file}")
 
-        if Stash._mod_time == None or Stash._mod_time != self._stash_file.stat().st_mtime:
-            with open(self._stash_file, 'r+') as file:
-                file.seek(0)
-                Stash._cache = json.load(file)
-                Stash._mod_time = self._stash_file.stat().st_mtime
-                if self._module not in Stash._cache or self._id not in Stash._cache[self._module]:
-                    Stash._cache[self._module] = {self._id: {}}
-                    file.seek(0)
-                    json.dump(Stash._cache, file, indent=2)
-                    self._dom = {}
-                    return
+        try:
+            self._load_stash_file()
+        except JSONDecodeError as jsondec_except:
+            os.remove(self._stash_file)
+            if recreate_if_broken:
+                self._create_empty_stash_file()
+            else:
+                raise jsondec_except
 
-        self._dom = Stash._cache[self._module][self._id].copy()
-        print(self._dom)
-        # end of load
+    # end of load function
 
     def set(self, prop, value):
         if self._dom == None:

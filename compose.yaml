@@ -6,13 +6,13 @@ services:
       - SUDOERS=true
       - PKGS_ADD=poetry sqlite
     volumes:
-      - ./pyproject.toml:/srv/pyproject.toml:ro
-      - ./README.md:/srv/README.md:ro
-      - ./ecommquery:/srv/ecommquery:ro
-      - ./tasks:/srv/tasks:ro
-      - ./confs:/srv/confs:ro
+      - ./pyproject.toml:/app/pyproject.toml:ro
+      - ./README.md:/app/README.md:ro
+      - ./ecommquery:/app/ecommquery:ro
+      - ./tasks:/app/task:ro
+      - ./conf:/app/conf:ro
       - ./files/sync.start:/etc/local.d/sync.start:ro
-      - ./files/sqliterc:/root/.sqliterc:ro
+      - ./files/sqliterc:/app/.sqliterc:ro
     healthcheck:
       test: [ "CMD-SHELL", "ps -o comm,args | grep -q -e '^python.*ecommquery'" ]
       interval: 60s
