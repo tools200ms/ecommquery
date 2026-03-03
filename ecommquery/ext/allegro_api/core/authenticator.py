@@ -1,10 +1,13 @@
 import time
 from pprint import pprint
+import logging
 
 from ecommquery.ext.allegro_api.core.requestor import Requestor
 from ecommquery.ext.allegro_api.core.session import Session
 from ecommquery.ext.allegro_api.lib.constants import PathTo
+from ecommquery.ext.allegro_api.lib.errors import AllegroConnectionTimeOutUserAuthorizationError
 
+logger = logging.getLogger(__name__)
 
 class Authenticator:
     _device_resp_filter = ("device_code", "user_code",
@@ -81,12 +84,13 @@ Authentication Details:
 
     def poll_for_token(self, req: Requestor):
         """Step 2: Poll the Allegro token endpoint until the user grants access."""
-        print(f"\n--- Waiting for User Authorization for {self.expires_in} seconds ---")
+        logger.info(f"--- Waiting for User Authorization for {self.expires_in} seconds ---")
+        logger.info(f"    Polling interval: {self.interval}")
 
         time_begin = time.time()
         expiry_time = time_begin + self.expires_in
 
-        while time.time() < expiry_time:
+        while True:
             # Wait for the specified interval before polling again
             time.sleep(self.interval)
 
@@ -96,20 +100,24 @@ Authentication Details:
 
             # Get response data
             resp_data = resp.json()
+            cur_time = time.time()
 
             if resp.status_code == 400:
-                error_msg = resp_data.get('error_description', 'No error description provided')
-                print(f"Error: Request failed with status code {resp.status_code}")
-                print(f"Error message: {error_msg}")
+                if (cur_time + self.interval) > expiry_time:
+                    raise AllegroConnectionTimeOutUserAuthorizationError("Authorization timed out.")
+
+                logger.info(f"Waiting for user authorization ({expiry_time - cur_time}sec. left)")
                 continue
             elif resp.status_code != 200:
                 raise Exception(f"Unexpected response status code: {resp.status_code}")
 
-            pprint(resp_data)
-            result = {k: resp_data[k] for k in Authenticator._token_resp_filter if k in resp_data}
-            result['req'] = req
+            # Got '200' status code, quit poll loop:
+            break
 
-            return Session(**result)
+        result = {k: resp_data[k] for k in Authenticator._token_resp_filter if k in resp_data}
+        result['req'] = req
 
-        print("Authorization timed out.")
-        return None
+        logger.info("Authorization succeed.")
+
+        return Session(**result)
+
