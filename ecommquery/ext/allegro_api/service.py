@@ -36,6 +36,29 @@ class ServiceAlle(ManagementService):
 
         return self._req.client_id
 
+    class Pending:
+        def __init__(self, waiting_fun, autn:Authenticator):
+            self._waiting_fun = waiting_fun
+            self._autn = autn
+
+        def waitForSession(self):
+            return self._waiting_fun()
+
+        def getDeviceCode(self):
+            return self._autn.device_code
+
+        def getUserCode(self):
+            return self._auth.user_code
+
+        def getVerificationUri(self):
+            return self._auth.verification_uri
+
+        def getVerificationUriComplete(self):
+            return self._autn.verification_uri_complete
+
+        def getExpiresIn(self):
+            return self._autn.expires_in
+
     def _establish(self, reset:bool = False) -> Session:
         access_token = self._stash.get("access_token")
         refresh_token = self._stash.get("refresh_token")
@@ -43,22 +66,28 @@ class ServiceAlle(ManagementService):
 
         if access_token == None or reset:
             auth = Authenticator.start_device_flow(self._req)
+
             auth.printMessage()
             auth.printDetails()
-            session = auth.poll_for_token(self._req)
 
-            self._stash.set("access_token", session.access_token)
-            self._stash.set("refresh_token", session.refresh_token)
-            self._stash.setDate("expires_on", session.expires_on)
-            self._stash.save()
-        else:
-            session = Session(self._req, access_token, refresh_token, expires_on)
-            if not session.isFresh():
-                if session.isStale():
-                    self.refresh(session)
-                else:
-                    print("Session is stale, trying to connect anyway.")
-                    self.refresh(session)
+            def wait_for_user_authentification():
+                session = auth.poll_for_token(self._req)
+
+                self._stash.set("access_token", session.access_token)
+                self._stash.set("refresh_token", session.refresh_token)
+                self._stash.setDate("expires_on", session.expires_on)
+                self._stash.save()
+                return session
+
+            return ServiceAlle.Pending(wait_for_user_authentification, auth)
+
+        session = Session(self._req, access_token, refresh_token, expires_on)
+        if not session.isFresh():
+            if session.isStale():
+                self.refresh(session)
+            else:
+                print("Session is stale, trying to connect anyway.")
+                self.refresh(session)
 
             # session is fresh, let's use it
 

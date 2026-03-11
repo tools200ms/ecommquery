@@ -1,8 +1,8 @@
-from ecommquery.lib.error import ServiceConnactionError
+from ecommquery.lib.error import NetworkConnectionError, UserMissAction
 
 
-class AllegroConnectionError(ServiceConnactionError):
+class AllegroConnectionError(NetworkConnectionError):
     pass
 
-class AllegroConnectionTimeOutUserAuthorizationError(AllegroConnectionError):
+class AllegroConnectionTimeOutUserAuthorizationError(UserMissAction):
     pass

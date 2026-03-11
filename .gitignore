@@ -38,6 +38,8 @@ venv/
 .venv/
 *.log
 poetry.lock
+log/
+logs/
 
 # Igonore compiled Python bytecode or other temporary files
 # gnerated by Python
