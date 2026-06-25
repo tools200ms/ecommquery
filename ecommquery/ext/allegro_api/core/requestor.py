@@ -11,7 +11,7 @@ from ecommquery.ext.allegro_api.lib.constants import (BASE_URL,
 
 class Requestor:
 
-    def __init__(self, client_id, client_secret, sandbox: bool = False):
+    def __init__(self, client_id, client_secret, options, sandbox: bool = False):
         # Create a Basic Auth header manually (same as curl)
         credentials = f"{client_id}:{client_secret}"
         b64_credentials = base64.b64encode(credentials.encode()).decode()
@@ -19,8 +19,11 @@ class Requestor:
         self.client_id = client_id
         self.headers = {
             "Authorization": f"Basic {b64_credentials}",
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/x-www-form-urlencoded"
         }
+
+        if options.use_http_user_agent_str is not None:
+            self.headers['User-Agent'] = options.use_http_user_agent_str
         
         if not sandbox:
             self._base_url = BASE_URL

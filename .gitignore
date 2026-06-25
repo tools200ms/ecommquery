@@ -12,6 +12,8 @@ conf/
 conf
 conf/
 conf
+config/
+config
 aiquery/
 aiquery
 prompts/
@@ -20,8 +22,11 @@ prompts
 # Data & dump directory
 data/
 dump/
+dumps/
+
 # report directory
 report/
+reports/
 
 # '~' ending (backup) files
 *~

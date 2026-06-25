@@ -16,6 +16,19 @@ class Validator:
 
         return len(str) < 512
 
+    @staticmethod
+    def onelinetext(str):
+        try:
+            str.encode('utf-8')
+        except UnicodeEncodeError:
+            return False
+
+        str = str.strip()
+        if len(str.splitlines()) != 1:
+            return False
+
+        return len(str) < 512
+
 class ParamValidator:
     @abstractmethod
     def validate(self, value: str) -> (bool, object):

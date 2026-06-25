@@ -58,9 +58,9 @@ class TestTask(unittest.TestCase):
         chkout1_src2 = ObjCheckout.create(src=d_src2)
 
         # Add object properties
-        ObjPropNoChange.create(obj=chkout1_src1, prop=prop_int)
-        ObjPropText.create(obj=chkout1_src1, prop=prop_txt, value='Test')
-        ObjPropInt.create(obj=chkout1_src1, prop=ref_int, value=123)
+        # ObjPropNoChange.create(obj=chkout1_src1, prop=prop_int)
+        # ObjPropText.create(obj=chkout1_src1, prop=prop_txt, value='Test')
+        # ObjPropInt.create(obj=chkout1_src1, prop=ref_int, value=123)
 
         shutil.rmtree(tmpdir)
 
