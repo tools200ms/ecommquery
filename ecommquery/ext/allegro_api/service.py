@@ -18,8 +18,11 @@ from ecommquery.ext.allegro_api.lib.errors import AllegroConnectionError
 
 class ServiceAlle(ManagementService):
 
-    def __init__(self, client_id:str, client_secret:str, sandbox: bool, verbose: bool, debug: bool, pretend: bool):
-        self._req = Requestor(client_id, client_secret, sandbox)
+    def __init__(self, client_id:str, client_secret:str, options:{}, sandbox: bool, verbose: bool, debug: bool, pretend: bool):
+        if debug == True:
+            options['debug'] = debug
+
+        self._req = Requestor(client_id, client_secret, options, sandbox)
 
         module = Endpoint.getEpName(self.__class__)
 

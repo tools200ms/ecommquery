@@ -26,9 +26,8 @@ unidecode = "^1.4"
 urllib3 = "^2.6"
 openai = "^2.14"
 packaging = "^24.2"
-validators = "^0.35"
 peewee = "^3.18.3"
-validators = "^0.35.0"
+validators = "^0.35"
 
 [poetry.group.dev.dependencies]
 pytest = "^7.4" # For testing

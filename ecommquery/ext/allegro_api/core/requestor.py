@@ -1,5 +1,6 @@
 
 import base64
+
 import requests
 
 from ecommquery.ext.allegro_api.lib.constants import (BASE_URL,
@@ -21,10 +22,16 @@ class Requestor:
             "Authorization": f"Basic {b64_credentials}",
             "Content-Type": "application/x-www-form-urlencoded"
         }
+        self.common_headers = {}
 
-        if options.use_http_user_agent_str is not None:
-            self.headers['User-Agent'] = options.use_http_user_agent_str
-        
+        if options.get('use_http_user_agent_str'):
+            self.common_headers['User-Agent'] = options['use_http_user_agent_str']
+
+        if options.get('debug') == True:
+            # Set debug level to 1 to dump all HTTP traffic to stdout
+            import http
+            http.client.HTTPConnection.debuglevel = 1
+
         if not sandbox:
             self._base_url = BASE_URL
             self._api_base_url = API_BASE_URL
@@ -39,7 +46,7 @@ class Requestor:
     def post(self, request_to: PathTo, params):
         return requests.post(
              self._base_url + request_to.getPath(),
-             headers=self.headers,
+             headers=(self.headers | self.common_headers),
              params=params
          )
 
@@ -50,8 +57,10 @@ class Requestor:
             "Content-Type": "application/vnd.allegro.public.v1+json"
         }
 
+        all_headers = headers | self.common_headers
+
         session = requests.Session()
 
-        return (lambda path, params: session.get(self._api_base_url + path, headers=headers, params=params),
-                lambda path, params: session.post(self._api_base_url + path, headers=headers, params=params),
-                lambda path, params, payload: session.patch(self._api_base_url + path, headers=headers, params=params, json=payload))
+        return (lambda path, params: session.get(self._api_base_url + path, headers=all_headers, params=params),
+                lambda path, params: session.post(self._api_base_url + path, headers=all_headers, params=params),
+                lambda path, params, payload: session.patch(self._api_base_url + path, headers=all_headers, params=params, json=payload))

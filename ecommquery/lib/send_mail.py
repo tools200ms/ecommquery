@@ -2,6 +2,16 @@ import smtplib
 
 # Simple SMTP wrapper
 
+class FakeSendMail:
+    def __init__(self):
+        pass
+
+    def send(self, to_addr: [str], cc_addr: [str] = None, msg: str = "", subject: str = 'No Subject'):
+        print("Mail TO: " + ", ".join(to_addr))
+        print("Mail CC: " + ", ".join(cc_addr) )
+        print("Mail Subject: " + subject)
+        print("Mail Message: \n" + msg)
+
 class SendMail:
     def __init__(self, from_email: str, hostname:str='localhost', port:int = 25):
         self._sendmail_from = from_email

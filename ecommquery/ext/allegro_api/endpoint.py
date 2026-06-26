@@ -1,6 +1,6 @@
 
 from ecommquery.ecommquery import Mode
-from ecommquery.core.validators import YesNoValidator, GenericKeyValidator
+from ecommquery.core.validators import YesNoValidator, GenericKeyValidator, Validator
 
 from ecommquery.core.endpoint import Endpoint
 from ecommquery.ext.allegro_api.service import ServiceAlle
@@ -34,7 +34,7 @@ class EndpointAlle(Endpoint):
         options = { 'use_http_user_agent_str': None }
 
         if self._http_user_agent:
-            options.use_http_user_agent_str = self._http_user_agent
+            options['use_http_user_agent_str'] = self._http_user_agent
 
         return ServiceAlle(self._client_id, self._client_secret, options, self._sandbox, **Mode.as_args(mode))
 
