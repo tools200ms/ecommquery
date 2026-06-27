@@ -5,6 +5,7 @@ services:
       - FEATURE=python sudo
       - SUDOERS=true
       - PKGS_ADD=poetry sqlite
+      #- TZ=Europe/Warsaw
     volumes:
       - ./pyproject.toml:/app/pyproject.toml:ro
       - ./README.md:/app/README.md:ro
