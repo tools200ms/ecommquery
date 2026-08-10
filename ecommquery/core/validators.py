@@ -96,6 +96,9 @@ class YesNoValidator (ParamValidator):
     def getDefaultValue(self):
         return self.__def_val
 
+# TODO: add options:
+# IF_DIR_EXISTS, IF_FILE_EXISTS
+# CREATE_IF_MISSING_DIR, CREATE_IF_MISSING_FILE
 class PathValidator(ParamValidator):
     def __init__(self, def_path: str):
         if not self.validate(def_path):
@@ -107,9 +110,9 @@ class PathValidator(ParamValidator):
         try:
             Path(path).resolve()
         except (OSError, RuntimeError):
-            return False
+            return False, path
 
-        return len(path) < 1024
+        return len(path) < 1024, path
 
     def getDefaultValue(self):
         return self.__def_path

@@ -74,6 +74,7 @@ In this case `{product.descr}` inserts Product's description into a prompt messa
 Let's develop a task that will assign product categories based on AI prompt response: 
 
 ```python
+import json
 from ecommquery import *
 from ecommquery.core.loader_ini import IniLoader
 from ecommquery.exceptions import EcommQueryError
@@ -82,8 +83,8 @@ try:
     integr = Integrations()
     integr.addLoaderAndRead(IniLoader('./config.ini'))
 
-    ps = inegr.getService(endpoint='prestashop')
-    ai = inegr.getService(endpoint='chatgpt')
+    ps = integr.getService(endpoint='prestashop')
+    ai = integr.getService(endpoint='chatgpt')
 
     for prod_id in ps.getProductList():
         prod = ps.getProduct(prod_id)
@@ -91,7 +92,7 @@ try:
         res = ai.sendPrompt('assign_cat_for', [prod])
         
         prod.addCat(json.loads(res))
-        ps.commitProduct(the_prod)
+        ps.commitProduct(prod)
 
     ai.close()
     ps.close()

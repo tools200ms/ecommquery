@@ -37,7 +37,7 @@ class EndpointAsOpenAI(Endpoint):
     def name():
         return "OpenAI ChatGPT API"
 
-    def __init__(self, params: {}):
+    def __init__(self, params: {}, id:str):
         super().__init__( {'version': Endpoint.Constr(
                                     ListValidator( EndpointAsOpenAI.model_versions, 0) ),
                            'key': Endpoint.Constr(
@@ -46,11 +46,11 @@ class EndpointAsOpenAI(Endpoint):
                                         # characters (assuming that UPPER case characters are curently used)
                                         # this code sould handle change without updates.
                                         # Exact validation is made by library that talks to API
-                                        RegExValidator('[a-zA-Z0-9|-|_]{16,96}')),
+                                        RegExValidator('[-|_|a-zA-Z0-9]{64,256}')),
                            'queries': Endpoint.Constr(PathValidator('queries'),
                                 alt_name = 'queries_path')
                                     },
-                         params )
+                         params, id )
 
     def info(self):
         return "Model version: " + self._version
