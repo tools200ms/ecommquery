@@ -10,23 +10,31 @@ from ecommquery.ecommquery import Mode
 class EndpointAsOpenAI(Endpoint):
 
     model_versions: Final = (
-        # GPT-4 Family
-        "gpt-4",              # Standard GPT-4 model with full capabilities, high accuracy.
-        "gpt-4-turbo",        # Optimized version of GPT-4; faster and cheaper.
+        # GPT-5.6 Family
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
+        "gpt-5.6-luna",
 
-        # GPT-3.5 Family
-        "gpt-3.5",            # Standard GPT-3.5 model; less capable than GPT-4 but effective.
-        "gpt-3.5-turbo",      # Optimized version of GPT-3.5; faster and more cost-efficient.
+        # GPT-5 Family
+        "gpt-5",
+        "gpt-5-pro",
+        "gpt-5-mini",
+        "gpt-5-nano",
+        # GPT / Reasoning / Chat (code & general text)
+        "gpt-4o",  # flagship multimodal/general model
+        "gpt-4o-mini",  # faster/cheaper general model
 
-        # Codex Family (For Code Completion Tasks)
-        "code-davinci-002",   # Advanced code generation model, high accuracy for coding tasks.
-        "code-cushman-001",   # Lightweight code completion model, faster but less powerful.
+        # (Optional) If you want separate “reasoning” models too
+        # "o1",
+        # "o3",
 
-        # Embedding Models
-        "text-embedding-ada-002",  # Embedding model for search, similarity, and NLP tasks.
+        # Embeddings (replacement for text-embedding-ada-002)
+        "text-embedding-3-small",
+        "text-embedding-3-large",
 
-        # Moderation Models
-        "moderation-latest"   # Model for content moderation tasks; ensures safe usage.
+        # Moderation
+        "text-moderation-latest",
+        "text-moderation-stable",
     )
 
     @staticmethod

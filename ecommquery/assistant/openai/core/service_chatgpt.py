@@ -37,13 +37,15 @@ class ServiceChatGPT(AnalyticalService):
 
         prompt = q.compileQueryText(params)
 
+        # 'system', 'assistant', 'user', 'function', 'tool', and 'developer'
         try:
-            response = self.__client.chat.completions.create(
+            response = self.__client.responses.create(
                 model = self.__model_name,
-                messages = [
-                    { "role": "assistant",
-                      "content": prompt },
-                ],
+                input = prompt,
+                #messages = [
+                #    { "role": "assistant",
+                #      "content": prompt },
+                #],
                 # functfions = [
                 # { "name": "createResultObject",
                 #   "parameters": {
@@ -66,7 +68,7 @@ class ServiceChatGPT(AnalyticalService):
                 # }],
                 # function_call = {"name": "createResultObject"},
                 stream = False,
-                max_tokens = 1080  # Maximum number of tokens to generate in the completion
+                #max_tokens = 16384  # Maximum number of tokens to generate in the completion
             )
 
         except openai.RateLimitError as rl_err:
@@ -94,7 +96,8 @@ class ServiceChatGPT(AnalyticalService):
 
     def _process_answer(self, response):
         resp_text=""
-        r = response.choices
+
+        return response.output_text
         #generated_texts = [
         #    choice.message["content"].strip() for choice in response["choices"]
         #]
