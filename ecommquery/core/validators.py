@@ -4,6 +4,7 @@ from pathlib import Path
 from abc import abstractmethod
 
 from ecommquery.exceptions import LocalResourceAccessError, CallError
+from email_validator import validate_email, EmailNotValidError
 
 
 class Validator:
@@ -58,6 +59,43 @@ class ListValidator (ParamValidator):
 
         return self.__list[self.__def_idx]
 
+class LoginNameValidator:
+
+    MAX_LOGIN_NAME_LENGTH = 64
+
+    def __init__(self, obligatory_letter_first: bool = True, also_accept_email: bool = False):
+        if obligatory_letter_first:
+            self._base_validation = self._first_must_be_aletter
+        else:
+            self._base_validation = self._there_must_be_aletter
+
+        self._accept_email = also_accept_email
+
+    def validate(self, name: str) -> (bool, object):
+        name = name.strip()
+        if len(name) > LoginNameValidator.MAX_LOGIN_NAME_LENGTH:
+            return False, None
+
+        res, name = self._base_validation(name.lower())
+
+        if self._accept_email:
+            try:
+                email_info = validate_email(name, check_deliverability=True)
+                name = email_info.deliverable_address
+                res = True
+            except EmailNotValidError as e:
+                return False, None
+
+        return res, name
+
+    @staticmethod
+    def _first_must_be_aletter(name: str):
+        return re.fullmatch(r'^[a-z][a-z0-9_.-]*$', name) != None, name
+
+    @staticmethod
+    def _there_must_be_aletter(name: str):
+        return name.isdigit() == False and re.fullmatch(r'^[a-z0-9_.-]*$', name) != None, name
+
 
 class RegExValidator (ParamValidator):
     def __init__(self, pattern):
@@ -90,7 +128,6 @@ class YesNoValidator (ParamValidator):
             return True, False
 
         return False, None
-
 
 
     def getDefaultValue(self):

@@ -7,3 +7,6 @@ class UserMissAction(Exception):
 # Something has happen on the network - not our fault.
 class NetworkConnectionError(Exception):
     pass
+
+class ExternalServiceError(Exception):
+    pass
