@@ -20,6 +20,7 @@ WORKDIR /app
 COPY pyproject.toml poetry.lock ./
 
 # Install prod dependencies only
+# if fails, probably need to call 'poetry lock' at host
 RUN poetry install --only main --no-root
 
 # ---------- Runtime stage ----------
@@ -43,4 +44,4 @@ RUN mkdir -p logs && chown -R appuser:appuser logs
 
 USER appuser
 
-CMD ["python", "main.py"]
+CMD ["python", "-m", "ecommquery"]

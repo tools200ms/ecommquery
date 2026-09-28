@@ -6,5 +6,7 @@ class about:
 Welcome to {NAME}: e-commerce integration tool: 
     https://github.com/tools200ms/ecommquery
     version: {VERSION}
+
+Use 'man()' for manual
 """
     EXEC_NAME = "ecommquery"

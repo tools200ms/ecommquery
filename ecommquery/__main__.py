@@ -13,6 +13,8 @@ def main():
     logger = logging.getLogger(__name__)
     logger.info("Application started")
 
+    from .lib.manual import Man
+    man = Man.print_man
     code.interact(banner=about.BANNER, local=locals())
 
     return 0
