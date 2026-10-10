@@ -6,7 +6,7 @@ Its concept is based on endpoints that can be of type:
 - **Data source** is an endpoint allowing product and product related data access. One of the data sources is PrestaShop API.
 - **AI assistant** is an interface for prompting AI (such as OpenAI's ChatGPT) with purpose of doing a certain operations on product or product related data.
 
-EcommQuery uses a simple self-explaing prompt file format: 
+EcommQuery uses a simple self-explaining prompt file format: 
 ```
 # file: product.prompt.txt
 
